@@ -1,6 +1,9 @@
 import { saveNow } from "../systems/saveManager.js";
 import { playSe } from "../systems/audioManager.js";
 
+const ROOT = new URL("../../", import.meta.url);
+const asset = (p) => new URL(String(p || "").replace(/^\/+/, ""), ROOT).toString();
+
 function isStageUnlocked(stage, save) {
   const cond = stage.unlock_condition?.type ?? "always";
   if (cond === "always") return true;
@@ -19,62 +22,61 @@ function getItemById(items, id) {
   return (items || []).find((it) => it?.item_id === id) ?? null;
 }
 
+function resolveMaybeAssetPath(p) {
+  if (!p) return "";
+  // master が "/assets/..." を返しても吸収する
+  if (/^https?:\/\//.test(p) || /^data:/.test(p)) return p;
+  return asset(p);
+}
+
 function safeMiniLayer(src, cls) {
-  if (!src) return "";
-  return `<img class="av-mini-layer ${cls}" src="${src}" alt="" onerror="this.style.opacity=0.25" />`;
+  const u = resolveMaybeAssetPath(src);
+  if (!u) return "";
+  return `<img class="av-mini-layer ${cls}" src="${u}" alt="" onerror="this.style.opacity=0.25" />`;
 }
 
 export function renderHome({ state, goto, params }) {
   const { save, masters } = state;
   const section = params?.section ?? "modes"; // "modes" | "story"
 
-  // 表示値
   const playerName = save.player?.name || "プレイヤー名未設定";
 
   const equippedTitleId = save.titles?.equippedTitleId ?? null;
   const unlockedTitleIds = save.titles?.unlockedTitleIds ?? [];
 
-  // ✅ titles.json は title_id が正。旧サンプル互換で id も許容
   const equippedTitle =
     (masters.titles || []).find((t) => (t.title_id ?? t.id) === equippedTitleId) ?? null;
   const equippedTitleName = equippedTitle ? equippedTitle.name : "称号なし";
 
   const coins = save.economy?.coins ?? 0;
 
-  // アバター合成ミニ用（装備）
   const avatarItems = masters?.avatar_items ?? masters?.avatarItems ?? [];
   const eq = save.avatar?.equipped ?? { body: null, head: null };
   const eqBody = getItemById(avatarItems, eq.body);
   const eqHead = getItemById(avatarItems, eq.head);
 
-  // storyステージ一覧
   const storyStages = (masters.stages || []).filter((s) => s.mode === "story");
 
-  // ボタン設定（旧レイアウトのまま）
   const btnsTop = [
-    { key: "story",      label: "ステージ",       icon: "/assets/images/icon_story.png",       onClick: () => goto("#home?section=story"), disabled: false },
-    { key: "timeAttack", label: "タイムアタック", icon: "/assets/images/icon_timeattack.png", onClick: () => goto("#timeAttack"), disabled: false },
-    { key: "endless",    label: "エンドレス",     icon: "/assets/images/icon_endless.png",    onClick: () => goto("#endless"), disabled: false },
+    { key: "story",      label: "ステージ",       icon: asset("assets/images/icon_story.png"),       onClick: () => goto("#home?section=story"), disabled: false },
+    { key: "timeAttack", label: "タイムアタック", icon: asset("assets/images/icon_timeattack.png"), onClick: () => goto("#timeAttack"), disabled: false },
+    { key: "endless",    label: "エンドレス",     icon: asset("assets/images/icon_endless.png"),    onClick: () => goto("#endless"), disabled: false },
   ];
 
-  // ✅ 対戦は準備中（グレーアウト＋押せない）
-  const btnBattle = { key: "battle", label: "対戦（準備中）", icon: "/assets/images/icon_battle.png", onClick: () => goto("#battle"), disabled: true };
+  const btnBattle = { key: "battle", label: "対戦（準備中）", icon: asset("assets/images/icon_battle.png"), onClick: () => goto("#battle"), disabled: true };
 
   const btnsBottom = [
-    { key: "avatar",  label: "アバター",   icon: "/assets/images/icon_avatar.png",  onClick: () => goto("#avatar"),  disabled: false },
-    { key: "gacha",   label: "ガチャ",     icon: "/assets/images/icon_gacha.png",   onClick: () => goto("#gacha"),   disabled: false },
-    { key: "options", label: "オプション", icon: "/assets/images/icon_options.png", onClick: () => goto("#options"), disabled: false },
+    { key: "avatar",  label: "アバター",   icon: asset("assets/images/icon_avatar.png"),  onClick: () => goto("#avatar"),  disabled: false },
+    { key: "gacha",   label: "ガチャ",     icon: asset("assets/images/icon_gacha.png"),   onClick: () => goto("#gacha"),   disabled: false },
+    { key: "options", label: "オプション", icon: asset("assets/images/icon_options.png"), onClick: () => goto("#options"), disabled: false },
   ];
 
-  // DOMイベント
   setTimeout(() => {
-    // アバターミニアイコン → アバター画面へ
     document.getElementById("avatarMiniBtn")?.addEventListener("click", () => {
       playSe("assets/sounds/se/se_decide.mp3", { volume: 0.85 });
       goto("#avatar");
     });
 
-    // プレイヤー名モーダル
     document.getElementById("playerNameBtn")?.addEventListener("click", () => {
       const modal = document.getElementById("playerModal");
       const input = document.getElementById("playerNameInput");
@@ -94,7 +96,6 @@ export function renderHome({ state, goto, params }) {
       goto("#home");
     });
 
-    // 称号モーダル
     document.getElementById("titleBtn")?.addEventListener("click", () => {
       const modal = document.getElementById("titleModal");
       if (modal) modal.style.display = "flex";
@@ -114,7 +115,6 @@ export function renderHome({ state, goto, params }) {
       });
     });
 
-    // ホームのメニュー押下（決定SE）
     document.querySelectorAll("[data-home-btn]")?.forEach((el) => {
       el.addEventListener("click", () => {
         const k = el.getAttribute("data-home-btn");
@@ -137,7 +137,6 @@ export function renderHome({ state, goto, params }) {
       });
     });
 
-    // ステージ選択（決定SE）
     document.querySelectorAll(".stage[href^='#quiz']")?.forEach((el) => {
       el.addEventListener("click", (e) => {
         const disabled = el.getAttribute("aria-disabled") === "true";
@@ -149,13 +148,11 @@ export function renderHome({ state, goto, params }) {
       });
     });
 
-    // ステージ一覧から戻る（決定SE）
     document.getElementById("backToModesBtn")?.addEventListener("click", () => {
       playSe("assets/sounds/se/se_decide.mp3", { volume: 0.85 });
       goto("#home");
     });
 
-    // モーダル背景タップで閉じる
     document.querySelectorAll(".modal")?.forEach((m) => {
       m.addEventListener("click", (e) => {
         if (e.target === m) m.style.display = "none";
@@ -191,7 +188,6 @@ export function renderHome({ state, goto, params }) {
     `;
   }).join("");
 
-  // ===== HUD 2行（モード画面） =====
   const hud2Rows = `
     <div class="hud">
       <div class="hud-row1">
@@ -222,7 +218,6 @@ export function renderHome({ state, goto, params }) {
   const modesHtml = `
     ${hud2Rows}
 
-    <!-- メニュー領域：縦中央寄せ -->
     <div class="menu-area">
       <div class="home-grid3">
         ${btnsTop.map(iconButton).join("")}
@@ -256,8 +251,10 @@ export function renderHome({ state, goto, params }) {
     </div>
   `;
 
+  const homeBg = asset("assets/images/home_bg.png");
+
   return `
-    <div class="home-screen" style="background-image:url('/assets/images/home_bg.png');">
+    <div class="home-screen" style="background-image:url('${homeBg}');">
       <div class="home-overlay">
         <div class="card home-card">
           <div class="card-inner home-inner">
@@ -369,7 +366,6 @@ export function renderHome({ state, goto, params }) {
         min-height: calc(100vh - 18px*2 - 14px*2 - 2px);
       }
 
-      /* ===== HUD（2行） ===== */
       .hud{
         display:flex;
         flex-direction:column;
@@ -438,7 +434,6 @@ export function renderHome({ state, goto, params }) {
       .hud-title{ width: 100%; }
       .hud-pill.hud-coin{ cursor: default; text-align:center; }
 
-      /* story表示時は既存の3列HUD */
       .hud-row.hud-row-story{
         display:grid;
         grid-template-columns: 1fr auto auto;
@@ -451,7 +446,6 @@ export function renderHome({ state, goto, params }) {
       }
       .hud-pill.hud-static{ cursor: default; }
 
-      /* ===== メニュー（縦中央寄せ） ===== */
       .menu-area{
         flex:1;
         display:flex;
@@ -527,7 +521,6 @@ export function renderHome({ state, goto, params }) {
         text-shadow: none;
       }
 
-      /* ===== モーダル：白カード ===== */
       .modal{
         display:none;
         position:fixed;

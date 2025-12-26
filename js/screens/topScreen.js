@@ -1,23 +1,25 @@
 // js/screens/topScreen.js
 import { playSe } from "../systems/audioManager.js";
 
+const ROOT = new URL("../../", import.meta.url);
+const asset = (p) => new URL(String(p || "").replace(/^\/+/, ""), ROOT).toString();
+
 export function renderTop({ goto }) {
-  // イベント登録
   setTimeout(() => {
     const startBtn = document.getElementById("startBtn");
-
-    // クリック/タップで決定音 → ホームへ
     startBtn?.addEventListener("click", () => {
       playSe("assets/sounds/se/se_decide.mp3", { volume: 0.85 });
       goto("#home");
     });
   }, 0);
 
+  const topBg = asset("assets/images/top_bg.png");
+
   return `
     <div class="top-screen">
       <img
         class="top-bg"
-        src="/assets/images/top_bg.png"
+        src="${topBg}"
         alt="Top Background"
         onerror="this.style.display='none'"
       />
