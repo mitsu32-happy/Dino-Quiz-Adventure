@@ -119,29 +119,45 @@ export function renderResult({ state, goto }) {
   // 詳細（通常ステージのみ）
   const showDetails = run.mode === "stage" && Array.isArray(run.answers) && run.answers.length > 0;
   const detailsHtml = showDetails
-    ? run.answers.map((a, idx) => {
-        const q = masters?.questionById?.get?.(a.qid);
-        if (!q) return "";
-        const chosen = (a.chosenIndex == null) ? "（未回答）" : (q.choices?.[a.chosenIndex]?.label ?? "（不明）");
-        const correct = (q.choices?.[a.correctIndex]?.label ?? "（不明）");
-        const ok = a.isCorrect;
+? run.answers.map((a, idx) => {
+    // ✅ 旧形式/新形式どちらでも拾えるように正規化
+    const qid = a.qid ?? a.questionId ?? a.question_id ?? a.id;
+    const q = masters?.questionById?.get?.(qid);
+    if (!q) return "";
 
-        return `
-          <div class="stage" style="pointer-events:none;">
-            <div class="row" style="justify-content:space-between;">
-              <div style="font-weight:900;">Q${idx + 1}</div>
-              <div class="pill" style="color:${ok ? "var(--good)" : "var(--bad)"}">${ok ? "正解" : "不正解"}</div>
-            </div>
-            <div class="space" style="height:6px;"></div>
-            <div style="font-weight:900; line-height:1.5;">${safeText(q.question_text)}</div>
-            <div class="space" style="height:6px;"></div>
-            <div class="notice">
-              あなた：${safeText(chosen)}<br/>
-              正解：${safeText(correct)}
-            </div>
-          </div>
-        `;
-      }).join("")
+    const chosenIndex =
+      (a.chosenIndex ?? a.selectedIndex ?? a.choiceIndex ?? a.selected_index);
+    const correctIndex =
+      (a.correctIndex ?? a.correct_index ?? a.answerIndex ?? a.answer_index ?? getCorrectIndex(q));
+
+    const okRaw =
+      (a.isCorrect ?? a.correct ?? a.is_correct);
+    const ok = (okRaw === true);
+
+    const chosen = (chosenIndex == null)
+      ? "（未回答）"
+      : (q.choices?.[chosenIndex]?.label ?? "（不明）");
+
+    const correct = (correctIndex == null)
+      ? "（不明）"
+      : (q.choices?.[correctIndex]?.label ?? "（不明）");
+
+    return `
+      <div class="stage" style="pointer-events:none;">
+        <div class="row" style="justify-content:space-between;">
+          <div style="font-weight:900;">Q${idx + 1}</div>
+          <div class="pill" style="color:${ok ? "var(--good)" : "var(--bad)"}">${ok ? "正解" : "不正解"}</div>
+        </div>
+        <div class="space" style="height:6px;"></div>
+        <div style="font-weight:900; line-height:1.5;">${safeText(q.question_text)}</div>
+        <div class="space" style="height:6px;"></div>
+        <div class="notice">
+          あなた：${safeText(chosen)}<br/>
+          正解：${safeText(correct)}
+        </div>
+      </div>
+    `;
+  }).join("")
     : "";
 
   // 称号UI用

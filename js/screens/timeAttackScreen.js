@@ -1,6 +1,14 @@
 import { saveNow } from "../systems/saveManager.js";
 import { playSe } from "../systems/audioManager.js";
 
+/**
+ * タイムアタック
+ * - ✅ バグ修正：問題回答ごとにタイマーが加速する（tick増殖）問題を解消
+ *   -> requestAnimationFrame / interval / ループSE を「画面世代(session)」で管理し、再描画時に必ず停止
+ * - ✅ GitHub Pages(Project Pages)対応：/assets/... の絶対パスを使わず、import.meta.url から解決
+ * - CSSは外部化して1回だけ読み込む（共通CSS=endless.css + 専用CSS=timeAttack.css）
+ */
+
 // GitHub Pages (Project Pages) / ローカル両対応：このモジュール位置から assets を解決する
 const ROOT = new URL("../../", import.meta.url);
 const asset = (p) => new URL(String(p || "").replace(/^\/+/, ""), ROOT).toString();
@@ -10,12 +18,6 @@ const normalizeAsset = (p) => {
   if (/^https?:\/\//.test(s) || /^data:/.test(s)) return s;
   return asset(s);
 };
-
-/**
- * タイムアタック
- * - ✅ バグ修正：問題回答ごとに timer tick が増殖して加速する問題を解消
- *   -> requestAnimationFrame / interval / ループSE を「画面世代(session)」で管理し、再描画時に必ず停止
- */
 
 function ensureCssLoadedOnce(href, id) {
   if (document.getElementById(id)) return;
@@ -68,7 +70,7 @@ function imgWithFallback(className, primarySrc, fallbackSrcList = []) {
 }
 
 // ✅ 画面ライフサイクル用：以前のタイマー/interval/SEを止める
-function stopTimeAttackRuntime(run) {
+function stopRuntime(run) {
   try {
     if (run?._rafId) cancelAnimationFrame(run._rafId);
   } catch (_) {}
@@ -90,7 +92,8 @@ function stopTimeAttackRuntime(run) {
 }
 
 export function renderTimeAttack({ state, goto }) {
-  // ✅ CSSを1回だけ読み込む（崩れ対策）
+  // ✅ 共通CSS（quiz画面系） + タイムアタック専用CSS
+  ensureCssLoadedOnce(asset("assets/css/endless.css"), "quiz-base-css");
   ensureCssLoadedOnce(asset("assets/css/timeAttack.css"), "time-attack-css");
 
   const { save, masters } = state;
@@ -136,9 +139,8 @@ export function renderTimeAttack({ state, goto }) {
 
   const run = state.timeAttackRun;
 
-  // ✅ ここが肝：再描画のたびに、古いランタイムを必ず停止
-  // （これをしないと tick が積み上がって「加速」する）
-  stopTimeAttackRuntime(run);
+  // ✅ 再描画のたびに古いランタイムを必ず停止（tick増殖を防ぐ）
+  stopRuntime(run);
 
   // ✅ 今回描画の“世代”ID
   run._sessionId = (run._sessionId || 0) + 1;
@@ -148,6 +150,7 @@ export function renderTimeAttack({ state, goto }) {
   const q = questionById ? questionById.get(qid) : allQuestions.find((x) => x.id === qid);
 
   if (!q) {
+    stopRuntime(run);
     state.timeAttackRun = null;
     goto("#home");
     return "";
@@ -194,8 +197,8 @@ export function renderTimeAttack({ state, goto }) {
     `;
   }).join("");
 
+  // DOMイベント/タイマー
   setTimeout(() => {
-    // ✅ 画面がすでに次世代に切り替わってたら何もしない
     if (state.timeAttackRun !== run) return;
     if (run._sessionId !== mySessionId) return;
 
@@ -273,7 +276,7 @@ export function renderTimeAttack({ state, goto }) {
       save.stats.timeAttackBest = Math.max(save.stats.timeAttackBest || 0, run.correct);
       saveNow(save);
 
-      stopTimeAttackRuntime(run);
+      stopRuntime(run);
       state.timeAttackRun = null;
       goto("#result");
     }
@@ -281,19 +284,17 @@ export function renderTimeAttack({ state, goto }) {
     function nextQuestion() {
       answeredThisQ = false;
       run.cursor += 1;
-      // ✅ 次へ行く前に今世代のランタイムを停止（念のため）
-      stopTimeAttackRuntime(run);
+      stopRuntime(run);
       goto("#timeAttack");
     }
 
     setTimerText();
     setScoreText();
 
-    // ✅ RAF tick：世代IDが変わったら自動停止
     run._lastNow = performance.now();
     const tick = (now) => {
       if (state.timeAttackRun !== run) return;
-      if (run._sessionId !== mySessionId) return; // 古い世代なら停止
+      if (run._sessionId !== mySessionId) return;
       if (run.finished) return;
 
       const dt = now - (run._lastNow ?? now);
@@ -326,7 +327,7 @@ export function renderTimeAttack({ state, goto }) {
     retireBtn?.addEventListener("click", () => {
       playSe("assets/sounds/se/se_decide.mp3", { volume: 0.8 });
       stopTimerSe();
-      stopTimeAttackRuntime(run);
+      stopRuntime(run);
       state.timeAttackRun = null;
       goto("#home");
     });
@@ -367,7 +368,6 @@ export function renderTimeAttack({ state, goto }) {
       });
     });
 
-    // タイプライター（これも世代ごとに1本）
     const fullText = String(q.question_text ?? "");
     let i = 0;
     const speedMs = 32;
