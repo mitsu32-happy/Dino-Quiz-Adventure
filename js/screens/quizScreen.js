@@ -185,6 +185,10 @@ export function renderQuiz({ state, goto, params }) {
     const typeEl = document.getElementById("typewriter");
     const verdictEl = document.getElementById("verdict");
 
+// ✅ 出題SE（問題表示のたびに1回）
+playSe("assets/sounds/se/se_question.mp3", { volume: 0.9 });
+
+
     const pauseBtn = document.getElementById("pauseBtn");
     const modal = document.getElementById("pauseModal");
     const resumeBtn = document.getElementById("resumeBtn");
