@@ -13,8 +13,8 @@ const normalizeAsset = (p) => {
 
 /**
  * タイムアタック
- * - CSSは外部化して1回だけ読み込む（多重評価による崩れ防止）
- * - レイアウトは quizScreen と同系統
+ * - ✅ バグ修正：問題回答ごとに timer tick が増殖して加速する問題を解消
+ *   -> requestAnimationFrame / interval / ループSE を「画面世代(session)」で管理し、再描画時に必ず停止
  */
 
 function ensureCssLoadedOnce(href, id) {
@@ -67,6 +67,28 @@ function imgWithFallback(className, primarySrc, fallbackSrcList = []) {
   `;
 }
 
+// ✅ 画面ライフサイクル用：以前のタイマー/interval/SEを止める
+function stopTimeAttackRuntime(run) {
+  try {
+    if (run?._rafId) cancelAnimationFrame(run._rafId);
+  } catch (_) {}
+  run._rafId = null;
+
+  try {
+    if (run?._typeIntervalId) clearInterval(run._typeIntervalId);
+  } catch (_) {}
+  run._typeIntervalId = null;
+
+  try {
+    run?._warnSe?.pause?.();
+    run?._urgentSe?.pause?.();
+  } catch (_) {}
+  run._warnSe = null;
+  run._urgentSe = null;
+
+  run._lastNow = null;
+}
+
 export function renderTimeAttack({ state, goto }) {
   // ✅ CSSを1回だけ読み込む（崩れ対策）
   ensureCssLoadedOnce(asset("assets/css/timeAttack.css"), "time-attack-css");
@@ -101,10 +123,26 @@ export function renderTimeAttack({ state, goto }) {
       remainMs: TOTAL_SEC * 1000,
       paused: false,
       finished: false,
+
+      // ✅ runtime
+      _sessionId: 0,
+      _rafId: null,
+      _typeIntervalId: null,
+      _lastNow: null,
+      _warnSe: null,
+      _urgentSe: null,
     };
   }
 
   const run = state.timeAttackRun;
+
+  // ✅ ここが肝：再描画のたびに、古いランタイムを必ず停止
+  // （これをしないと tick が積み上がって「加速」する）
+  stopTimeAttackRuntime(run);
+
+  // ✅ 今回描画の“世代”ID
+  run._sessionId = (run._sessionId || 0) + 1;
+  const mySessionId = run._sessionId;
 
   const qid = run.order[run.cursor % run.order.length];
   const q = questionById ? questionById.get(qid) : allQuestions.find((x) => x.id === qid);
@@ -157,6 +195,10 @@ export function renderTimeAttack({ state, goto }) {
   }).join("");
 
   setTimeout(() => {
+    // ✅ 画面がすでに次世代に切り替わってたら何もしない
+    if (state.timeAttackRun !== run) return;
+    if (run._sessionId !== mySessionId) return;
+
     const timerEl = document.getElementById("taTimerText");
     const scoreEl = document.getElementById("taScoreText");
     const verdictEl = document.getElementById("taVerdict");
@@ -168,17 +210,15 @@ export function renderTimeAttack({ state, goto }) {
     const retireBtn = document.getElementById("taRetireBtn");
 
     const choiceButtons = Array.from(document.querySelectorAll(".choice-btn"));
-
     let answeredThisQ = false;
 
     playSe("assets/sounds/se/se_question.mp3", { volume: 0.9 });
 
-    let warnSe = null;
-    let urgentSe = null;
     function stopTimerSe() {
-      warnSe?.pause();
-      urgentSe?.pause();
-      warnSe = urgentSe = null;
+      try { run._warnSe?.pause?.(); } catch (_) {}
+      try { run._urgentSe?.pause?.(); } catch (_) {}
+      run._warnSe = null;
+      run._urgentSe = null;
     }
 
     function setTimerText() {
@@ -186,13 +226,13 @@ export function renderTimeAttack({ state, goto }) {
       if (timerEl) timerEl.textContent = `⏱ ${clamp(sec, 0, 999)}`;
 
       if (sec <= 5) {
-        if (!urgentSe) {
+        if (!run._urgentSe) {
           stopTimerSe();
-          urgentSe = playSe("assets/sounds/se/se_timer_urgent.mp3", { loop: true, volume: 0.9 });
+          run._urgentSe = playSe("assets/sounds/se/se_timer_urgent.mp3", { loop: true, volume: 0.9 });
         }
       } else if (sec <= 10) {
-        if (!warnSe) {
-          warnSe = playSe("assets/sounds/se/se_timer_warn.mp3", { loop: true, volume: 0.8 });
+        if (!run._warnSe) {
+          run._warnSe = playSe("assets/sounds/se/se_timer_warn.mp3", { loop: true, volume: 0.8 });
         }
       }
     }
@@ -233,6 +273,7 @@ export function renderTimeAttack({ state, goto }) {
       save.stats.timeAttackBest = Math.max(save.stats.timeAttackBest || 0, run.correct);
       saveNow(save);
 
+      stopTimeAttackRuntime(run);
       state.timeAttackRun = null;
       goto("#result");
     }
@@ -240,18 +281,25 @@ export function renderTimeAttack({ state, goto }) {
     function nextQuestion() {
       answeredThisQ = false;
       run.cursor += 1;
+      // ✅ 次へ行く前に今世代のランタイムを停止（念のため）
+      stopTimeAttackRuntime(run);
       goto("#timeAttack");
     }
 
     setTimerText();
     setScoreText();
 
-    let last = performance.now();
+    // ✅ RAF tick：世代IDが変わったら自動停止
+    run._lastNow = performance.now();
     const tick = (now) => {
-      const dt = now - last;
-      last = now;
+      if (state.timeAttackRun !== run) return;
+      if (run._sessionId !== mySessionId) return; // 古い世代なら停止
+      if (run.finished) return;
 
-      if (!run.paused && !run.finished) {
+      const dt = now - (run._lastNow ?? now);
+      run._lastNow = now;
+
+      if (!run.paused) {
         run.remainMs -= dt;
         if (run.remainMs <= 0) {
           run.remainMs = 0;
@@ -261,9 +309,10 @@ export function renderTimeAttack({ state, goto }) {
         }
         setTimerText();
       }
-      requestAnimationFrame(tick);
+
+      run._rafId = requestAnimationFrame(tick);
     };
-    requestAnimationFrame(tick);
+    run._rafId = requestAnimationFrame(tick);
 
     pauseBtn?.addEventListener("click", () => {
       if (run.finished) return;
@@ -277,6 +326,7 @@ export function renderTimeAttack({ state, goto }) {
     retireBtn?.addEventListener("click", () => {
       playSe("assets/sounds/se/se_decide.mp3", { volume: 0.8 });
       stopTimerSe();
+      stopTimeAttackRuntime(run);
       state.timeAttackRun = null;
       goto("#home");
     });
@@ -317,16 +367,19 @@ export function renderTimeAttack({ state, goto }) {
       });
     });
 
+    // タイプライター（これも世代ごとに1本）
     const fullText = String(q.question_text ?? "");
     let i = 0;
     const speedMs = 32;
     if (typeEl) typeEl.textContent = "";
 
-    const t = setInterval(() => {
-      if (run.finished) { clearInterval(t); return; }
+    run._typeIntervalId = setInterval(() => {
+      if (state.timeAttackRun !== run) { clearInterval(run._typeIntervalId); return; }
+      if (run._sessionId !== mySessionId) { clearInterval(run._typeIntervalId); return; }
+      if (run.finished) { clearInterval(run._typeIntervalId); return; }
       if (run.paused) return;
-      if (!typeEl) { clearInterval(t); return; }
-      if (i >= fullText.length) { clearInterval(t); return; }
+      if (!typeEl) { clearInterval(run._typeIntervalId); return; }
+      if (i >= fullText.length) { clearInterval(run._typeIntervalId); return; }
       typeEl.textContent += fullText[i];
       i += 1;
     }, speedMs);
