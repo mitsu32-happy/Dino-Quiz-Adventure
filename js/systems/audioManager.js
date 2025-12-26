@@ -10,7 +10,16 @@ function clamp(v, min = 0, max = 1) {
   return Math.max(min, Math.min(max, v));
 }
 
-// オプション適用
+/**
+ * ✅ 互換用：main.js などが initAudio(save) を呼んでいる場合に備える
+ * - save.options の音量を反映
+ */
+export function initAudio(save) {
+  const opts = save?.options || save?.settings || {};
+  applyAudioOptions(opts);
+}
+
+// オプション適用（BGM/SE 共通）
 export function applyAudioOptions(options = {}) {
   if (typeof options.bgmVolume === "number") {
     bgmVolume = clamp(options.bgmVolume);
