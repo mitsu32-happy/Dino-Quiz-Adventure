@@ -63,20 +63,46 @@ export function renderResult({ state, goto }) {
   // 進行反映（ベストスコア）
   const st = ensureStageProgress(save, stageId);
 
+  // ✅ ここが大事：このリザルト処理に入る前から cleared だったか
+  const wasClearedBefore = Boolean(st.cleared);
+
   // 通常ステージだけは cleared=true（TA/Endlessは疑似ステージとしてベストだけ更新でもOK）
   if (run.mode === "stage") st.cleared = true;
 
   st.bestScore = (st.bestScore == null) ? score : Math.max(st.bestScore, score);
   save.progress.stages[stageId] = st;
 
-  // 報酬（1回だけ）
+  // =========================
+  // ✅ 報酬：ステージは初回クリアのみ
+  // =========================
+  const computedReward = calcRewardByRun(run, stage);
+
+  let rewardAppliedThisResult = false;
   let reward = 0;
+
   if (!run._rewardApplied) {
-    reward = calcRewardByRun(run, stage);
-    save.economy.coins = Number(save.economy.coins ?? 0) + reward;
-    run._rewardApplied = true;
+    // まだこの run では付与していない
+    if (run.mode === "stage") {
+      // ✅ 通常ステージ：初回クリアのみ
+      if (!wasClearedBefore) {
+        reward = computedReward;
+        save.economy.coins = Number(save.economy.coins ?? 0) + reward;
+        rewardAppliedThisResult = true;
+      } else {
+        reward = 0; // 2回目以降は付与しない
+        rewardAppliedThisResult = false;
+      }
+    } else {
+      // TA / Endless：毎回付与でOK
+      reward = computedReward;
+      save.economy.coins = Number(save.economy.coins ?? 0) + reward;
+      rewardAppliedThisResult = true;
+    }
+
+    run._rewardApplied = true; // 二重付与防止（画面再描画対策）
   } else {
-    reward = 0; // 二重付与防止（表示は別枠で出す）
+    reward = 0; // 二重付与防止
+    rewardAppliedThisResult = false;
   }
 
   // 反映保存（ステージ解放）
@@ -173,9 +199,15 @@ export function renderResult({ state, goto }) {
   })();
 
   const rewardBadge = (() => {
-    // 既に適用済みでも、見た目には「今回の計算値」を出したい場合は run._lastReward を使うなどもあり
-    const computed = calcRewardByRun(run, stage);
-    return `<span class="pill">報酬 +${computed}コイン</span>`;
+    if (run.mode === "stage") {
+      if (!wasClearedBefore && rewardAppliedThisResult) {
+        return `<span class="pill">報酬 +${computedReward}コイン</span>`;
+      }
+      // 2回目以降（または既に付与済み再描画）
+      return `<span class="pill">報酬（初回のみ）</span>`;
+    }
+    // TA/Endless
+    return `<span class="pill">報酬 +${computedReward}コイン</span>`;
   })();
 
   // イベント
