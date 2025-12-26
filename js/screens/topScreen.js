@@ -1,10 +1,14 @@
 // js/screens/topScreen.js
+import { playSe } from "../systems/audioManager.js";
 
 export function renderTop({ goto }) {
   // イベント登録
   setTimeout(() => {
     const startBtn = document.getElementById("startBtn");
+
+    // クリック/タップで決定音 → ホームへ
     startBtn?.addEventListener("click", () => {
+      playSe("assets/sounds/se/se_decide.mp3", { volume: 0.85 });
       goto("#home");
     });
   }, 0);

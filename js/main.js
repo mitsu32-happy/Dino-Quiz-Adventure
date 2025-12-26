@@ -1,5 +1,6 @@
 import { loadAllMasters } from "./systems/dataLoader.js";
 import { ensureSaveLoaded } from "./systems/saveManager.js";
+import { playBgm, stopBgm, initAudio } from "./systems/audioManager.js";
 
 import { renderTop } from "./screens/topScreen.js";
 import { renderHome } from "./screens/homeScreen.js";
@@ -51,11 +52,13 @@ function goto(hash) {
 }
 
 async function init() {
-  // リロード時はトップへ（既存仕様）
   if (location.hash !== "#top") location.hash = "#top";
 
   state.save = ensureSaveLoaded();
   state.masters = await loadAllMasters();
+
+  // 🔓 最初の操作で音を解禁
+  initAudio();
 
   window.addEventListener("hashchange", route);
   route();
@@ -64,67 +67,77 @@ async function init() {
 function route() {
   const { parts, params } = parseHash();
 
-  // top
-  const isTop = parts.length === 0 || parts[0] === "top";
-  if (isTop) {
+  // トップ
+  if (parts.length === 0 || parts[0] === "top") {
+    playBgm("top");
     setView(renderTop({ goto }));
     return;
   }
 
-  // home
+  // ホーム
   if (parts[0] === "home") {
+    playBgm("home");
     setView(renderHome({ state, goto, params }));
     return;
   }
 
-  // quiz (stage)
+  // ステージクイズ（BGMなし）
   if (parts[0] === "quiz") {
+    stopBgm();
     setView(renderQuiz({ state, goto, params }));
     return;
   }
 
-  // result (stage)
+  // リザルト
   if (parts[0] === "result") {
+    playBgm("home");
     setView(renderResult({ state, goto }));
     return;
   }
 
-  // options
+  // オプション
   if (parts[0] === "options") {
+    playBgm("home");
     setView(renderOptions({ state, goto }));
     return;
   }
 
-  // avatar
+  // アバター
   if (parts[0] === "avatar") {
+    playBgm("home");
     setView(renderAvatar({ state, goto }));
     return;
   }
 
-  // gacha
+  // ガチャ
   if (parts[0] === "gacha") {
+    playBgm("home");
     setView(renderGacha({ state, goto, params }));
     return;
   }
   if (parts[0] === "gachaDraw") {
+    playBgm("home");
     setView(renderGachaDraw({ state, goto, params }));
     return;
   }
 
-  // timeAttack
+  // タイムアタック（BGMなし）
   if (parts[0] === "timeAttack") {
+    stopBgm();
     setView(renderTimeAttack({ state, goto, params }));
     return;
   }
 
-  // ★endless（3ミス終了）
+  // エンドレス（BGMなし）
   if (parts[0] === "endless") {
+    stopBgm();
     setView(renderEndless({ state, goto, params }));
     return;
   }
 
-  // battle はまだ準備中
-  if (["battle"].includes(parts[0])) {
+  // 対戦（準備中・BGMなし）
+  if (parts[0] === "battle") {
+    stopBgm();
     setView(
       renderPlaceholder({
         title: "準備中",
@@ -140,6 +153,7 @@ function route() {
 
 init().catch((e) => {
   console.error(e);
+  stopBgm();
   setView(`
     <div class="card"><div class="card-inner">
       <h2>起動エラー</h2>

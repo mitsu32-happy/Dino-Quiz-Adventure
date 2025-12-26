@@ -1,37 +1,135 @@
 [
   {
-    "title_id": "title_dino_beginner",
-    "name": "見習い恐竜ファン",
-    "description": "はじめてクイズに正解した。",
-    "condition_type": "total_correct_answers",
+    "title_id": "t_first_clear",
+    "name": "はじめの一歩",
+    "description": "ステージを1回クリアする",
+    "condition_type": "any_stage_cleared",
     "condition_value": 1
   },
   {
-    "title_id": "title_quiz_master_10",
-    "name": "クイズマスター候補",
-    "description": "合計10問正解した。",
-    "condition_type": "total_correct_answers",
+    "title_id": "t_clear_5",
+    "name": "駆け出し博士",
+    "description": "ステージを5回クリアする",
+    "condition_type": "stage_cleared_count_at_least",
+    "condition_value": 5
+  },
+  {
+    "title_id": "t_clear_10",
+    "name": "恐竜博士見習い",
+    "description": "ステージを10回クリアする",
+    "condition_type": "stage_cleared_count_at_least",
     "condition_value": 10
   },
   {
-    "title_id": "title_combo_10",
-    "name": "コンボハンター",
-    "description": "1プレイで10コンボ達成。",
-    "condition_type": "max_combo_in_single_play",
+    "title_id": "t_all_clear",
+    "name": "恐竜博士",
+    "description": "全ステージをクリアする",
+    "condition_type": "all_stages_cleared",
+    "condition_value": 1
+  },
+  {
+    "title_id": "t_coin_100",
+    "name": "小銭王",
+    "description": "コインを100枚所持する",
+    "condition_type": "coins_at_least",
+    "condition_value": 100
+  },
+  {
+    "title_id": "t_coin_1000",
+    "name": "コイン収集家",
+    "description": "コインを1000枚所持する",
+    "condition_type": "coins_at_least",
+    "condition_value": 1000
+  },
+  {
+    "title_id": "t_coin_5000",
+    "name": "財宝発掘家",
+    "description": "コインを5000枚所持する",
+    "condition_type": "coins_at_least",
+    "condition_value": 5000
+  },
+  {
+    "title_id": "t_gacha_1",
+    "name": "初ガチャ",
+    "description": "ガチャを1回引く",
+    "condition_type": "total_gacha_pulls_at_least",
+    "condition_value": 1
+  },
+  {
+    "title_id": "t_gacha_10",
+    "name": "ガチャ好き",
+    "description": "ガチャを10回引く",
+    "condition_type": "total_gacha_pulls_at_least",
     "condition_value": 10
   },
   {
-    "title_id": "title_stage_1_clear",
-    "name": "白亜紀入門クリア",
-    "description": "ステージ「白亜紀 入門1」をクリアした。",
-    "condition_type": "stage_cleared",
-    "condition_value": "stage_1_1"
+    "title_id": "t_gacha_50",
+    "name": "ガチャ職人",
+    "description": "ガチャを50回引く",
+    "condition_type": "total_gacha_pulls_at_least",
+    "condition_value": 50
   },
   {
-    "title_id": "title_gacha_mania",
-    "name": "ガチャマニア",
-    "description": "ガチャを合計20回まわした。",
-    "condition_type": "total_gacha_pulls",
-    "condition_value": 20
+    "title_id": "t_avatar_10",
+    "name": "着せ替え初心者",
+    "description": "アバターアイテムを10個所持する",
+    "condition_type": "owned_avatar_items_at_least",
+    "condition_value": 10
+  },
+  {
+    "title_id": "t_avatar_30",
+    "name": "着せ替え上級者",
+    "description": "アバターアイテムを30個所持する",
+    "condition_type": "owned_avatar_items_at_least",
+    "condition_value": 30
+  },
+  {
+    "title_id": "t_avatar_60",
+    "name": "着せ替えマスター",
+    "description": "アバターアイテムを60個所持する",
+    "condition_type": "owned_avatar_items_at_least",
+    "condition_value": 60
+  },
+  {
+    "title_id": "t_endless_10",
+    "name": "エンドレス入門",
+    "description": "エンドレスでベスト10正解を達成する",
+    "condition_type": "best_score_mode_at_least",
+    "condition_value": "endless:10"
+  },
+  {
+    "title_id": "t_endless_30",
+    "name": "エンドレス強者",
+    "description": "エンドレスでベスト30正解を達成する",
+    "condition_type": "best_score_mode_at_least",
+    "condition_value": "endless:30"
+  },
+  {
+    "title_id": "t_endless_50",
+    "name": "終わらない挑戦者",
+    "description": "エンドレスでベスト50正解を達成する",
+    "condition_type": "best_score_mode_at_least",
+    "condition_value": "endless:50"
+  },
+  {
+    "title_id": "t_ta_10",
+    "name": "秒読みの勘",
+    "description": "タイムアタックでベスト10正解を達成する",
+    "condition_type": "best_score_mode_at_least",
+    "condition_value": "time_attack:10"
+  },
+  {
+    "title_id": "t_ta_25",
+    "name": "タイムアタック巧者",
+    "description": "タイムアタックでベスト25正解を達成する",
+    "condition_type": "best_score_mode_at_least",
+    "condition_value": "time_attack:25"
+  },
+  {
+    "title_id": "t_ta_40",
+    "name": "60秒の支配者",
+    "description": "タイムアタックでベスト40正解を達成する",
+    "condition_type": "best_score_mode_at_least",
+    "condition_value": "time_attack:40"
   }
 ]

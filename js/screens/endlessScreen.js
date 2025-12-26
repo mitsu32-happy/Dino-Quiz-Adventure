@@ -1,11 +1,28 @@
 import { saveNow } from "../systems/saveManager.js";
+import { playSe } from "../systems/audioManager.js";
+
+/**
+ * エンドレス（ステージクイズ画面と同じ構成に寄せる版）
+ * - CSSは外部化して1回だけ読み込む（多重評価による崩れ防止）
+ * - 終了時は result へ遷移し、報酬付与は resultScreen 側で行う
+ */
+
+function ensureCssLoadedOnce(href, id) {
+  if (document.getElementById(id)) return;
+  const link = document.createElement("link");
+  link.id = id;
+  link.rel = "stylesheet";
+  link.href = href;
+  document.head.appendChild(link);
+}
 
 function clamp(n, min, max) {
   return Math.max(min, Math.min(max, n));
 }
 
+// 正解Indexのキーゆれ対策
 function getCorrectIndex(q) {
-  const v = q?.correct_index ?? q?.correct_choice_index ?? q?.answer_index ?? null;
+  const v = q?.correct_choice_index ?? q?.correct_index ?? q?.answer_index ?? q?.correct;
   const n = Number(v);
   return Number.isFinite(n) ? n : null;
 }
@@ -13,7 +30,7 @@ function getCorrectIndex(q) {
 function shuffle(arr) {
   const a = arr.slice();
   for (let i = a.length - 1; i > 0; i--) {
-    const j = Math.floor(Math.random() * (i + 1));
+    const j = (Math.random() * (i + 1)) | 0;
     [a[i], a[j]] = [a[j], a[i]];
   }
   return a;
@@ -23,6 +40,7 @@ function getItemById(items, id) {
   return (items || []).find((it) => it?.item_id === id) ?? null;
 }
 
+// 画像パスフォールバック（quizScreen.js と同様）
 function imgWithFallback(className, primarySrc, fallbackSrcList = []) {
   const fallbacks = [primarySrc, ...fallbackSrcList].filter(Boolean);
   const data = encodeURIComponent(JSON.stringify(fallbacks));
@@ -41,43 +59,9 @@ function imgWithFallback(className, primarySrc, fallbackSrcList = []) {
   `;
 }
 
-export function renderEndless({ state, goto }) {
+function buildAvatarZoneHtml(state) {
   const { save, masters } = state;
 
-  const questionById = masters?.questionById;
-  const allQuestions = questionById ? Array.from(questionById.values()) : [];
-  if (allQuestions.length === 0) {
-    return `
-      <div class="card"><div class="card-inner">
-        <h2>エンドレス</h2>
-        <div class="notice">問題がありません（questions.json を確認してください）</div>
-        <div class="space"></div>
-        <button class="btn secondary" onclick="location.hash='#home'">ホームへ</button>
-      </div></div>
-    `;
-  }
-
-  const MAX_MISS = 3;
-
-  // run 初期化（stateに保持）
-  if (!state.endlessRun) {
-    state.endlessRun = {
-      order: shuffle(allQuestions.map((q) => q.id)),
-      cursor: 0,
-      correct: 0,
-      answered: 0,
-      miss: 0,
-      paused: false,
-      finished: false,
-    };
-  }
-  const run = state.endlessRun;
-
-  // 現在問題
-  const qid = run.order[run.cursor % run.order.length];
-  const q = questionById.get(qid);
-
-  // アバター表示ゾーン（ステージと同じ）
   const avatarItems = masters?.avatar_items ?? masters?.avatarItems ?? [];
   const eq = save.avatar?.equipped ?? { body: null, head: null };
   const eqBody = getItemById(avatarItems, eq.body);
@@ -94,7 +78,7 @@ export function renderEndless({ state, goto }) {
     "/images/quiz/quiz_stand.png",
   ];
 
-  const avatarZoneHtml = `
+  return `
     <div class="avatar-zone">
       <div class="avatar-stage">
         ${imgWithFallback("az-bg", bgCandidates[0], bgCandidates.slice(1))}
@@ -106,8 +90,69 @@ export function renderEndless({ state, goto }) {
       </div>
     </div>
   `;
+}
 
-  const choices = Array.isArray(q?.choices) ? q.choices : [];
+function ensureEndlessRun(state) {
+  const { masters } = state;
+  const allQuestions = masters.questions ?? [];
+
+  if (!Array.isArray(allQuestions) || allQuestions.length === 0) {
+    return { ok: false, reason: "no_questions" };
+  }
+
+  if (!state.endlessRun) {
+    state.endlessRun = {
+      order: shuffle(allQuestions.map((q) => q.id)),
+      cursor: 0,
+      correct: 0,
+      answered: 0,
+      miss: 0,
+      startedAt: new Date().toISOString(),
+    };
+  }
+  return { ok: true };
+}
+
+export function renderEndless({ state, goto }) {
+  // ✅ CSSを1回だけ読み込む（崩れ対策）
+  ensureCssLoadedOnce("/assets/css/endless.css", "endless-css");
+
+  const { save, masters } = state;
+
+  // progress 初期（必要なら）
+  if (!save.progress) save.progress = {};
+  if (!save.progress.modes) save.progress.modes = {};
+  save.progress.modes.endlessLastPlayedAt = new Date().toISOString();
+  saveNow(save);
+
+  const init = ensureEndlessRun(state);
+  if (!init.ok) {
+    return `
+      <div class="card"><div class="card-inner">
+        <h2 style="margin:0 0 8px;">エンドレス</h2>
+        <div class="notice">問題データが見つかりません。</div>
+        <div class="space"></div>
+        <button class="btn" onclick="location.hash='#home'">ホームへ</button>
+      </div></div>
+    `;
+  }
+
+  const run = state.endlessRun;
+  const MAX_MISS = 3;
+
+  const qid = run.order[run.cursor % run.order.length];
+  const q = masters?.questionById?.get(qid);
+
+  if (!q) {
+    // 不整合：スキップ
+    run.cursor += 1;
+    goto("#endless");
+    return `<div class="card"><div class="card-inner">読み込み中...</div></div>`;
+  }
+
+  const avatarZoneHtml = buildAvatarZoneHtml(state);
+
+  const choices = Array.isArray(q.choices) ? q.choices : [];
   const choicesHtml = choices
     .map((c, idx) => {
       const isImage = c?.type === "image" && c?.image_url;
@@ -121,25 +166,27 @@ export function renderEndless({ state, goto }) {
     })
     .join("");
 
+  // イベント付与（render 内 setTimeout）
   setTimeout(() => {
-    const pauseBtn = document.getElementById("enPauseBtn");
-    const modal = document.getElementById("enPauseModal");
-    const resumeBtn = document.getElementById("enResumeBtn");
-    const retireBtn = document.getElementById("enRetireBtn");
+    let answered = false;
+    let paused = false;
 
-    const verdictEl = document.getElementById("enVerdict");
-    const typeEl = document.getElementById("enTypewriter");
-
-    const hudEl = document.getElementById("enHudText");
-
-    const resultModal = document.getElementById("enResultModal");
-    const resultText = document.getElementById("enResultText");
-    const resultOkBtn = document.getElementById("enResultOkBtn");
+    const pauseBtn = document.getElementById("pauseBtn");
+    const modal = document.getElementById("pauseModal");
+    const resumeBtn = document.getElementById("resumeBtn");
+    const retireBtn = document.getElementById("retireBtn");
+    const verdictEl = document.getElementById("verdict");
+    const typeEl = document.getElementById("typewriter");
+    const hudEl = document.getElementById("endlessHud");
 
     const choiceButtons = Array.from(document.querySelectorAll(".choice-btn"));
 
+    // ✅ 出題SE
+    playSe("assets/sounds/se/se_question.mp3", { volume: 0.9 });
+
     function setHud() {
-      hudEl.textContent = `正解 ${run.correct} / 回答 ${run.answered}　ミス ${run.miss}/${MAX_MISS}`;
+      if (!hudEl) return;
+      hudEl.textContent = `正解 ${run.correct} / 回答 ${run.answered} / ミス ${run.miss}/${MAX_MISS}`;
     }
 
     function setChoicesEnabled(enabled) {
@@ -147,120 +194,148 @@ export function renderEndless({ state, goto }) {
     }
 
     function openPause() {
-      if (run.finished) return;
-      run.paused = true;
-      modal.style.display = "flex";
+      if (answered) return;
+      paused = true;
+      if (modal) modal.style.display = "flex";
     }
 
     function closePause() {
-      run.paused = false;
-      modal.style.display = "none";
+      paused = false;
+      if (modal) modal.style.display = "none";
     }
 
-    function finish() {
-      run.finished = true;
+    function finish(reason) {
+      if (answered) return;
+      answered = true;
+      closePause();
       setChoicesEnabled(false);
 
-      // 報酬は仕様が未確定なので、今回はコイン付与なし（後で1行で変更可能）
-      // もし付与する場合はここで save.economy.coins += ...; saveNow(save);
+      // Resultへ渡す（報酬付与は resultScreen 側）
+      state.currentRun = {
+        mode: "endless",
+        stageId: "endless",
+        stageName: "エンドレス",
+        correctCount: run.correct,
+        totalCount: run.answered,
+        missCount: run.miss,
+        endedReason: reason,
+        questionIds: Array.isArray(run.order) ? run.order.slice() : [],
+        answers: [],
+        _rewardApplied: false,
+      };
 
-      saveNow(save);
-
-      resultText.textContent = `結果\n正解 ${run.correct}\n回答 ${run.answered}\nミス ${run.miss}/${MAX_MISS}`;
-      resultModal.style.display = "flex";
+      state.endlessRun = null;
+      goto("#result");
     }
 
-    function nextQuestion() {
+    function goNext() {
       run.cursor += 1;
       goto("#endless");
     }
 
-    // HUD
+    function showVerdict(ok) {
+      verdictEl.textContent = ok ? "〇" : "×";
+      verdictEl.className = `verdict ${ok ? "good" : "bad"}`;
+    }
+
+    // HUD 初期表示
     setHud();
 
-    // 一時停止
-    pauseBtn.addEventListener("click", () => openPause());
-    resumeBtn.addEventListener("click", () => closePause());
-    retireBtn.addEventListener("click", () => {
-      state.endlessRun = null;
-      goto("#home");
+    // 一時停止（決定SE）
+    pauseBtn?.addEventListener("click", () => {
+      playSe("assets/sounds/se/se_decide.mp3", { volume: 0.8 });
+      openPause();
     });
-    modal.addEventListener("click", (e) => {
-      if (e.target === modal) closePause();
+    resumeBtn?.addEventListener("click", () => {
+      playSe("assets/sounds/se/se_decide.mp3", { volume: 0.8 });
+      closePause();
     });
-
-    // 結果OK
-    resultOkBtn.addEventListener("click", () => {
-      state.endlessRun = null;
-      goto("#home");
+    retireBtn?.addEventListener("click", () => {
+      // エンドレスは「リタイア」でも結果へ
+      playSe("assets/sounds/se/se_decide.mp3", { volume: 0.8 });
+      closePause();
+      finish("retire");
     });
-
-    // タイプライター（クイズと同程度）
-    const fullText = String(q?.question_text ?? "");
-    typeEl.textContent = "";
-    let i = 0;
-    const speedMs = 38;
-
-    const typeTimer = setInterval(() => {
-      if (run.finished) {
-        clearInterval(typeTimer);
-        return;
+    modal?.addEventListener("click", (e) => {
+      if (e.target === modal) {
+        playSe("assets/sounds/se/se_decide.mp3", { volume: 0.8 });
+        closePause();
       }
-      if (run.paused) return;
-      if (i >= fullText.length) {
-        clearInterval(typeTimer);
-        return;
-      }
-      typeEl.textContent += fullText[i];
-      i += 1;
-    }, speedMs);
+    });
 
-    // 選択肢
+    // 選択（決定→正誤SE）
     choiceButtons.forEach((btn) => {
       btn.addEventListener("click", () => {
-        if (run.finished) return;
-        if (run.paused) return;
+        if (answered) return;
+        if (paused) return;
 
         const idx = Number(btn.dataset.idx);
-        const correctIdx = getCorrectIndex(q);
-
         run.answered += 1;
+
+        const correctIdx = getCorrectIndex(q);
         const isCorrect = correctIdx != null ? idx === correctIdx : false;
+
+        playSe("assets/sounds/se/se_decide.mp3", { volume: 0.8 });
+        playSe(
+          isCorrect ? "assets/sounds/se/se_correct.mp3" : "assets/sounds/se/se_wrong.mp3",
+          { volume: 0.95 }
+        );
 
         if (isCorrect) run.correct += 1;
         else run.miss += 1;
 
         setHud();
+        setChoicesEnabled(false);
+        showVerdict(isCorrect);
 
-        verdictEl.textContent = isCorrect ? "〇" : "×";
-        verdictEl.className = `verdict ${isCorrect ? "good" : "bad"}`;
+        // 3ミスで終了
+        if (run.miss >= MAX_MISS) {
+          setTimeout(() => finish("miss"), 600);
+          return;
+        }
 
         setTimeout(() => {
-          verdictEl.className = "verdict";
-          if (run.miss >= MAX_MISS) finish();
-          else nextQuestion();
-        }, 420);
+          goNext();
+        }, 600);
       });
     });
+
+    // タイプライター
+    const fullText = String(q.question_text ?? "");
+    let i = 0;
+    const speedMs = 38;
+    typeEl.textContent = "";
+
+    const t = setInterval(() => {
+      if (answered) {
+        clearInterval(t);
+        return;
+      }
+      if (paused) return;
+      if (i >= fullText.length) {
+        clearInterval(t);
+        return;
+      }
+      typeEl.textContent += fullText[i];
+      i += 1;
+    }, speedMs);
   }, 0);
 
   return `
     <div class="quiz-root">
       <div class="top-bar">
-        <button id="enPauseBtn" class="pause-btn" type="button">⏸ 一時停止</button>
+        <button id="pauseBtn" class="pause-btn" type="button">⏸ 一時停止</button>
       </div>
 
       <div class="stage-row">
         <div class="stage-name">エンドレス</div>
-        <div class="timer-pill" style="min-width:auto;padding:8px 12px;">3ミスで終了</div>
+        <div id="endlessHud" class="timer-pill">正解 ${run.correct} / 回答 ${run.answered} / ミス ${run.miss}/3</div>
       </div>
-
-      <div id="enHudText" style="margin:-4px 2px 6px;color:var(--muted);font-size:12px;font-weight:900;"></div>
 
       <div class="divider"></div>
 
       <div class="question-box">
-        <div id="enTypewriter" class="question-text"></div>
+        <div id="typewriter" class="question-text"></div>
       </div>
 
       <div class="divider"></div>
@@ -273,115 +348,19 @@ export function renderEndless({ state, goto }) {
         ${choicesHtml}
       </div>
 
-      <div id="enVerdict" class="verdict"></div>
+      <div id="verdict" class="verdict"></div>
 
-      <!-- 一時停止モーダル -->
-      <div id="enPauseModal" class="modal" style="display:none;">
+      <div id="pauseModal" class="modal" style="display:none;">
         <div class="modal-sheet">
           <div class="modal-title">一時中断</div>
           <div class="modal-sub">再開するか、リタイアするか選んでください。</div>
           <div class="space"></div>
           <div class="row">
-            <button id="enResumeBtn" class="btn" type="button">再開</button>
-            <button id="enRetireBtn" class="btn secondary" type="button">リタイア</button>
+            <button id="resumeBtn" class="btn" type="button">再開</button>
+            <button id="retireBtn" class="btn secondary" type="button">リタイア</button>
           </div>
         </div>
       </div>
-
-      <!-- 結果モーダル -->
-      <div id="enResultModal" class="modal" style="display:none;">
-        <div class="modal-sheet">
-          <div class="modal-title">結果</div>
-          <pre id="enResultText" class="notice" style="white-space:pre-wrap;margin:10px 0 0;"></pre>
-          <div class="space"></div>
-          <button id="enResultOkBtn" class="btn" type="button">ホームへ</button>
-        </div>
-      </div>
-
-      <style>
-        .quiz-root{ max-width:520px; margin:0 auto; padding:14px 12px 18px; }
-        .top-bar{ display:flex; justify-content:flex-start; margin-bottom:10px; }
-        .pause-btn{
-          appearance:none; border:2px solid rgba(31,42,68,.18); background:rgba(255,255,255,.96);
-          border-radius:14px; padding:10px 12px; font-weight:1000; cursor:pointer;
-          box-shadow:0 10px 18px rgba(31,42,68,.12);
-        }
-        .pause-btn:active{ transform: translateY(2px); }
-
-        .stage-row{ display:flex; justify-content:space-between; align-items:center; gap:10px; padding:0 2px 6px; }
-        .stage-name{ font-weight:1000; font-size:16px; color:var(--text); }
-        .timer-pill{
-          border:2px solid rgba(31,42,68,.18); background:rgba(255,255,255,.96);
-          border-radius:999px; padding:8px 10px; font-weight:1000; text-align:center;
-          box-shadow:0 10px 18px rgba(31,42,68,.10);
-        }
-
-        .divider{ height:1px; background:rgba(31,42,68,.16); margin:10px 0; }
-
-        .question-box{
-          border:2px solid rgba(31,42,68,.20); background:rgba(255,255,255,.96);
-          border-radius:18px; padding:14px 14px; box-shadow:0 12px 20px rgba(31,42,68,.12);
-          min-height:82px;
-        }
-        .question-text{
-          font-weight:1000; color:var(--text); line-height:1.55; word-break:break-word;
-          white-space:pre-wrap; font-size:18px;
-        }
-
-        /* アバター表示ゾーン */
-        .avatar-zone{ margin: 0; }
-        .avatar-stage{
-          width:100%; max-width:420px; margin:0 auto; aspect-ratio:16/9;
-          position:relative; border-radius:18px; border:2px solid rgba(31,42,68,.18);
-          background:rgba(255,255,255,.92); box-shadow:0 12px 22px rgba(31,42,68,.14);
-          overflow:hidden;
-        }
-        .az-bg{ position:absolute; inset:0; width:100%; height:100%; object-fit:cover; pointer-events:none; }
-        .az-actor{
-          position:absolute; left:50%; top:58%; transform:translate(-50%,-50%);
-          width:64%; aspect-ratio:1/1; pointer-events:none;
-        }
-        .az-layer{ position:absolute; inset:0; width:100%; height:100%; object-fit:contain; }
-        .az-body{ z-index:1; } .az-head{ z-index:2; } .az-stand{ z-index:3; }
-
-        /* 選択肢 */
-        .choices-grid{ display:grid; grid-template-columns:1fr 1fr; gap:12px; }
-        .choice-btn{
-          appearance:none; border:2px solid rgba(31,42,68,.18); background:rgba(255,255,255,.96);
-          border-radius:18px; padding:12px; cursor:pointer; box-shadow:0 12px 20px rgba(31,42,68,.14);
-          display:flex; flex-direction:column; align-items:center; justify-content:center; gap:10px;
-          min-height:110px;
-        }
-        .choice-btn:active{ transform: translateY(2px); }
-        .choice-img{
-          width:100%; max-height:110px; object-fit:contain; border-radius:14px;
-          border:2px solid rgba(31,42,68,.12); background:rgba(255,255,255,.95);
-        }
-        .choice-text{
-          width:100%; text-align:center; font-weight:1000; font-size:14px; color:var(--text);
-          display:flex; align-items:center; justify-content:center; min-height:24px;
-        }
-
-        .verdict{
-          position: fixed; left:50%; top:46%; transform:translate(-50%,-50%);
-          font-size:96px; font-weight:1000; line-height:1; opacity:0; pointer-events:none;
-          text-shadow:0 18px 32px rgba(31,42,68,.20); transition: opacity .12s ease; z-index:1200;
-        }
-        .verdict.good{ opacity:1; color:var(--good); }
-        .verdict.bad{ opacity:1; color:var(--bad); }
-
-        .modal{
-          position:fixed; inset:0; background:rgba(0,0,0,.35); backdrop-filter:blur(6px);
-          display:flex; align-items:center; justify-content:center; z-index:1100; padding:14px;
-        }
-        .modal-sheet{
-          width:92%; max-width:420px; border-radius:22px; border:2px solid rgba(31,42,68,.18);
-          background: linear-gradient(180deg, #ffffff, #f8fafc);
-          box-shadow:0 22px 50px rgba(31,42,68,.22); padding:14px; color:var(--text);
-        }
-        .modal-title{ font-weight:1000; font-size:16px; }
-        .modal-sub{ margin-top:6px; color:var(--muted); font-size:12px; line-height:1.5; }
-      </style>
     </div>
   `;
 }

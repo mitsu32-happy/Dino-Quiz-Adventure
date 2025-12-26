@@ -1,3 +1,6 @@
+import { applyAudioOptions } from "../systems/audioManager.js";
+
+
 // js/screens/optionsScreen.js
 import {
   exportSaveJson,
@@ -55,6 +58,10 @@ export function renderOptions({ state, goto }) {
       save.options.seVolume = fromPercent(seRange.value);
       save.options.vibration = vibToggle.checked;
       saveNow(save);
+
+      applyAudioOptions(save.options);
+
+
     }
 
     bgmRange?.addEventListener("input", () => {

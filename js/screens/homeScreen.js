@@ -1,4 +1,5 @@
 import { saveNow } from "../systems/saveManager.js";
+import { playSe } from "../systems/audioManager.js";
 
 function isStageUnlocked(stage, save) {
   const cond = stage.unlock_condition?.type ?? "always";
@@ -32,7 +33,10 @@ export function renderHome({ state, goto, params }) {
 
   const equippedTitleId = save.titles?.equippedTitleId ?? null;
   const unlockedTitleIds = save.titles?.unlockedTitleIds ?? [];
-  const equippedTitle = (masters.titles || []).find((t) => t.id === equippedTitleId) ?? null;
+
+  // ✅ titles.json は title_id が正。旧サンプル互換で id も許容
+  const equippedTitle =
+    (masters.titles || []).find((t) => (t.title_id ?? t.id) === equippedTitleId) ?? null;
   const equippedTitleName = equippedTitle ? equippedTitle.name : "称号なし";
 
   const coins = save.economy?.coins ?? 0;
@@ -46,13 +50,16 @@ export function renderHome({ state, goto, params }) {
   // storyステージ一覧
   const storyStages = (masters.stages || []).filter((s) => s.mode === "story");
 
-  // ボタン設定
+  // ボタン設定（旧レイアウトのまま）
   const btnsTop = [
-    { key: "story",      label: "ステージ",       icon: "/assets/images/icon_story.png",       onClick: () => goto("#home?section=story") },
+    { key: "story",      label: "ステージ",       icon: "/assets/images/icon_story.png",       onClick: () => goto("#home?section=story"), disabled: false },
     { key: "timeAttack", label: "タイムアタック", icon: "/assets/images/icon_timeattack.png", onClick: () => goto("#timeAttack"), disabled: false },
     { key: "endless",    label: "エンドレス",     icon: "/assets/images/icon_endless.png",    onClick: () => goto("#endless"), disabled: false },
   ];
-  const btnBattle = { key: "battle", label: "対戦", icon: "/assets/images/icon_battle.png", onClick: () => goto("#battle"), disabled: false };
+
+  // ✅ 対戦は準備中（グレーアウト＋押せない）
+  const btnBattle = { key: "battle", label: "対戦（準備中）", icon: "/assets/images/icon_battle.png", onClick: () => goto("#battle"), disabled: true };
+
   const btnsBottom = [
     { key: "avatar",  label: "アバター",   icon: "/assets/images/icon_avatar.png",  onClick: () => goto("#avatar"),  disabled: false },
     { key: "gacha",   label: "ガチャ",     icon: "/assets/images/icon_gacha.png",   onClick: () => goto("#gacha"),   disabled: false },
@@ -63,6 +70,7 @@ export function renderHome({ state, goto, params }) {
   setTimeout(() => {
     // アバターミニアイコン → アバター画面へ
     document.getElementById("avatarMiniBtn")?.addEventListener("click", () => {
+      playSe("assets/sounds/se/se_decide.mp3", { volume: 0.85 });
       goto("#avatar");
     });
 
@@ -106,7 +114,7 @@ export function renderHome({ state, goto, params }) {
       });
     });
 
-    // ホームのメニュー押下
+    // ホームのメニュー押下（決定SE）
     document.querySelectorAll("[data-home-btn]")?.forEach((el) => {
       el.addEventListener("click", () => {
         const k = el.getAttribute("data-home-btn");
@@ -123,12 +131,27 @@ export function renderHome({ state, goto, params }) {
         };
         const btn = map[k];
         if (!btn || btn.disabled) return;
+
+        playSe("assets/sounds/se/se_decide.mp3", { volume: 0.85 });
         btn.onClick();
       });
     });
 
-    // ステージ一覧から戻る
+    // ステージ選択（決定SE）
+    document.querySelectorAll(".stage[href^='#quiz']")?.forEach((el) => {
+      el.addEventListener("click", (e) => {
+        const disabled = el.getAttribute("aria-disabled") === "true";
+        if (disabled) {
+          e.preventDefault();
+          return;
+        }
+        playSe("assets/sounds/se/se_decide.mp3", { volume: 0.85 });
+      });
+    });
+
+    // ステージ一覧から戻る（決定SE）
     document.getElementById("backToModesBtn")?.addEventListener("click", () => {
+      playSe("assets/sounds/se/se_decide.mp3", { volume: 0.85 });
       goto("#home");
     });
 
@@ -273,11 +296,13 @@ export function renderHome({ state, goto, params }) {
 
         <div class="list">
           ${(masters.titles || []).map((t) => {
-            const unlocked = unlockedTitleIds.includes(t.id);
-            const equipped = t.id === equippedTitleId;
+            const tid = t.title_id ?? t.id;
+
+            const unlocked = unlockedTitleIds.includes(tid);
+            const equipped = tid === equippedTitleId;
 
             return `
-              <div class="stage titleItem" data-id="${t.id}"
+              <div class="stage titleItem" data-id="${tid}"
                 style="
                   opacity:${unlocked ? "1" : "0.45"};
                   border-color:${equipped ? "rgba(37,99,235,.55)" : "rgba(31,42,68,.16)"};
@@ -426,7 +451,7 @@ export function renderHome({ state, goto, params }) {
       }
       .hud-pill.hud-static{ cursor: default; }
 
-      /* ===== メニュー（ここが崩れてた原因：必須） ===== */
+      /* ===== メニュー（縦中央寄せ） ===== */
       .menu-area{
         flex:1;
         display:flex;

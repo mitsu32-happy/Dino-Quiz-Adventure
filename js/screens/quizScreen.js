@@ -1,4 +1,5 @@
 import { saveNow } from "../systems/saveManager.js";
+import { playSe } from "../systems/audioManager.js";
 
 /**
  * クイズ画面（元構成）
@@ -203,6 +204,9 @@ export function renderQuiz({ state, goto, params }) {
 
     const choiceButtons = Array.from(document.querySelectorAll(".choice-btn"));
 
+    // ✅ 出題SE（問題表示開始タイミングで1回）
+    playSe("assets/sounds/se/se_question.mp3", { volume: 0.9 });
+
     function setTimerText() {
       if (timerEl) timerEl.textContent = `⏱ ${remaining}`;
     }
@@ -213,11 +217,15 @@ export function renderQuiz({ state, goto, params }) {
 
     function openPause() {
       if (answered) return;
+      // ✅ 決定SE（停止）
+      playSe("assets/sounds/se/se_decide.mp3", { volume: 0.75 });
       paused = true;
       if (modal) modal.style.display = "flex";
     }
 
     function closePause() {
+      // ✅ 決定SE（再開）
+      playSe("assets/sounds/se/se_decide.mp3", { volume: 0.75 });
       paused = false;
       if (modal) modal.style.display = "none";
     }
@@ -226,6 +234,10 @@ export function renderQuiz({ state, goto, params }) {
       if (answered) return;
       answered = true;
       setChoicesEnabled(false);
+
+      // ✅ 不正解SE（タイムアウトは不正解扱い）
+      playSe("assets/sounds/se/se_wrong.mp3", { volume: 0.95 });
+
       verdictEl.textContent = "×";
       verdictEl.className = "verdict bad";
 
@@ -249,11 +261,20 @@ export function renderQuiz({ state, goto, params }) {
     function finishByAnswer(selectedIdx) {
       if (answered) return;
       answered = true;
-      closePause();
+      if (paused) return; // 念のため
       setChoicesEnabled(false);
+
+      // ✅ 決定SE（回答確定）
+      playSe("assets/sounds/se/se_decide.mp3", { volume: 0.8 });
 
       const correctIdx = getCorrectIndex(q);
       const isCorrect = (correctIdx != null) ? (selectedIdx === correctIdx) : false;
+
+      // ✅ 正誤SE
+      playSe(
+        isCorrect ? "assets/sounds/se/se_correct.mp3" : "assets/sounds/se/se_wrong.mp3",
+        { volume: 0.95 }
+      );
 
       verdictEl.textContent = isCorrect ? "〇" : "×";
       verdictEl.className = `verdict ${isCorrect ? "good" : "bad"}`;
@@ -294,13 +315,19 @@ export function renderQuiz({ state, goto, params }) {
     pauseBtn?.addEventListener("click", () => openPause());
     resumeBtn?.addEventListener("click", () => closePause());
     retireBtn?.addEventListener("click", () => {
+      // ✅ 決定SE（リタイア）
+      playSe("assets/sounds/se/se_decide.mp3", { volume: 0.85 });
+
       clearInterval(interval);
       state.currentRun = null;
-      closePause();
+      if (modal) modal.style.display = "none";
       goto("#home");
     });
     modal?.addEventListener("click", (e) => {
-      if (e.target === modal) closePause();
+      if (e.target === modal) {
+        // クリックで閉じる＝再開扱い
+        closePause();
+      }
     });
 
     // 選択
