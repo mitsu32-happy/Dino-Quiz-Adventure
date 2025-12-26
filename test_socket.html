@@ -1,0 +1,102 @@
+<!doctype html>
+<html lang="ja">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Socket.IO 接続テスト</title>
+  <style>
+    body { font-family: sans-serif; padding: 16px; }
+    .row { margin: 8px 0; }
+    button { padding: 10px 14px; }
+    pre { background: #f4f4f4; padding: 10px; border-radius: 8px; overflow:auto; }
+  </style>
+</head>
+<body>
+  <h1>Socket.IO 接続テスト</h1>
+
+  <div class="row">
+    <label>接続先URL：</label>
+    <input id="url" style="width: 320px;" value="http://localhost:3001" />
+    <button id="connectBtn">接続</button>
+    <button id="disconnectBtn">切断</button>
+  </div>
+
+  <div class="row">
+    <button id="pingBtn">client:ping 送信</button>
+  </div>
+
+  <h2>ログ</h2>
+  <pre id="log"></pre>
+
+  <!-- CDNで socket.io-client を読み込む（まずはこれが一番ラク） -->
+  <script src="https://cdn.socket.io/4.8.1/socket.io.min.js"></script>
+
+  <script>
+    const logEl = document.getElementById("log");
+    const urlEl = document.getElementById("url");
+    const connectBtn = document.getElementById("connectBtn");
+    const disconnectBtn = document.getElementById("disconnectBtn");
+    const pingBtn = document.getElementById("pingBtn");
+
+    let socket = null;
+
+    function log(msg) {
+      const t = new Date().toLocaleTimeString();
+      logEl.textContent += `[${t}] ${msg}\n`;
+      logEl.scrollTop = logEl.scrollHeight;
+    }
+
+    connectBtn.addEventListener("click", () => {
+      const url = urlEl.value.trim();
+      if (!url) return;
+
+      if (socket) {
+        log("すでに接続済みなので、一度切断してから接続します。");
+        socket.disconnect();
+        socket = null;
+      }
+
+      log(`接続開始: ${url}`);
+      socket = io(url, {
+        transports: ["websocket", "polling"],
+      });
+
+      socket.on("connect", () => {
+        log(`connect: socket.id=${socket.id}`);
+      });
+
+      socket.on("connect_error", (err) => {
+        log(`connect_error: ${err?.message || err}`);
+      });
+
+      socket.on("server:hello", (data) => {
+        log(`server:hello: ${JSON.stringify(data)}`);
+      });
+
+      socket.on("server:pong", (data) => {
+        log(`server:pong: ${JSON.stringify(data)}`);
+      });
+
+      socket.on("disconnect", (reason) => {
+        log(`disconnect: reason=${reason}`);
+      });
+    });
+
+    disconnectBtn.addEventListener("click", () => {
+      if (!socket) return;
+      socket.disconnect();
+      socket = null;
+      log("手動で切断しました。");
+    });
+
+    pingBtn.addEventListener("click", () => {
+      if (!socket || !socket.connected) {
+        log("未接続です。先に接続してください。");
+        return;
+      }
+      socket.emit("client:ping", { msg: "hello", ts: Date.now() });
+      log("client:ping を送信しました。");
+    });
+  </script>
+</body>
+</html>

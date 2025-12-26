@@ -1,0 +1,37 @@
+[
+  {
+    "title_id": "title_dino_beginner",
+    "name": "見習い恐竜ファン",
+    "description": "はじめてクイズに正解した。",
+    "condition_type": "total_correct_answers",
+    "condition_value": 1
+  },
+  {
+    "title_id": "title_quiz_master_10",
+    "name": "クイズマスター候補",
+    "description": "合計10問正解した。",
+    "condition_type": "total_correct_answers",
+    "condition_value": 10
+  },
+  {
+    "title_id": "title_combo_10",
+    "name": "コンボハンター",
+    "description": "1プレイで10コンボ達成。",
+    "condition_type": "max_combo_in_single_play",
+    "condition_value": 10
+  },
+  {
+    "title_id": "title_stage_1_clear",
+    "name": "白亜紀入門クリア",
+    "description": "ステージ「白亜紀 入門1」をクリアした。",
+    "condition_type": "stage_cleared",
+    "condition_value": "stage_1_1"
+  },
+  {
+    "title_id": "title_gacha_mania",
+    "name": "ガチャマニア",
+    "description": "ガチャを合計20回まわした。",
+    "condition_type": "total_gacha_pulls",
+    "condition_value": 20
+  }
+]

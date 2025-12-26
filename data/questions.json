@@ -1,0 +1,2571 @@
+[
+  {
+    "id": "triassic_beg_01",
+    "question_text": "恐竜が初めて現れた地質時代はどれ？",
+    "mode": "text_choice",
+    "choices": [
+      { "type": "text", "label": "ペルム紀" },
+      { "type": "text", "label": "三畳紀" },
+      { "type": "text", "label": "ジュラ紀" },
+      { "type": "text", "label": "白亜紀" }
+    ],
+    "correct_index": 1,
+    "category": "era",
+    "difficulty": 1,
+    "image_url": null,
+    "time_limit": 10
+  },
+  {
+    "id": "triassic_beg_02",
+    "question_text": "三畳紀に生きていた恐竜の特徴として正しいものはどれ？",
+    "mode": "text_choice",
+    "choices": [
+      { "type": "text", "label": "巨大な体を持つ恐竜が多かった" },
+      { "type": "text", "label": "空を飛ぶ恐竜が主流だった" },
+      { "type": "text", "label": "比較的小型の恐竜が多かった" },
+      { "type": "text", "label": "すべて水中で生活していた" }
+    ],
+    "correct_index": 2,
+    "category": "feature",
+    "difficulty": 1,
+    "image_url": null,
+    "time_limit": 10
+  },
+  {
+    "id": "triassic_beg_03",
+    "question_text": "三畳紀は、恐竜にとってどんな時代だった？",
+    "mode": "text_choice",
+    "choices": [
+      { "type": "text", "label": "恐竜が絶滅した時代" },
+      { "type": "text", "label": "恐竜が誕生し始めた時代" },
+      { "type": "text", "label": "恐竜が最も繁栄した時代" },
+      { "type": "text", "label": "鳥が初めて現れた時代" }
+    ],
+    "correct_index": 1,
+    "category": "overview",
+    "difficulty": 1,
+    "image_url": null,
+    "time_limit": 10
+  },
+  {
+    "id": "triassic_beg_04",
+    "question_text": "次のうち、三畳紀に生きていた恐竜はどれ？",
+    "mode": "text_choice",
+    "choices": [
+      { "type": "text", "label": "ティラノサウルス" },
+      { "type": "text", "label": "ステゴサウルス" },
+      { "type": "text", "label": "コエロフィシス" },
+      { "type": "text", "label": "トリケラトプス" }
+    ],
+    "correct_index": 2,
+    "category": "dinosaur",
+    "difficulty": 1,
+    "image_url": null,
+    "time_limit": 10
+  },
+  {
+    "id": "triassic_beg_05",
+    "question_text": "三畳紀の恐竜と、後の時代（ジュラ紀・白亜紀）の恐竜を比べると正しいのはどれ？",
+    "mode": "text_choice",
+    "choices": [
+      { "type": "text", "label": "三畳紀の方が種類が多かった" },
+      { "type": "text", "label": "三畳紀は恐竜がまだ少数派だった" },
+      { "type": "text", "label": "三畳紀は巨大恐竜ばかりだった" },
+      { "type": "text", "label": "三畳紀には陸上生物がいなかった" }
+    ],
+    "correct_index": 1,
+    "category": "comparison",
+    "difficulty": 1,
+    "image_url": null,
+    "time_limit": 10
+  },
+  {
+    "id": "triassic_beg_06",
+    "question_text": "三畳紀の地球の環境として考えられているのはどれ？",
+    "mode": "text_choice",
+    "choices": [
+      { "type": "text", "label": "寒冷で氷に覆われていた" },
+      { "type": "text", "label": "現在とほぼ同じ気候" },
+      { "type": "text", "label": "乾燥した地域が多かった" },
+      { "type": "text", "label": "地表のほとんどが水中だった" }
+    ],
+    "correct_index": 2,
+    "category": "environment",
+    "difficulty": 1,
+    "image_url": null,
+    "time_limit": 10
+  },
+  {
+    "id": "triassic_beg_07",
+    "question_text": "三畳紀の海でよく知られる生物として正しいのはどれ？",
+    "mode": "text_choice",
+    "choices": [
+      { "type": "text", "label": "アンモナイト" },
+      { "type": "text", "label": "恐竜だけ" },
+      { "type": "text", "label": "人類" },
+      { "type": "text", "label": "ウミガメ" }
+    ],
+    "correct_index": 0,
+    "category": "other_life",
+    "difficulty": 1,
+    "image_url": null,
+    "time_limit": 10
+  },
+  {
+    "id": "triassic_beg_08",
+    "question_text": "三畳紀の恐竜で多かった移動のしかたはどれ？",
+    "mode": "text_choice",
+    "choices": [
+      { "type": "text", "label": "腹ばいで移動" },
+      { "type": "text", "label": "二足歩行で移動" },
+      { "type": "text", "label": "泳いで移動" },
+      { "type": "text", "label": "飛んで移動" }
+    ],
+    "correct_index": 1,
+    "category": "movement",
+    "difficulty": 1,
+    "image_url": null,
+    "time_limit": 10
+  },
+  {
+    "id": "triassic_beg_09",
+    "question_text": "三畳紀は恐竜の歴史の中でどの段階？",
+    "mode": "text_choice",
+    "choices": [
+      { "type": "text", "label": "恐竜の終わり" },
+      { "type": "text", "label": "恐竜のはじまり" },
+      { "type": "text", "label": "恐竜の最盛期" },
+      { "type": "text", "label": "恐竜がいない時代" }
+    ],
+    "correct_index": 1,
+    "category": "overview",
+    "difficulty": 1,
+    "image_url": null,
+    "time_limit": 10
+  },
+  {
+    "id": "triassic_beg_10",
+    "question_text": "三畳紀の恐竜について正しい説明はどれ？",
+    "mode": "text_choice",
+    "choices": [
+      { "type": "text", "label": "恐竜が地球を完全に支配していた" },
+      { "type": "text", "label": "恐竜はまだ発展途中で、種類も多くなかった" },
+      { "type": "text", "label": "恐竜は存在しなかった" },
+      { "type": "text", "label": "恐竜はすべて草食だった" }
+    ],
+    "correct_index": 1,
+    "category": "overview",
+    "difficulty": 1,
+    "image_url": null,
+    "time_limit": 10
+  },
+
+  {
+    "id": "triassic_mid_01",
+    "question_text": "コエロフィシスは、どんな特徴を持つ恐竜だった？",
+    "mode": "text_choice",
+    "choices": [
+      { "type": "text", "label": "大型で四足歩行" },
+      { "type": "text", "label": "小型で細身の二足歩行" },
+      { "type": "text", "label": "羽毛で覆われていた" },
+      { "type": "text", "label": "水中生活をしていた" }
+    ],
+    "correct_index": 1,
+    "category": "dinosaur",
+    "difficulty": 2,
+    "image_url": null,
+    "time_limit": 12
+  },
+  {
+    "id": "triassic_mid_02",
+    "question_text": "三畳紀に恐竜が現れた背景として考えられているのはどれ？",
+    "mode": "text_choice",
+    "choices": [
+      { "type": "text", "label": "恐竜以外の生物がすべて消えたから" },
+      { "type": "text", "label": "環境変化や進化の積み重ねの結果" },
+      { "type": "text", "label": "偶然の突然変異だけが原因" },
+      { "type": "text", "label": "人類が作ったから" }
+    ],
+    "correct_index": 1,
+    "category": "evolution",
+    "difficulty": 2,
+    "image_url": null,
+    "time_limit": 12
+  },
+  {
+    "id": "triassic_mid_03",
+    "question_text": "三畳紀の終わりごろに起きた出来事として正しいものはどれ？",
+    "mode": "text_choice",
+    "choices": [
+      { "type": "text", "label": "恐竜が完全に絶滅した" },
+      { "type": "text", "label": "大量絶滅（生物の入れ替わり）が起こった" },
+      { "type": "text", "label": "鳥類が支配した" },
+      { "type": "text", "label": "人類が誕生した" }
+    ],
+    "correct_index": 1,
+    "category": "event",
+    "difficulty": 2,
+    "image_url": null,
+    "time_limit": 12
+  },
+  {
+    "id": "triassic_mid_04",
+    "question_text": "三畳紀の恐竜が、後の時代より小型な傾向だった理由として自然なのはどれ？",
+    "mode": "text_choice",
+    "choices": [
+      { "type": "text", "label": "恐竜の進化がまだ初期段階だったため" },
+      { "type": "text", "label": "酸素がまったく無かったため" },
+      { "type": "text", "label": "恐竜が水中で暮らしていたため" },
+      { "type": "text", "label": "恐竜が空を飛ぶ必要があったため" }
+    ],
+    "correct_index": 0,
+    "category": "evolution",
+    "difficulty": 2,
+    "image_url": null,
+    "time_limit": 12
+  },
+  {
+    "id": "triassic_mid_05",
+    "question_text": "三畳紀の恐竜とジュラ紀の恐竜を比べたとき、大きな違いとして正しいのはどれ？",
+    "mode": "text_choice",
+    "choices": [
+      { "type": "text", "label": "二足歩行かどうか" },
+      { "type": "text", "label": "体の大きさと種類の多様さ" },
+      { "type": "text", "label": "恐竜かどうか" },
+      { "type": "text", "label": "水中生活かどうか" }
+    ],
+    "correct_index": 1,
+    "category": "comparison",
+    "difficulty": 2,
+    "image_url": null,
+    "time_limit": 12
+  },
+  {
+    "id": "triassic_mid_06",
+    "question_text": "三畳紀に栄えた、恐竜を含む大きなグループ（系統）として正しいのはどれ？",
+    "mode": "text_choice",
+    "choices": [
+      { "type": "text", "label": "哺乳類" },
+      { "type": "text", "label": "主竜類" },
+      { "type": "text", "label": "鳥類" },
+      { "type": "text", "label": "魚類" }
+    ],
+    "correct_index": 1,
+    "category": "classification",
+    "difficulty": 2,
+    "image_url": null,
+    "time_limit": 12
+  },
+  {
+    "id": "triassic_mid_07",
+    "question_text": "三畳紀の恐竜がよく暮らしていたと考えられる環境として近いのはどれ？",
+    "mode": "text_choice",
+    "choices": [
+      { "type": "text", "label": "深海" },
+      { "type": "text", "label": "乾燥しやすい陸地" },
+      { "type": "text", "label": "氷原地帯" },
+      { "type": "text", "label": "空中" }
+    ],
+    "correct_index": 1,
+    "category": "environment",
+    "difficulty": 2,
+    "image_url": null,
+    "time_limit": 12
+  },
+  {
+    "id": "triassic_mid_08",
+    "question_text": "二足歩行は、初期の恐竜にとってどんな利点があったと考えられる？",
+    "mode": "text_choice",
+    "choices": [
+      { "type": "text", "label": "海の中で速く泳げる" },
+      { "type": "text", "label": "必ず道具が使える" },
+      { "type": "text", "label": "素早く移動しやすい" },
+      { "type": "text", "label": "空を飛べる" }
+    ],
+    "correct_index": 2,
+    "category": "movement",
+    "difficulty": 2,
+    "image_url": null,
+    "time_limit": 12
+  },
+  {
+    "id": "triassic_mid_09",
+    "question_text": "三畳紀に現れた恐竜たちは、その後どうなった？",
+    "mode": "text_choice",
+    "choices": [
+      { "type": "text", "label": "恐竜ではない動物に進化した" },
+      { "type": "text", "label": "ジュラ紀・白亜紀の恐竜へつながっていった" },
+      { "type": "text", "label": "全員が海へ移った" },
+      { "type": "text", "label": "すぐに絶滅して恐竜はいなくなった" }
+    ],
+    "correct_index": 1,
+    "category": "evolution",
+    "difficulty": 2,
+    "image_url": null,
+    "time_limit": 12
+  },
+  {
+    "id": "triassic_mid_10",
+    "question_text": "三畳紀は恐竜の進化において、どんな意味を持つ時代？",
+    "mode": "text_choice",
+    "choices": [
+      { "type": "text", "label": "恐竜が消えた時代" },
+      { "type": "text", "label": "恐竜が誕生し、基礎が作られた時代" },
+      { "type": "text", "label": "恐竜が最も巨大化した時代" },
+      { "type": "text", "label": "恐竜が空を飛ぶのが普通になった時代" }
+    ],
+    "correct_index": 1,
+    "category": "overview",
+    "difficulty": 2,
+    "image_url": null,
+    "time_limit": 12
+  },
+
+  {
+    "id": "jurassic_beg_v3_01",
+    "question_text": "ジュラ紀は、恐竜の歴史の中でどんな時代？",
+    "mode": "text_choice",
+    "choices": [
+      { "type": "text", "label": "恐竜が初めて現れた時代" },
+      { "type": "text", "label": "恐竜が大きく多様化した時代" },
+      { "type": "text", "label": "恐竜が絶滅した時代" },
+      { "type": "text", "label": "人類が登場した時代" }
+    ],
+    "correct_index": 1,
+    "category": "overview",
+    "difficulty": 1,
+    "image_url": null,
+    "time_limit": 10
+  },
+  {
+    "id": "jurassic_beg_v3_02",
+    "question_text": "次のうち、ジュラ紀に生きていた恐竜はどれ？",
+    "mode": "text_choice",
+    "choices": [
+      { "type": "text", "label": "ステゴサウルス" },
+      { "type": "text", "label": "トリケラトプス" },
+      { "type": "text", "label": "ティラノサウルス" },
+      { "type": "text", "label": "ヴェロキラプトル" }
+    ],
+    "correct_index": 0,
+    "category": "dinosaur",
+    "difficulty": 1,
+    "image_url": null,
+    "time_limit": 10
+  },
+  {
+    "id": "jurassic_beg_v3_03",
+    "question_text": "ジュラ紀の草食恐竜として多かった特徴はどれ？",
+    "mode": "text_choice",
+    "choices": [
+      { "type": "text", "label": "長い首を持つ" },
+      { "type": "text", "label": "鋭い牙を持つ" },
+      { "type": "text", "label": "角が3本ある" },
+      { "type": "text", "label": "体が小さい" }
+    ],
+    "correct_index": 0,
+    "category": "feature",
+    "difficulty": 1,
+    "image_url": null,
+    "time_limit": 10
+  },
+  {
+    "id": "jurassic_beg_v3_04",
+    "question_text": "ジュラ紀の海でよく知られている生物はどれ？",
+    "mode": "text_choice",
+    "choices": [
+      { "type": "text", "label": "アンモナイト" },
+      { "type": "text", "label": "イルカ" },
+      { "type": "text", "label": "人類" },
+      { "type": "text", "label": "ペンギン" }
+    ],
+    "correct_index": 0,
+    "category": "other_life",
+    "difficulty": 1,
+    "image_url": null,
+    "time_limit": 10
+  },
+  {
+    "id": "jurassic_beg_v3_05",
+    "question_text": "ジュラ紀に有名な大型肉食恐竜はどれ？",
+    "mode": "text_choice",
+    "choices": [
+      { "type": "text", "label": "アロサウルス" },
+      { "type": "text", "label": "トリケラトプス" },
+      { "type": "text", "label": "アンキロサウルス" },
+      { "type": "text", "label": "パキケファロサウルス" }
+    ],
+    "correct_index": 0,
+    "category": "dinosaur",
+    "difficulty": 1,
+    "image_url": null,
+    "time_limit": 10
+  },
+  {
+    "id": "jurassic_beg_v3_06",
+    "question_text": "ジュラ紀の恐竜が主に生活していた場所はどこ？",
+    "mode": "text_choice",
+    "choices": [
+      { "type": "text", "label": "陸上" },
+      { "type": "text", "label": "深海" },
+      { "type": "text", "label": "空中" },
+      { "type": "text", "label": "氷の上" }
+    ],
+    "correct_index": 0,
+    "category": "environment",
+    "difficulty": 1,
+    "image_url": null,
+    "time_limit": 10
+  },
+  {
+    "id": "jurassic_beg_v3_07",
+    "question_text": "ジュラ紀は、三畳紀と比べて恐竜はどうなった？",
+    "mode": "text_choice",
+    "choices": [
+      { "type": "text", "label": "数が減った" },
+      { "type": "text", "label": "多様化して増えた" },
+      { "type": "text", "label": "すべて絶滅した" },
+      { "type": "text", "label": "海に移った" }
+    ],
+    "correct_index": 1,
+    "category": "comparison",
+    "difficulty": 1,
+    "image_url": null,
+    "time_limit": 10
+  },
+  {
+    "id": "jurassic_beg_v3_08",
+    "question_text": "ジュラ紀に多く見られた大型草食恐竜の仲間はどれ？",
+    "mode": "text_choice",
+    "choices": [
+      { "type": "text", "label": "竜脚類（首の長い仲間）" },
+      { "type": "text", "label": "角竜類" },
+      { "type": "text", "label": "剣竜類" },
+      { "type": "text", "label": "獣脚類" }
+    ],
+    "correct_index": 0,
+    "category": "classification",
+    "difficulty": 1,
+    "image_url": null,
+    "time_limit": 10
+  },
+  {
+    "id": "jurassic_beg_v3_09",
+    "question_text": "ジュラ紀の恐竜について正しい説明はどれ？",
+    "mode": "text_choice",
+    "choices": [
+      { "type": "text", "label": "巨大な恐竜が多く活躍した" },
+      { "type": "text", "label": "恐竜はほとんどいなかった" },
+      { "type": "text", "label": "恐竜はすべて小型だった" },
+      { "type": "text", "label": "恐竜は海で暮らしていた" }
+    ],
+    "correct_index": 0,
+    "category": "overview",
+    "difficulty": 1,
+    "image_url": null,
+    "time_limit": 10
+  },
+  {
+    "id": "jurassic_beg_v3_10",
+    "question_text": "ジュラ紀は恐竜の進化において、どんな位置づけ？",
+    "mode": "text_choice",
+    "choices": [
+      { "type": "text", "label": "恐竜が本格的に繁栄した時代" },
+      { "type": "text", "label": "恐竜が衰退した時代" },
+      { "type": "text", "label": "恐竜が絶滅した時代" },
+      { "type": "text", "label": "恐竜が出現する前の時代" }
+    ],
+    "correct_index": 0,
+    "category": "overview",
+    "difficulty": 1,
+    "image_url": null,
+    "time_limit": 10
+  },
+
+  {
+    "id": "jurassic_mid_v3_01",
+    "question_text": "ステゴサウルスはこの中でどれ？",
+    "mode": "image_choice",
+    "choices": [
+      { "type": "image", "label": "ステゴサウルス", "image_url": "/assets/images/questions/jurassic_mid_v3_01_stegosaurus.png" },
+      { "type": "image", "label": "トリケラトプス", "image_url": "/assets/images/questions/jurassic_mid_v3_01_triceratops.png" },
+      { "type": "image", "label": "ティラノサウルス", "image_url": "/assets/images/questions/jurassic_mid_v3_01_tyrannosaurus.png" },
+      { "type": "image", "label": "ヴェロキラプトル", "image_url": "/assets/images/questions/jurassic_mid_v3_01_velociraptor.png" }
+    ],
+    "correct_index": 0,
+    "category": "identify",
+    "difficulty": 2,
+    "image_url": null,
+    "time_limit": 12
+  },
+  {
+    "id": "jurassic_mid_v3_02",
+    "question_text": "ブラキオサウルスはこの中でどれ？",
+    "mode": "image_choice",
+    "choices": [
+      { "type": "image", "label": "ブラキオサウルス", "image_url": "/assets/images/questions/jurassic_mid_v3_02_brachiosaurus.png" },
+      { "type": "image", "label": "ステゴサウルス", "image_url": "/assets/images/questions/jurassic_mid_v3_02_stegosaurus.png" },
+      { "type": "image", "label": "トリケラトプス", "image_url": "/assets/images/questions/jurassic_mid_v3_02_triceratops.png" },
+      { "type": "image", "label": "ティラノサウルス", "image_url": "/assets/images/questions/jurassic_mid_v3_02_tyrannosaurus.png" }
+    ],
+    "correct_index": 0,
+    "category": "identify",
+    "difficulty": 2,
+    "image_url": null,
+    "time_limit": 12
+  },
+  {
+    "id": "jurassic_mid_v3_03",
+    "question_text": "ステゴサウルスの背中の板の役割として有力な説はどれ？",
+    "mode": "text_choice",
+    "choices": [
+      { "type": "text", "label": "体温調節やアピール" },
+      { "type": "text", "label": "空を飛ぶため" },
+      { "type": "text", "label": "水中移動" },
+      { "type": "text", "label": "音を聞くため" }
+    ],
+    "correct_index": 0,
+    "category": "behavior",
+    "difficulty": 2,
+    "image_url": null,
+    "time_limit": 12
+  },
+  {
+    "id": "jurassic_mid_v3_04",
+    "question_text": "アロサウルスはどんな恐竜として知られている？",
+    "mode": "text_choice",
+    "choices": [
+      { "type": "text", "label": "ジュラ紀を代表する大型肉食恐竜" },
+      { "type": "text", "label": "白亜紀の終盤に現れた恐竜" },
+      { "type": "text", "label": "草だけを食べる恐竜" },
+      { "type": "text", "label": "海で生活する恐竜" }
+    ],
+    "correct_index": 0,
+    "category": "dinosaur",
+    "difficulty": 2,
+    "image_url": null,
+    "time_limit": 12
+  },
+  {
+    "id": "jurassic_mid_v3_05",
+    "question_text": "ジュラ紀の翼竜について正しいのはどれ？",
+    "mode": "text_choice",
+    "choices": [
+      { "type": "text", "label": "恐竜とは別の爬虫類" },
+      { "type": "text", "label": "恐竜の一種" },
+      { "type": "text", "label": "すべて羽毛を持つ" },
+      { "type": "text", "label": "水中生活をしていた" }
+    ],
+    "correct_index": 0,
+    "category": "classification",
+    "difficulty": 2,
+    "image_url": null,
+    "time_limit": 12
+  },
+  {
+    "id": "jurassic_mid_v3_06",
+    "question_text": "ジュラ紀に恐竜が多様化した理由として自然なのはどれ？",
+    "mode": "text_choice",
+    "choices": [
+      { "type": "text", "label": "環境への適応が進んだため" },
+      { "type": "text", "label": "恐竜以外がすべて消えたため" },
+      { "type": "text", "label": "人類が育てたため" },
+      { "type": "text", "label": "海に移ったため" }
+    ],
+    "correct_index": 0,
+    "category": "evolution",
+    "difficulty": 2,
+    "image_url": null,
+    "time_limit": 12
+  },
+  {
+    "id": "jurassic_mid_v3_07",
+    "question_text": "ジュラ紀と白亜紀の関係として正しいのはどれ？",
+    "mode": "text_choice",
+    "choices": [
+      { "type": "text", "label": "白亜紀のほうが後の時代" },
+      { "type": "text", "label": "ジュラ紀のほうが後" },
+      { "type": "text", "label": "同じ時代" },
+      { "type": "text", "label": "三畳紀の後に白亜紀が来る" }
+    ],
+    "correct_index": 0,
+    "category": "era",
+    "difficulty": 2,
+    "image_url": null,
+    "time_limit": 12
+  },
+  {
+    "id": "jurassic_mid_v3_08",
+    "question_text": "長い首を持つジュラ紀の草食恐竜の利点はどれ？",
+    "mode": "text_choice",
+    "choices": [
+      { "type": "text", "label": "高い場所の植物を食べられる" },
+      { "type": "text", "label": "速く走れる" },
+      { "type": "text", "label": "空を飛べる" },
+      { "type": "text", "label": "水中で息ができる" }
+    ],
+    "correct_index": 0,
+    "category": "behavior",
+    "difficulty": 2,
+    "image_url": null,
+    "time_limit": 12
+  },
+  {
+    "id": "jurassic_mid_v3_09",
+    "question_text": "ジュラ紀の恐竜について、より正確な説明はどれ？",
+    "mode": "text_choice",
+    "choices": [
+      { "type": "text", "label": "草食・肉食ともに大型種が目立った" },
+      { "type": "text", "label": "恐竜は小型種だけだった" },
+      { "type": "text", "label": "恐竜は水中で暮らしていた" },
+      { "type": "text", "label": "恐竜は三畳紀にしか存在しなかった" }
+    ],
+    "correct_index": 0,
+    "category": "overview",
+    "difficulty": 2,
+    "image_url": null,
+    "time_limit": 12
+  },
+  {
+    "id": "jurassic_mid_v3_10",
+    "question_text": "ジュラ紀は恐竜の進化において、どんな位置づけ？",
+    "mode": "text_choice",
+    "choices": [
+      { "type": "text", "label": "恐竜が本格的に繁栄した時代" },
+      { "type": "text", "label": "恐竜が衰退した時代" },
+      { "type": "text", "label": "恐竜が絶滅した時代" },
+      { "type": "text", "label": "恐竜が出現する前の時代" }
+    ],
+    "correct_index": 0,
+    "category": "overview",
+    "difficulty": 2,
+    "image_url": null,
+    "time_limit": 12
+  }
+,
+{
+  "id": "cretaceous_beg_v3_01",
+  "question_text": "白亜紀は、ジュラ紀と比べてどちらが後の時代？",
+  "mode": "text_choice",
+  "choices": [
+    { "type": "text", "label": "ジュラ紀" },
+    { "type": "text", "label": "白亜紀" },
+    { "type": "text", "label": "同じ時代" },
+    { "type": "text", "label": "三畳紀" }
+  ],
+  "correct_index": 1,
+  "category": "era",
+  "difficulty": 1,
+  "image_url": null,
+  "time_limit": 10
+},
+{
+  "id": "cretaceous_beg_v3_02",
+  "question_text": "次のうち、白亜紀の恐竜として有名なのはどれ？",
+  "mode": "text_choice",
+  "choices": [
+    { "type": "text", "label": "トリケラトプス" },
+    { "type": "text", "label": "ステゴサウルス" },
+    { "type": "text", "label": "ディプロドクス" },
+    { "type": "text", "label": "アロサウルス" }
+  ],
+  "correct_index": 0,
+  "category": "dinosaur",
+  "difficulty": 1,
+  "image_url": null,
+  "time_limit": 10
+},
+{
+  "id": "cretaceous_beg_v3_03",
+  "question_text": "ティラノサウルスが生きていたのは主にどの時代？",
+  "mode": "text_choice",
+  "choices": [
+    { "type": "text", "label": "三畳紀" },
+    { "type": "text", "label": "ジュラ紀" },
+    { "type": "text", "label": "白亜紀" },
+    { "type": "text", "label": "現代" }
+  ],
+  "correct_index": 2,
+  "category": "dinosaur",
+  "difficulty": 1,
+  "image_url": null,
+  "time_limit": 10
+},
+{
+  "id": "cretaceous_beg_v3_04",
+  "question_text": "白亜紀の恐竜に多かった特徴として、もっとも自然なのはどれ？",
+  "mode": "text_choice",
+  "choices": [
+    { "type": "text", "label": "恐竜が消えていく一方だった" },
+    { "type": "text", "label": "恐竜が多様化し、いろいろな形が増えた" },
+    { "type": "text", "label": "恐竜がすべて海で生活していた" },
+    { "type": "text", "label": "恐竜がすべて小型だった" }
+  ],
+  "correct_index": 1,
+  "category": "overview",
+  "difficulty": 1,
+  "image_url": null,
+  "time_limit": 10
+},
+{
+  "id": "cretaceous_beg_v3_05",
+  "question_text": "トリケラトプスの特徴として分かりやすいのはどれ？",
+  "mode": "text_choice",
+  "choices": [
+    { "type": "text", "label": "背中に板が並ぶ" },
+    { "type": "text", "label": "顔に角がある" },
+    { "type": "text", "label": "首がとても長い" },
+    { "type": "text", "label": "羽で空を飛ぶ" }
+  ],
+  "correct_index": 1,
+  "category": "feature",
+  "difficulty": 1,
+  "image_url": null,
+  "time_limit": 10
+},
+{
+  "id": "cretaceous_beg_v3_06",
+  "question_text": "白亜紀の終わりに起きた出来事として有名なのはどれ？",
+  "mode": "text_choice",
+  "choices": [
+    { "type": "text", "label": "恐竜を含む多くの生物が絶滅した" },
+    { "type": "text", "label": "人類が登場した" },
+    { "type": "text", "label": "恐竜が初めて現れた" },
+    { "type": "text", "label": "海が完全になくなった" }
+  ],
+  "correct_index": 0,
+  "category": "event",
+  "difficulty": 1,
+  "image_url": null,
+  "time_limit": 10
+},
+{
+  "id": "cretaceous_beg_v3_07",
+  "question_text": "白亜紀に生きていた恐竜として正しい組み合わせはどれ？",
+  "mode": "text_choice",
+  "choices": [
+    { "type": "text", "label": "ティラノサウルスとトリケラトプス" },
+    { "type": "text", "label": "ステゴサウルスとアロサウルス" },
+    { "type": "text", "label": "ディプロドクスとブラキオサウルス" },
+    { "type": "text", "label": "コエロフィシスとエオラプトル" }
+  ],
+  "correct_index": 0,
+  "category": "dinosaur",
+  "difficulty": 1,
+  "image_url": null,
+  "time_limit": 10
+},
+{
+  "id": "cretaceous_beg_v3_08",
+  "question_text": "白亜紀の恐竜に関する説明として正しいのはどれ？",
+  "mode": "text_choice",
+  "choices": [
+    { "type": "text", "label": "恐竜が最も多様化した時代のひとつ" },
+    { "type": "text", "label": "恐竜が最初に現れた時代" },
+    { "type": "text", "label": "恐竜がいなかった時代" },
+    { "type": "text", "label": "恐竜が海だけで生活した時代" }
+  ],
+  "correct_index": 0,
+  "category": "overview",
+  "difficulty": 1,
+  "image_url": null,
+  "time_limit": 10
+},
+{
+  "id": "cretaceous_beg_v3_09",
+  "question_text": "アンキロサウルスのイメージとして近いのはどれ？",
+  "mode": "text_choice",
+  "choices": [
+    { "type": "text", "label": "体が硬いよろいのように見える恐竜" },
+    { "type": "text", "label": "背中に板が並ぶ恐竜" },
+    { "type": "text", "label": "首が長い草食恐竜" },
+    { "type": "text", "label": "角が3本ある恐竜" }
+  ],
+  "correct_index": 0,
+  "category": "feature",
+  "difficulty": 1,
+  "image_url": null,
+  "time_limit": 10
+},
+{
+  "id": "cretaceous_beg_v3_10",
+  "question_text": "白亜紀の肉食恐竜として代表的なものはどれ？",
+  "mode": "text_choice",
+  "choices": [
+    { "type": "text", "label": "ティラノサウルス" },
+    { "type": "text", "label": "ステゴサウルス" },
+    { "type": "text", "label": "トリケラトプス" },
+    { "type": "text", "label": "アンキロサウルス" }
+  ],
+  "correct_index": 0,
+  "category": "dinosaur",
+  "difficulty": 1,
+  "image_url": null,
+  "time_limit": 10
+},
+
+{
+  "id": "cretaceous_mid_v3_01",
+  "question_text": "ティラノサウルスはこの中でどれ？",
+  "mode": "image_choice",
+  "choices": [
+    { "type": "image", "label": "ティラノサウルス", "image_url": "/assets/images/questions/cretaceous_mid_v3_01_tyrannosaurus.png" },
+    { "type": "image", "label": "トリケラトプス", "image_url": "/assets/images/questions/cretaceous_mid_v3_01_triceratops.png" },
+    { "type": "image", "label": "アンキロサウルス", "image_url": "/assets/images/questions/cretaceous_mid_v3_01_ankylosaurus.png" },
+    { "type": "image", "label": "ステゴサウルス", "image_url": "/assets/images/questions/cretaceous_mid_v3_01_stegosaurus.png" }
+  ],
+  "correct_index": 0,
+  "category": "identify",
+  "difficulty": 2,
+  "image_url": null,
+  "time_limit": 12
+},
+{
+  "id": "cretaceous_mid_v3_02",
+  "question_text": "トリケラトプスはこの中でどれ？",
+  "mode": "image_choice",
+  "choices": [
+    { "type": "image", "label": "トリケラトプス", "image_url": "/assets/images/questions/cretaceous_mid_v3_02_triceratops.png" },
+    { "type": "image", "label": "ティラノサウルス", "image_url": "/assets/images/questions/cretaceous_mid_v3_02_tyrannosaurus.png" },
+    { "type": "image", "label": "アンキロサウルス", "image_url": "/assets/images/questions/cretaceous_mid_v3_02_ankylosaurus.png" },
+    { "type": "image", "label": "ブラキオサウルス", "image_url": "/assets/images/questions/cretaceous_mid_v3_02_brachiosaurus.png" }
+  ],
+  "correct_index": 0,
+  "category": "identify",
+  "difficulty": 2,
+  "image_url": null,
+  "time_limit": 12
+},
+{
+  "id": "cretaceous_mid_v3_03",
+  "question_text": "白亜紀の終わりに起きた大量絶滅の原因として有名なのはどれ？",
+  "mode": "text_choice",
+  "choices": [
+    { "type": "text", "label": "巨大隕石の衝突が大きな要因とされる" },
+    { "type": "text", "label": "恐竜が海へ移住した" },
+    { "type": "text", "label": "人類が狩り尽くした" },
+    { "type": "text", "label": "地球の自転が止まった" }
+  ],
+  "correct_index": 0,
+  "category": "event",
+  "difficulty": 2,
+  "image_url": null,
+  "time_limit": 12
+},
+{
+  "id": "cretaceous_mid_v3_04",
+  "question_text": "トリケラトプスの「えり（フリル）」の役割として考えられているのはどれ？",
+  "mode": "text_choice",
+  "choices": [
+    { "type": "text", "label": "アピールや防御（説がある）" },
+    { "type": "text", "label": "空を飛ぶための翼" },
+    { "type": "text", "label": "水中で泳ぐため" },
+    { "type": "text", "label": "発電するため" }
+  ],
+  "correct_index": 0,
+  "category": "behavior",
+  "difficulty": 2,
+  "image_url": null,
+  "time_limit": 12
+},
+{
+  "id": "cretaceous_mid_v3_05",
+  "question_text": "アンキロサウルスの武器として有名なのはどれ？",
+  "mode": "text_choice",
+  "choices": [
+    { "type": "text", "label": "しっぽの先のこん棒のような部分（尾の棍棒）" },
+    { "type": "text", "label": "背中の大きな板" },
+    { "type": "text", "label": "長い首" },
+    { "type": "text", "label": "毒のトゲ" }
+  ],
+  "correct_index": 0,
+  "category": "feature",
+  "difficulty": 2,
+  "image_url": null,
+  "time_limit": 12
+},
+{
+  "id": "cretaceous_mid_v3_06",
+  "question_text": "白亜紀は、恐竜の多様化という点でどう言える？",
+  "mode": "text_choice",
+  "choices": [
+    { "type": "text", "label": "多様化が進んだ時代のひとつ" },
+    { "type": "text", "label": "恐竜がほとんどいなかった" },
+    { "type": "text", "label": "恐竜がすべて海に移った" },
+    { "type": "text", "label": "恐竜が一種類だけになった" }
+  ],
+  "correct_index": 0,
+  "category": "overview",
+  "difficulty": 2,
+  "image_url": null,
+  "time_limit": 12
+},
+{
+  "id": "cretaceous_mid_v3_07",
+  "question_text": "次のうち「白亜紀の恐竜」としてもっとも自然な組み合わせはどれ？",
+  "mode": "text_choice",
+  "choices": [
+    { "type": "text", "label": "ティラノサウルス＋トリケラトプス" },
+    { "type": "text", "label": "ステゴサウルス＋アロサウルス" },
+    { "type": "text", "label": "ディプロドクス＋ブラキオサウルス" },
+    { "type": "text", "label": "コエロフィシス＋エオラプトル" }
+  ],
+  "correct_index": 0,
+  "category": "dinosaur",
+  "difficulty": 2,
+  "image_url": null,
+  "time_limit": 12
+},
+{
+  "id": "cretaceous_mid_v3_08",
+  "question_text": "ティラノサウルスが生きていたのは白亜紀のどのあたり？（ざっくり）",
+  "mode": "text_choice",
+  "choices": [
+    { "type": "text", "label": "白亜紀の前半" },
+    { "type": "text", "label": "白亜紀の後半（終盤）" },
+    { "type": "text", "label": "ジュラ紀の終わり" },
+    { "type": "text", "label": "三畳紀の後半" }
+  ],
+  "correct_index": 1,
+  "category": "era",
+  "difficulty": 2,
+  "image_url": null,
+  "time_limit": 12
+},
+{
+  "id": "cretaceous_mid_v3_09",
+  "question_text": "白亜紀の終わりの大量絶滅で、恐竜はどうなった？",
+  "mode": "text_choice",
+  "choices": [
+    { "type": "text", "label": "恐竜（非鳥類型恐竜）は絶滅した" },
+    { "type": "text", "label": "恐竜は海に移って生き残った" },
+    { "type": "text", "label": "恐竜は人類になった" },
+    { "type": "text", "label": "恐竜は一度もいなかった" }
+  ],
+  "correct_index": 0,
+  "category": "event",
+  "difficulty": 2,
+  "image_url": null,
+  "time_limit": 12
+},
+{
+  "id": "cretaceous_mid_v3_10",
+  "question_text": "白亜紀の恐竜について、中級者向けの説明として正しいのはどれ？",
+  "mode": "text_choice",
+  "choices": [
+    { "type": "text", "label": "多様な恐竜が登場し、終わりに大量絶滅が起こった" },
+    { "type": "text", "label": "恐竜は白亜紀に初めて登場した" },
+    { "type": "text", "label": "恐竜は白亜紀にだけ存在した" },
+    { "type": "text", "label": "恐竜は白亜紀に海で暮らしていた" }
+  ],
+  "correct_index": 0,
+  "category": "overview",
+  "difficulty": 2,
+  "image_url": null,
+  "time_limit": 12
+}
+,
+{
+  "id": "cretaceous_adv_v3_01",
+  "question_text": "白亜紀に現れた植物の大きな変化として有名なのはどれ？",
+  "mode": "text_choice",
+  "choices": [
+    { "type": "text", "label": "被子植物（花を咲かせる植物）が広がった" },
+    { "type": "text", "label": "陸上植物が消滅した" },
+    { "type": "text", "label": "植物がすべて海に移った" },
+    { "type": "text", "label": "コケしか存在しなかった" }
+  ],
+  "correct_index": 0,
+  "category": "environment",
+  "difficulty": 3,
+  "image_url": null,
+  "time_limit": 14
+},
+{
+  "id": "cretaceous_adv_v3_02",
+  "question_text": "次のうち、白亜紀の恐竜として自然なのはどれ？",
+  "mode": "text_choice",
+  "choices": [
+    { "type": "text", "label": "パラサウロロフス" },
+    { "type": "text", "label": "ディプロドクス" },
+    { "type": "text", "label": "ステゴサウルス" },
+    { "type": "text", "label": "アロサウルス" }
+  ],
+  "correct_index": 0,
+  "category": "dinosaur",
+  "difficulty": 3,
+  "image_url": null,
+  "time_limit": 14
+},
+{
+  "id": "cretaceous_adv_v3_03",
+  "question_text": "ヴェロキラプトルが生きていたのは主にどの時代？",
+  "mode": "text_choice",
+  "choices": [
+    { "type": "text", "label": "三畳紀" },
+    { "type": "text", "label": "ジュラ紀" },
+    { "type": "text", "label": "白亜紀" },
+    { "type": "text", "label": "現代" }
+  ],
+  "correct_index": 2,
+  "category": "era",
+  "difficulty": 3,
+  "image_url": null,
+  "time_limit": 14
+},
+{
+  "id": "cretaceous_adv_v3_04",
+  "question_text": "モササウルスについて正しい説明はどれ？",
+  "mode": "text_choice",
+  "choices": [
+    { "type": "text", "label": "海にいた大型の爬虫類で、恐竜ではない" },
+    { "type": "text", "label": "空を飛ぶ恐竜" },
+    { "type": "text", "label": "白亜紀の代表的な角竜" },
+    { "type": "text", "label": "哺乳類の仲間" }
+  ],
+  "correct_index": 0,
+  "category": "other_life",
+  "difficulty": 3,
+  "image_url": null,
+  "time_limit": 14
+},
+{
+  "id": "cretaceous_adv_v3_05",
+  "question_text": "白亜紀の角竜類（かくりゅうるい）の代表例として有名なのはどれ？",
+  "mode": "text_choice",
+  "choices": [
+    { "type": "text", "label": "トリケラトプス" },
+    { "type": "text", "label": "ステゴサウルス" },
+    { "type": "text", "label": "アンキロサウルス" },
+    { "type": "text", "label": "アロサウルス" }
+  ],
+  "correct_index": 0,
+  "category": "classification",
+  "difficulty": 3,
+  "image_url": null,
+  "time_limit": 14
+},
+{
+  "id": "cretaceous_adv_v3_06",
+  "question_text": "白亜紀の「鳥盤類（ちょうばんるい）」に多い食性として自然なのはどれ？",
+  "mode": "text_choice",
+  "choices": [
+    { "type": "text", "label": "草食が多い" },
+    { "type": "text", "label": "肉食のみ" },
+    { "type": "text", "label": "すべて雑食" },
+    { "type": "text", "label": "海藻だけを食べる" }
+  ],
+  "correct_index": 0,
+  "category": "classification",
+  "difficulty": 3,
+  "image_url": null,
+  "time_limit": 14
+},
+{
+  "id": "cretaceous_adv_v3_07",
+  "question_text": "スピノサウルスについて、一般的に言われる特徴として近いのはどれ？",
+  "mode": "text_choice",
+  "choices": [
+    { "type": "text", "label": "背中に大きな帆（ほ）状の突起がある" },
+    { "type": "text", "label": "顔に3本の角がある" },
+    { "type": "text", "label": "背中に板が並ぶ" },
+    { "type": "text", "label": "首がとても長い草食恐竜" }
+  ],
+  "correct_index": 0,
+  "category": "feature",
+  "difficulty": 3,
+  "image_url": null,
+  "time_limit": 14
+},
+{
+  "id": "cretaceous_adv_v3_08",
+  "question_text": "白亜紀の終わりの大量絶滅で「恐竜以外」にも大きな影響が出た例として自然なのはどれ？",
+  "mode": "text_choice",
+  "choices": [
+    { "type": "text", "label": "アンモナイトなど多くの生物が影響を受けた" },
+    { "type": "text", "label": "海の生物は一切影響を受けなかった" },
+    { "type": "text", "label": "植物だけが絶滅した" },
+    { "type": "text", "label": "哺乳類だけが絶滅した" }
+  ],
+  "correct_index": 0,
+  "category": "event",
+  "difficulty": 3,
+  "image_url": null,
+  "time_limit": 14
+},
+{
+  "id": "cretaceous_adv_v3_09",
+  "question_text": "ハドロサウルス類（カモノハシ恐竜の仲間）のイメージとして近いのはどれ？",
+  "mode": "text_choice",
+  "choices": [
+    { "type": "text", "label": "くちばしのような口を持つ草食恐竜" },
+    { "type": "text", "label": "背中の板が目立つ恐竜" },
+    { "type": "text", "label": "角が3本ある恐竜" },
+    { "type": "text", "label": "しっぽの先がこん棒の恐竜" }
+  ],
+  "correct_index": 0,
+  "category": "classification",
+  "difficulty": 3,
+  "image_url": null,
+  "time_limit": 14
+},
+{
+  "id": "cretaceous_adv_v3_10",
+  "question_text": "白亜紀の恐竜を覚えるコツとして一番それっぽいのはどれ？",
+  "mode": "text_choice",
+  "choices": [
+    { "type": "text", "label": "角竜・鎧竜・カモノハシ系など“見た目のグループ”で覚える" },
+    { "type": "text", "label": "全部ティラノサウルスとして覚える" },
+    { "type": "text", "label": "時代は考えず名前だけ暗記する" },
+    { "type": "text", "label": "海の生物だけ覚える" }
+  ],
+  "correct_index": 0,
+  "category": "tips",
+  "difficulty": 3,
+  "image_url": null,
+  "time_limit": 14
+},
+{
+  "id": "cretaceous_sup_v3_01",
+  "question_text": "白亜紀に被子植物（花を咲かせる植物）が広がったことによる影響として考えられるのはどれ？",
+  "mode": "text_choice",
+  "choices": [
+    { "type": "text", "label": "草食恐竜の食性や生態に変化を与えた可能性がある" },
+    { "type": "text", "label": "恐竜がすべて肉食になった" },
+    { "type": "text", "label": "植物がほとんど存在しなくなった" },
+    { "type": "text", "label": "恐竜が空中生活に移行した" }
+  ],
+  "correct_index": 0,
+  "category": "environment",
+  "difficulty": 4,
+  "image_url": null,
+  "time_limit": 15
+},
+{
+  "id": "cretaceous_sup_v3_02",
+  "question_text": "白亜紀後期に角竜類（トリケラトプスなど）が多様化した理由として考えられるのはどれ？",
+  "mode": "text_choice",
+  "choices": [
+    { "type": "text", "label": "植物資源の多様化と防御構造の進化が関係した可能性" },
+    { "type": "text", "label": "捕食者が完全にいなくなったため" },
+    { "type": "text", "label": "すべて水中生活だったため" },
+    { "type": "text", "label": "哺乳類との共生が必須だったため" }
+  ],
+  "correct_index": 0,
+  "category": "evolution",
+  "difficulty": 4,
+  "image_url": null,
+  "time_limit": 15
+},
+{
+  "id": "cretaceous_sup_v3_03",
+  "question_text": "白亜紀の獣脚類（肉食恐竜）に見られる特徴として妥当なのはどれ？",
+  "mode": "text_choice",
+  "choices": [
+    { "type": "text", "label": "大型から小型まで幅広い体サイズが存在した" },
+    { "type": "text", "label": "すべて同じ大きさだった" },
+    { "type": "text", "label": "草食に完全転向していた" },
+    { "type": "text", "label": "ほとんどが海生だった" }
+  ],
+  "correct_index": 0,
+  "category": "classification",
+  "difficulty": 4,
+  "image_url": null,
+  "time_limit": 15
+},
+{
+  "id": "cretaceous_sup_v3_04",
+  "question_text": "ティラノサウルス科が白亜紀後期に繁栄した理由として有力なのはどれ？",
+  "mode": "text_choice",
+  "choices": [
+    { "type": "text", "label": "強力な噛む力や感覚器官の発達が捕食に有利だった" },
+    { "type": "text", "label": "空を飛べたため" },
+    { "type": "text", "label": "完全な腐肉食だったため" },
+    { "type": "text", "label": "植物のみを食べていたため" }
+  ],
+  "correct_index": 0,
+  "category": "function",
+  "difficulty": 4,
+  "image_url": null,
+  "time_limit": 15
+},
+{
+  "id": "cretaceous_sup_v3_05",
+  "question_text": "白亜紀に鳥脚類（ハドロサウルス類など）が成功した要因として近いのはどれ？",
+  "mode": "text_choice",
+  "choices": [
+    { "type": "text", "label": "効率的な咀嚼能力と群れ生活の可能性" },
+    { "type": "text", "label": "完全な単独生活" },
+    { "type": "text", "label": "飛行能力の獲得" },
+    { "type": "text", "label": "水中専用の体構造" }
+  ],
+  "correct_index": 0,
+  "category": "ecology",
+  "difficulty": 4,
+  "image_url": null,
+  "time_limit": 15
+},
+{
+  "id": "cretaceous_sup_v3_06",
+  "question_text": "白亜紀の恐竜分布について正しい理解はどれ？",
+  "mode": "text_choice",
+  "choices": [
+    { "type": "text", "label": "大陸分裂により地域ごとに特徴的な恐竜相が生まれた" },
+    { "type": "text", "label": "世界中で同じ恐竜しか存在しなかった" },
+    { "type": "text", "label": "恐竜は一つの大陸にしかいなかった" },
+    { "type": "text", "label": "恐竜は南半球にのみ存在した" }
+  ],
+  "correct_index": 0,
+  "category": "geography",
+  "difficulty": 4,
+  "image_url": null,
+  "time_limit": 15
+},
+{
+  "id": "cretaceous_sup_v3_07",
+  "question_text": "白亜紀後期に見られる恐竜の特徴として最も近いのはどれ？",
+  "mode": "text_choice",
+  "choices": [
+    { "type": "text", "label": "分類群ごとの専門化が進んでいた" },
+    { "type": "text", "label": "恐竜が急激に単純化した" },
+    { "type": "text", "label": "恐竜の種類がほぼ消滅していた" },
+    { "type": "text", "label": "恐竜が一斉に小型化した" }
+  ],
+  "correct_index": 0,
+  "category": "evolution",
+  "difficulty": 4,
+  "image_url": null,
+  "time_limit": 15
+},
+{
+  "id": "cretaceous_sup_v3_08",
+  "question_text": "白亜紀末の大量絶滅について、現在の理解として妥当なのはどれ？",
+  "mode": "text_choice",
+  "choices": [
+    { "type": "text", "label": "隕石衝突など複数要因が関係した可能性が高い" },
+    { "type": "text", "label": "単一の寒冷化のみが原因と確定している" },
+    { "type": "text", "label": "恐竜が自発的に姿を消した" },
+    { "type": "text", "label": "人類の活動が原因だった" }
+  ],
+  "correct_index": 0,
+  "category": "extinction",
+  "difficulty": 4,
+  "image_url": null,
+  "time_limit": 15
+},
+{
+  "id": "cretaceous_sup_v3_09",
+  "question_text": "白亜紀の恐竜を理解する際に重要な視点として適切なのはどれ？",
+  "mode": "text_choice",
+  "choices": [
+    { "type": "text", "label": "時代後期に向かうほど多様化と専門化が進んだ点" },
+    { "type": "text", "label": "恐竜が衰退し続けていた点" },
+    { "type": "text", "label": "恐竜がすべて同じ生態だった点" },
+    { "type": "text", "label": "恐竜が進化を止めていた点" }
+  ],
+  "correct_index": 0,
+  "category": "overview",
+  "difficulty": 4,
+  "image_url": null,
+  "time_limit": 15
+},
+{
+  "id": "cretaceous_sup_v3_10",
+  "question_text": "白亜紀を恐竜史全体の中で位置づけると最も近いのはどれ？",
+  "mode": "text_choice",
+  "choices": [
+    { "type": "text", "label": "恐竜の多様性が最も広がり、その後に大きな転換点を迎えた時代" },
+    { "type": "text", "label": "恐竜が登場した直後の時代" },
+    { "type": "text", "label": "恐竜が存在しなかった時代" },
+    { "type": "text", "label": "恐竜が海に完全適応した時代" }
+  ],
+  "correct_index": 0,
+  "category": "overview",
+  "difficulty": 4,
+  "image_url": null,
+  "time_limit": 15
+},
+  {
+    "id": "jp_beg_v2_01",
+    "question_text": "映画『ジュラシック・パーク／ワールド』シリーズで、恐竜が現代に存在する理由はどれ？（映画設定）",
+    "mode": "text_choice",
+    "choices": [
+      { "type": "text", "label": "化石に残ったDNAを使って復元された" },
+      { "type": "text", "label": "地下で生き残っていた" },
+      { "type": "text", "label": "宇宙から飛来した" },
+      { "type": "text", "label": "未来から連れてこられた" }
+    ],
+    "correct_index": 0,
+    "category": "movie_setting",
+    "difficulty": 1,
+    "image_url": null,
+    "time_limit": 15
+  },
+  {
+    "id": "jp_beg_v2_02",
+    "question_text": "映画『ジュラシック・パーク』第1作の舞台として正しいのはどれ？（映画設定）",
+    "mode": "text_choice",
+    "choices": [
+      { "type": "text", "label": "イスラ・ヌブラル島" },
+      { "type": "text", "label": "イスラ・ソルナ島" },
+      { "type": "text", "label": "ガラパゴス諸島" },
+      { "type": "text", "label": "マダガスカル島" }
+    ],
+    "correct_index": 0,
+    "category": "location",
+    "difficulty": 1,
+    "image_url": null,
+    "time_limit": 15
+  },
+  {
+    "id": "jp_beg_v2_03",
+    "question_text": "映画シリーズでヴェロキラプトルはどのような存在として描かれている？（映画設定）",
+    "mode": "text_choice",
+    "choices": [
+      { "type": "text", "label": "知能が高く、連携行動も見せる危険な肉食恐竜" },
+      { "type": "text", "label": "おとなしい草食恐竜" },
+      { "type": "text", "label": "水中で生活する恐竜" },
+      { "type": "text", "label": "恐竜ではない哺乳類" }
+    ],
+    "correct_index": 0,
+    "category": "behavior",
+    "difficulty": 1,
+    "image_url": null,
+    "time_limit": 15
+  },
+  {
+    "id": "jp_beg_v2_04",
+    "question_text": "映画『ジュラシック・ワールド』で恐竜が主に扱われているものとして近いのはどれ？（映画設定）",
+    "mode": "text_choice",
+    "choices": [
+      { "type": "text", "label": "テーマパークの展示・観光資源" },
+      { "type": "text", "label": "家畜" },
+      { "type": "text", "label": "家庭用ペット" },
+      { "type": "text", "label": "宇宙探査用生物" }
+    ],
+    "correct_index": 0,
+    "category": "theme",
+    "difficulty": 1,
+    "image_url": null,
+    "time_limit": 15
+  },
+  {
+    "id": "jp_beg_v2_05",
+    "question_text": "映画『ジュラシック・ワールド』に登場する巨大な海の恐竜として有名なのはどれ？（映画設定）",
+    "mode": "text_choice",
+    "choices": [
+      { "type": "text", "label": "モササウルス" },
+      { "type": "text", "label": "プレシオサウルス" },
+      { "type": "text", "label": "メガロドン" },
+      { "type": "text", "label": "シーラカンス" }
+    ],
+    "correct_index": 0,
+    "category": "creature",
+    "difficulty": 1,
+    "image_url": null,
+    "time_limit": 15
+  },
+  {
+    "id": "jp_beg_v2_06",
+    "question_text": "映画シリーズで「人工的に作られた恐竜」として正しいのはどれ？（映画設定）",
+    "mode": "text_choice",
+    "choices": [
+      { "type": "text", "label": "インドミナス・レックス" },
+      { "type": "text", "label": "トリケラトプス" },
+      { "type": "text", "label": "ステゴサウルス" },
+      { "type": "text", "label": "ブラキオサウルス" }
+    ],
+    "correct_index": 0,
+    "category": "movie_original",
+    "difficulty": 1,
+    "image_url": null,
+    "time_limit": 15
+  },
+  {
+    "id": "jp_beg_v2_07",
+    "question_text": "映画『ジュラシック・パーク』で施設が危険な状態になる主なきっかけとして近いのはどれ？（映画設定）",
+    "mode": "text_choice",
+    "choices": [
+      { "type": "text", "label": "安全システムが止まり、柵などが機能しなくなる" },
+      { "type": "text", "label": "恐竜が自然に絶滅する" },
+      { "type": "text", "label": "島が突然沈む" },
+      { "type": "text", "label": "恐竜が冬眠する" }
+    ],
+    "correct_index": 0,
+    "category": "plot",
+    "difficulty": 1,
+    "image_url": null,
+    "time_limit": 15
+  },
+  {
+    "id": "jp_beg_v2_08",
+    "question_text": "映画『ジュラシック・ワールド』でラプトルと深く関わる人物として正しいのはどれ？（映画設定）",
+    "mode": "text_choice",
+    "choices": [
+      { "type": "text", "label": "オーウェン" },
+      { "type": "text", "label": "ジョン・ハモンド" },
+      { "type": "text", "label": "ヘンリー・ウー" },
+      { "type": "text", "label": "イーライ・ミルズ" }
+    ],
+    "correct_index": 0,
+    "category": "character",
+    "difficulty": 1,
+    "image_url": null,
+    "time_limit": 15
+  },
+  {
+    "id": "jp_beg_v2_09",
+    "question_text": "映画『ジュラシック・ワールド』で“青い体色”が特徴のラプトルの名前はどれ？（映画設定）",
+    "mode": "text_choice",
+    "choices": [
+      { "type": "text", "label": "ブルー" },
+      { "type": "text", "label": "デルタ" },
+      { "type": "text", "label": "エコー" },
+      { "type": "text", "label": "チャーリー" }
+    ],
+    "correct_index": 0,
+    "category": "dinosaur",
+    "difficulty": 1,
+    "image_url": null,
+    "time_limit": 15
+  },
+  {
+    "id": "jp_beg_v2_10",
+    "question_text": "映画シリーズで繰り返し描かれるテーマとして近いのはどれ？（映画設定）",
+    "mode": "text_choice",
+    "choices": [
+      { "type": "text", "label": "生命を完全に制御できるという過信の危うさ" },
+      { "type": "text", "label": "恐竜の家畜化は簡単である" },
+      { "type": "text", "label": "恐竜は人類の味方である" },
+      { "type": "text", "label": "恐竜は感情を持たない機械である" }
+    ],
+    "correct_index": 0,
+    "category": "theme",
+    "difficulty": 1,
+    "image_url": null,
+    "time_limit": 15
+  },
+
+  {
+    "id": "jp_mid_v2_01",
+    "question_text": "映画『ジュラシック・パーク』で、安全管理が破綻する主な原因として最も近いのはどれ？（映画設定）",
+    "mode": "text_choice",
+    "choices": [
+      { "type": "text", "label": "システム停止により柵や監視が機能しなくなった" },
+      { "type": "text", "label": "恐竜が全員おとなしかった" },
+      { "type": "text", "label": "恐竜が自然に島外へ移住した" },
+      { "type": "text", "label": "島の重力が変化した" }
+    ],
+    "correct_index": 0,
+    "category": "plot",
+    "difficulty": 2,
+    "image_url": null,
+    "time_limit": 15
+  },
+  {
+    "id": "jp_mid_v2_02",
+    "question_text": "映画シリーズの企業名として正しいのはどれ？（映画設定）",
+    "mode": "text_choice",
+    "choices": [
+      { "type": "text", "label": "インジェン社（InGen）" },
+      { "type": "text", "label": "アンブレラ社" },
+      { "type": "text", "label": "ウェイランド社" },
+      { "type": "text", "label": "サイバーライフ社" }
+    ],
+    "correct_index": 0,
+    "category": "organization",
+    "difficulty": 2,
+    "image_url": null,
+    "time_limit": 15
+  },
+  {
+    "id": "jp_mid_v2_03",
+    "question_text": "映画『ロスト・ワールド／ジュラシック・パーク』で重要な場所として扱われる島はどれ？（映画設定）",
+    "mode": "text_choice",
+    "choices": [
+      { "type": "text", "label": "イスラ・ソルナ島（サイトB）" },
+      { "type": "text", "label": "イスラ・ヌブラル島" },
+      { "type": "text", "label": "スカル島" },
+      { "type": "text", "label": "サルガッソ海" }
+    ],
+    "correct_index": 0,
+    "category": "location",
+    "difficulty": 2,
+    "image_url": null,
+    "time_limit": 15
+  },
+  {
+    "id": "jp_mid_v2_04",
+    "question_text": "映画『ジュラシック・ワールド』でインドミナス・レックスが見せる能力として正しいのはどれ？（映画設定）",
+    "mode": "text_choice",
+    "choices": [
+      { "type": "text", "label": "周囲に溶け込むようなカモフラージュ能力" },
+      { "type": "text", "label": "空を飛ぶ能力" },
+      { "type": "text", "label": "火を吐く能力" },
+      { "type": "text", "label": "時間を止める能力" }
+    ],
+    "correct_index": 0,
+    "category": "ability",
+    "difficulty": 2,
+    "image_url": null,
+    "time_limit": 15
+  },
+  {
+    "id": "jp_mid_v2_05",
+    "question_text": "映画『ジュラシック・ワールド』で、ラプトル部隊が追跡に動員される理由として近いのはどれ？（映画設定）",
+    "mode": "text_choice",
+    "choices": [
+      { "type": "text", "label": "逃走した危険個体を追跡するため" },
+      { "type": "text", "label": "観光客に芸を見せるため" },
+      { "type": "text", "label": "草を食べさせるため" },
+      { "type": "text", "label": "海の掃除をするため" }
+    ],
+    "correct_index": 0,
+    "category": "plot",
+    "difficulty": 2,
+    "image_url": null,
+    "time_limit": 15
+  },
+  {
+    "id": "jp_mid_v2_06",
+    "question_text": "映画『ジュラシック・パーク』シリーズで、恐竜のDNAの欠けた部分を補う方法として示されるのはどれ？（映画設定）",
+    "mode": "text_choice",
+    "choices": [
+      { "type": "text", "label": "別の生物のDNAで補完する" },
+      { "type": "text", "label": "月の光で修復する" },
+      { "type": "text", "label": "砂に埋めて自然回復させる" },
+      { "type": "text", "label": "恐竜自身が自動で再生する" }
+    ],
+    "correct_index": 0,
+    "category": "movie_setting",
+    "difficulty": 2,
+    "image_url": null,
+    "time_limit": 15
+  },
+  {
+    "id": "jp_mid_v2_07",
+    "question_text": "映画『ジュラシック・ワールド／炎の王国』で、島の恐竜が危機に陥る原因として描かれるのはどれ？（映画設定）",
+    "mode": "text_choice",
+    "choices": [
+      { "type": "text", "label": "火山活動による災害" },
+      { "type": "text", "label": "巨大津波が毎日起きる" },
+      { "type": "text", "label": "永久凍土が広がる" },
+      { "type": "text", "label": "太陽光が消える" }
+    ],
+    "correct_index": 0,
+    "category": "plot",
+    "difficulty": 2,
+    "image_url": null,
+    "time_limit": 15
+  },
+  {
+    "id": "jp_mid_v2_08",
+    "question_text": "映画『ジュラシック・ワールド／炎の王国』で人工恐竜として登場するのはどれ？（映画設定）",
+    "mode": "text_choice",
+    "choices": [
+      { "type": "text", "label": "インドラプトル" },
+      { "type": "text", "label": "アンキロサウルス" },
+      { "type": "text", "label": "パラサウロロフス" },
+      { "type": "text", "label": "ガリミムス" }
+    ],
+    "correct_index": 0,
+    "category": "movie_original",
+    "difficulty": 2,
+    "image_url": null,
+    "time_limit": 15
+  },
+  {
+    "id": "jp_mid_v2_09",
+    "question_text": "映画『ジュラシック・ワールド』で、モササウルスが飼育されている場所として正しいのはどれ？（映画設定）",
+    "mode": "text_choice",
+    "choices": [
+      { "type": "text", "label": "巨大な水槽（ラグーン）" },
+      { "type": "text", "label": "森の中の檻" },
+      { "type": "text", "label": "砂漠の地下" },
+      { "type": "text", "label": "雪山の洞窟" }
+    ],
+    "correct_index": 0,
+    "category": "location",
+    "difficulty": 2,
+    "image_url": null,
+    "time_limit": 15
+  },
+  {
+    "id": "jp_mid_v2_10",
+    "question_text": "映画『ジュラシック・ワールド』で、パーク運営側がより強い恐竜を求める理由として近いのはどれ？（映画設定）",
+    "mode": "text_choice",
+    "choices": [
+      { "type": "text", "label": "来場者の注目を集める新目玉を作ろうとした" },
+      { "type": "text", "label": "恐竜を絶滅させるため" },
+      { "type": "text", "label": "恐竜を家畜化するため" },
+      { "type": "text", "label": "恐竜を宇宙へ送るため" }
+    ],
+    "correct_index": 0,
+    "category": "theme",
+    "difficulty": 2,
+    "image_url": null,
+    "time_limit": 15
+  },
+
+  {
+    "id": "jp_adv_v2_01",
+    "question_text": "映画『ジュラシック・ワールド』でインドミナス・レックスが作られた理由として最も近いのはどれ？（映画設定）",
+    "mode": "text_choice",
+    "choices": [
+      { "type": "text", "label": "複数の遺伝子を組み合わせ、話題性のある新恐竜を作るため" },
+      { "type": "text", "label": "自然に生まれた個体を保護するため" },
+      { "type": "text", "label": "恐竜をすべて草食にするため" },
+      { "type": "text", "label": "恐竜を小型化して安全にするため" }
+    ],
+    "correct_index": 0,
+    "category": "movie_original",
+    "difficulty": 3,
+    "image_url": null,
+    "time_limit": 15
+  },
+  {
+    "id": "jp_adv_v2_02",
+    "question_text": "映画『ジュラシック・ワールド』で、インドミナス・レックスの危険性が増す要素として描かれるのはどれ？（映画設定）",
+    "mode": "text_choice",
+    "choices": [
+      { "type": "text", "label": "知能が高く、学習して状況を利用する" },
+      { "type": "text", "label": "必ず眠ってしまう" },
+      { "type": "text", "label": "太陽光で弱体化する" },
+      { "type": "text", "label": "水に触れると動けない" }
+    ],
+    "correct_index": 0,
+    "category": "ability",
+    "difficulty": 3,
+    "image_url": null,
+    "time_limit": 15
+  },
+  {
+    "id": "jp_adv_v2_03",
+    "question_text": "映画『ジュラシック・パーク』第1作で、恐竜の繁殖に関して問題となる点として近いのはどれ？（映画設定）",
+    "mode": "text_choice",
+    "choices": [
+      { "type": "text", "label": "想定外に繁殖が起こり得る" },
+      { "type": "text", "label": "恐竜は一切繁殖しない" },
+      { "type": "text", "label": "恐竜は自動的に消滅する" },
+      { "type": "text", "label": "恐竜は必ず人に従う" }
+    ],
+    "correct_index": 0,
+    "category": "movie_setting",
+    "difficulty": 3,
+    "image_url": null,
+    "time_limit": 15
+  },
+  {
+    "id": "jp_adv_v2_04",
+    "question_text": "映画『ジュラシック・ワールド／炎の王国』で、恐竜が島外へ移される流れとして近いのはどれ？（映画設定）",
+    "mode": "text_choice",
+    "choices": [
+      { "type": "text", "label": "救出や利権を名目に、恐竜が人間社会側へ運び出される" },
+      { "type": "text", "label": "恐竜が自力で船を運転する" },
+      { "type": "text", "label": "恐竜が空輸で世界へ散布される" },
+      { "type": "text", "label": "恐竜が全員海へ移住する" }
+    ],
+    "correct_index": 0,
+    "category": "plot",
+    "difficulty": 3,
+    "image_url": null,
+    "time_limit": 15
+  },
+  {
+    "id": "jp_adv_v2_05",
+    "question_text": "映画『ジュラシック・ワールド／炎の王国』のインドラプトルについて、映画内設定として近いのはどれ？（映画設定）",
+    "mode": "text_choice",
+    "choices": [
+      { "type": "text", "label": "人工的に作られたハイブリッドで、兵器用途も示唆される" },
+      { "type": "text", "label": "自然に生まれた草食恐竜" },
+      { "type": "text", "label": "海生爬虫類の一種" },
+      { "type": "text", "label": "空を飛ぶ翼竜の一種" }
+    ],
+    "correct_index": 0,
+    "category": "movie_original",
+    "difficulty": 3,
+    "image_url": null,
+    "time_limit": 15
+  },
+  {
+    "id": "jp_adv_v2_06",
+    "question_text": "映画『ジュラシック・ワールド』で、恐竜の管理が難しいとされる理由として近いのはどれ？（映画設定）",
+    "mode": "text_choice",
+    "choices": [
+      { "type": "text", "label": "人間の想定を超える行動や知能を示す場合がある" },
+      { "type": "text", "label": "恐竜は必ず命令に従うから" },
+      { "type": "text", "label": "恐竜は動かないから" },
+      { "type": "text", "label": "恐竜は水が苦手だから" }
+    ],
+    "correct_index": 0,
+    "category": "theme",
+    "difficulty": 3,
+    "image_url": null,
+    "time_limit": 15
+  },
+  {
+    "id": "jp_adv_v2_07",
+    "question_text": "映画『ジュラシック・ワールド／新たなる支配者』で描かれる大きな状況変化として近いのはどれ？（映画設定）",
+    "mode": "text_choice",
+    "choices": [
+      { "type": "text", "label": "恐竜が人間社会の外側にも広がり、共存問題が生じる" },
+      { "type": "text", "label": "恐竜が全員島に戻される" },
+      { "type": "text", "label": "恐竜が完全に絶滅する" },
+      { "type": "text", "label": "恐竜が海中にしか存在しなくなる" }
+    ],
+    "correct_index": 0,
+    "category": "plot",
+    "difficulty": 3,
+    "image_url": null,
+    "time_limit": 15
+  },
+  {
+    "id": "jp_adv_v2_08",
+    "question_text": "映画シリーズで、恐竜を巡る対立構造として繰り返し描かれるのはどれ？（映画設定）",
+    "mode": "text_choice",
+    "choices": [
+      { "type": "text", "label": "商業・軍事利用と安全・倫理の衝突" },
+      { "type": "text", "label": "恐竜同士の政治的対立" },
+      { "type": "text", "label": "恐竜の冬眠権を巡る議論" },
+      { "type": "text", "label": "恐竜の宇宙移住計画" }
+    ],
+    "correct_index": 0,
+    "category": "theme",
+    "difficulty": 3,
+    "image_url": null,
+    "time_limit": 15
+  },
+  {
+    "id": "jp_adv_v2_09",
+    "question_text": "映画『ジュラシック・ワールド』で、危機の中で重要な役割を果たす巨大肉食恐竜として描かれるのはどれ？（映画設定）",
+    "mode": "text_choice",
+    "choices": [
+      { "type": "text", "label": "ティラノサウルス" },
+      { "type": "text", "label": "パキケファロサウルス" },
+      { "type": "text", "label": "ステゴサウルス" },
+      { "type": "text", "label": "ブラキオサウルス" }
+    ],
+    "correct_index": 0,
+    "category": "dinosaur",
+    "difficulty": 3,
+    "image_url": null,
+    "time_limit": 15
+  },
+  {
+    "id": "jp_adv_v2_10",
+    "question_text": "映画シリーズの遺伝子技術の危うさを象徴する出来事として最も近いのはどれ？（映画設定）",
+    "mode": "text_choice",
+    "choices": [
+      { "type": "text", "label": "人工的に作られた危険個体が制御不能になる" },
+      { "type": "text", "label": "恐竜が全員おとなしくなる" },
+      { "type": "text", "label": "恐竜が植物だけ食べるようになる" },
+      { "type": "text", "label": "恐竜が自然に島へ戻っていく" }
+    ],
+    "correct_index": 0,
+    "category": "theme",
+    "difficulty": 3,
+    "image_url": null,
+    "time_limit": 15
+  },
+{
+  "id": "jp_sup_v3_01",
+  "question_text": "映画『ジュラシック・パーク』シリーズにおいて、恐竜が現代に蘇った主な理由はどれ？（映画設定）",
+  "mode": "text_choice",
+  "choices": [
+    { "type": "text", "label": "化石に残ったDNAを利用した遺伝子技術による復元" },
+    { "type": "text", "label": "地下で生き残っていた恐竜を発見したため" },
+    { "type": "text", "label": "未来から連れてきたため" },
+    { "type": "text", "label": "宇宙から飛来したため" }
+  ],
+  "correct_index": 0,
+  "category": "movie_setting",
+  "difficulty": 4,
+  "image_url": null,
+  "time_limit": 15
+},
+{
+  "id": "jp_sup_v3_02",
+  "question_text": "映画『ジュラシック・パーク』第1作で、ティラノサウルスが初登場する場面の特徴として正しいのはどれ？（映画設定）",
+  "mode": "text_choice",
+  "choices": [
+    { "type": "text", "label": "雨の中で柵を破り、車を襲う演出" },
+    { "type": "text", "label": "昼間に群れで登場する" },
+    { "type": "text", "label": "海から現れる" },
+    { "type": "text", "label": "檻の中で大人しくしている" }
+  ],
+  "correct_index": 0,
+  "category": "scene",
+  "difficulty": 4,
+  "image_url": null,
+  "time_limit": 15
+},
+{
+  "id": "jp_sup_v3_03",
+  "question_text": "映画シリーズに登場するヴェロキラプトルの描写として特徴的なのはどれ？（映画設定）",
+  "mode": "text_choice",
+  "choices": [
+    { "type": "text", "label": "高い知能と連携行動を見せる" },
+    { "type": "text", "label": "常に単独で行動する" },
+    { "type": "text", "label": "草食である" },
+    { "type": "text", "label": "人間と会話できる" }
+  ],
+  "correct_index": 0,
+  "category": "behavior",
+  "difficulty": 4,
+  "image_url": null,
+  "time_limit": 15
+},
+{
+  "id": "jp_sup_v3_04",
+  "question_text": "映画『ジュラシック・ワールド』で新たに作られた人工恐竜として正しいのはどれ？（映画設定）",
+  "mode": "text_choice",
+  "choices": [
+    { "type": "text", "label": "インドミナス・レックス" },
+    { "type": "text", "label": "ティラノサウルス" },
+    { "type": "text", "label": "トリケラトプス" },
+    { "type": "text", "label": "ステゴサウルス" }
+  ],
+  "correct_index": 0,
+  "category": "movie_original",
+  "difficulty": 4,
+  "image_url": null,
+  "time_limit": 15
+},
+{
+  "id": "jp_sup_v3_05",
+  "question_text": "インドミナス・レックスの能力として、映画内で示されているものはどれ？（映画設定）",
+  "mode": "text_choice",
+  "choices": [
+    { "type": "text", "label": "周囲に溶け込むようなカモフラージュ能力" },
+    { "type": "text", "label": "空を飛ぶ能力" },
+    { "type": "text", "label": "海中呼吸能力" },
+    { "type": "text", "label": "時間を止める能力" }
+  ],
+  "correct_index": 0,
+  "category": "ability",
+  "difficulty": 4,
+  "image_url": null,
+  "time_limit": 15
+},
+{
+  "id": "jp_sup_v3_06",
+  "question_text": "映画『ジュラシック・ワールド』シリーズにおいて、恐竜管理が困難になる主な理由はどれ？（映画設定）",
+  "mode": "text_choice",
+  "choices": [
+    { "type": "text", "label": "人間の想定を超える知能や行動を示すため" },
+    { "type": "text", "label": "恐竜がすべておとなしいため" },
+    { "type": "text", "label": "恐竜が突然絶滅するため" },
+    { "type": "text", "label": "恐竜が言葉を理解しないため" }
+  ],
+  "correct_index": 0,
+  "category": "theme",
+  "difficulty": 4,
+  "image_url": null,
+  "time_limit": 15
+},
+{
+  "id": "jp_sup_v3_07",
+  "question_text": "映画シリーズ全体を通して繰り返し描かれるテーマとして近いのはどれ？（映画設定）",
+  "mode": "text_choice",
+  "choices": [
+    { "type": "text", "label": "人間の制御を超えた生命への過信とその結果" },
+    { "type": "text", "label": "恐竜と人類の平和共存" },
+    { "type": "text", "label": "恐竜の完全な家畜化" },
+    { "type": "text", "label": "恐竜による文明社会の建設" }
+  ],
+  "correct_index": 0,
+  "category": "theme",
+  "difficulty": 4,
+  "image_url": null,
+  "time_limit": 15
+},
+{
+  "id": "jp_sup_v3_08",
+  "question_text": "映画『ジュラシック・パーク』で、パークの安全管理が破綻する直接的なきっかけはどれ？（映画設定）",
+  "mode": "text_choice",
+  "choices": [
+    { "type": "text", "label": "システム停止による電力・柵の無効化" },
+    { "type": "text", "label": "恐竜の自然災害による大量死" },
+    { "type": "text", "label": "観客の暴動" },
+    { "type": "text", "label": "恐竜同士の内戦" }
+  ],
+  "correct_index": 0,
+  "category": "plot",
+  "difficulty": 4,
+  "image_url": null,
+  "time_limit": 15
+},
+{
+  "id": "jp_sup_v3_09",
+  "question_text": "映画『ジュラシック・ワールド／炎の王国』で描かれる状況として正しいのはどれ？（映画設定）",
+  "mode": "text_choice",
+  "choices": [
+    { "type": "text", "label": "恐竜が島外へ持ち出され、世界に拡散するきっかけが生まれる" },
+    { "type": "text", "label": "すべての恐竜が島に隔離されたままになる" },
+    { "type": "text", "label": "恐竜が再び絶滅する" },
+    { "type": "text", "label": "恐竜が人類社会を支配する" }
+  ],
+  "correct_index": 0,
+  "category": "plot",
+  "difficulty": 4,
+  "image_url": null,
+  "time_limit": 15
+},
+{
+  "id": "jp_sup_v3_10",
+  "question_text": "映画『ジュラシック』シリーズにおける恐竜の描写として、一貫している点はどれ？（映画設定）",
+  "mode": "text_choice",
+  "choices": [
+    { "type": "text", "label": "人間の管理を容易に超える存在として描かれている" },
+    { "type": "text", "label": "完全に制御可能な存在である" },
+    { "type": "text", "label": "感情を持たない機械のような存在である" },
+    { "type": "text", "label": "常に人類の味方である" }
+  ],
+  "correct_index": 0,
+  "category": "theme",
+  "difficulty": 4,
+  "image_url": null,
+  "time_limit": 15
+}
+,
+{
+  "id": "triassic_adv_v3_01",
+  "question_text": "三畳紀は、古生代・中生代・新生代のどれに入る？",
+  "mode": "text_choice",
+  "choices": [
+    { "type": "text", "label": "古生代" },
+    { "type": "text", "label": "中生代" },
+    { "type": "text", "label": "新生代" },
+    { "type": "text", "label": "現代" }
+  ],
+  "correct_index": 1,
+  "category": "era",
+  "difficulty": 3,
+  "image_url": null,
+  "time_limit": 14
+},
+{
+  "id": "triassic_adv_v3_02",
+  "question_text": "三畳紀のあとに来る時代として正しいのはどれ？",
+  "mode": "text_choice",
+  "choices": [
+    { "type": "text", "label": "ジュラ紀" },
+    { "type": "text", "label": "白亜紀" },
+    { "type": "text", "label": "ペルム紀" },
+    { "type": "text", "label": "デボン紀" }
+  ],
+  "correct_index": 0,
+  "category": "era",
+  "difficulty": 3,
+  "image_url": null,
+  "time_limit": 14
+},
+{
+  "id": "triassic_adv_v3_03",
+  "question_text": "三畳紀の地球環境として、一般的に言われがちなのはどれ？",
+  "mode": "text_choice",
+  "choices": [
+    { "type": "text", "label": "大陸がまとまっていて内陸が乾燥しやすい" },
+    { "type": "text", "label": "現代よりも氷で覆われていた" },
+    { "type": "text", "label": "大陸が全部分裂し終わっていた" },
+    { "type": "text", "label": "海がほとんど存在しなかった" }
+  ],
+  "correct_index": 0,
+  "category": "environment",
+  "difficulty": 3,
+  "image_url": null,
+  "time_limit": 14
+},
+{
+  "id": "triassic_adv_v3_04",
+  "question_text": "恐竜（Dinosauria）が登場するのは主にいつ頃？（ざっくり）",
+  "mode": "text_choice",
+  "choices": [
+    { "type": "text", "label": "三畳紀の後半ごろ" },
+    { "type": "text", "label": "ジュラ紀の後半ごろ" },
+    { "type": "text", "label": "白亜紀の終わりごろ" },
+    { "type": "text", "label": "新生代のはじめ" }
+  ],
+  "correct_index": 0,
+  "category": "era",
+  "difficulty": 3,
+  "image_url": null,
+  "time_limit": 14
+},
+{
+  "id": "triassic_adv_v3_05",
+  "question_text": "三畳紀の生物史で重要な流れとして近いのはどれ？",
+  "mode": "text_choice",
+  "choices": [
+    { "type": "text", "label": "大絶滅後の回復と新しいグループの台頭" },
+    { "type": "text", "label": "恐竜が一斉に絶滅した時代" },
+    { "type": "text", "label": "人類が登場した時代" },
+    { "type": "text", "label": "哺乳類が支配した時代" }
+  ],
+  "correct_index": 0,
+  "category": "overview",
+  "difficulty": 3,
+  "image_url": null,
+  "time_limit": 14
+},
+{
+  "id": "triassic_adv_v3_06",
+  "question_text": "「翼竜（よくりゅう）」について正しい説明として近いのはどれ？",
+  "mode": "text_choice",
+  "choices": [
+    { "type": "text", "label": "空を飛ぶ爬虫類で、恐竜とは別系統" },
+    { "type": "text", "label": "恐竜の中でも角竜の仲間" },
+    { "type": "text", "label": "恐竜の中でも鎧竜の仲間" },
+    { "type": "text", "label": "哺乳類の仲間" }
+  ],
+  "correct_index": 0,
+  "category": "classification",
+  "difficulty": 3,
+  "image_url": null,
+  "time_limit": 14
+},
+{
+  "id": "triassic_adv_v3_07",
+  "question_text": "三畳紀に登場する「初期の恐竜」を覚えるコツとして良いのはどれ？",
+  "mode": "text_choice",
+  "choices": [
+    { "type": "text", "label": "“まだ小型が多い”というイメージで押さえる" },
+    { "type": "text", "label": "全部ティラノサウルスとして覚える" },
+    { "type": "text", "label": "恐竜はこの時代にいないと決めつける" },
+    { "type": "text", "label": "海の生物だけ覚える" }
+  ],
+  "correct_index": 0,
+  "category": "tips",
+  "difficulty": 3,
+  "image_url": null,
+  "time_limit": 14
+},
+{
+  "id": "triassic_adv_v3_08",
+  "question_text": "三畳紀に“恐竜以外”で勢いがあった爬虫類グループとして自然なのはどれ？",
+  "mode": "text_choice",
+  "choices": [
+    { "type": "text", "label": "主竜類（ワニ系統などを含む）" },
+    { "type": "text", "label": "哺乳類" },
+    { "type": "text", "label": "人類" },
+    { "type": "text", "label": "恐竜しかいない" }
+  ],
+  "correct_index": 0,
+  "category": "overview",
+  "difficulty": 3,
+  "image_url": null,
+  "time_limit": 14
+},
+{
+  "id": "triassic_adv_v3_09",
+  "question_text": "三畳紀は恐竜の歴史の中で、どんな立ち位置として説明されがち？",
+  "mode": "text_choice",
+  "choices": [
+    { "type": "text", "label": "恐竜が登場し始める“スタート地点”" },
+    { "type": "text", "label": "恐竜が最大化する“ピーク”" },
+    { "type": "text", "label": "恐竜が絶滅する“終点”" },
+    { "type": "text", "label": "恐竜が海に移住する“転居”" }
+  ],
+  "correct_index": 0,
+  "category": "overview",
+  "difficulty": 3,
+  "image_url": null,
+  "time_limit": 14
+},
+{
+  "id": "triassic_adv_v3_10",
+  "question_text": "三畳紀ステージのまとめとして一番自然なのはどれ？",
+  "mode": "text_choice",
+  "choices": [
+    { "type": "text", "label": "大絶滅後の回復期で、恐竜が登場し始めた" },
+    { "type": "text", "label": "恐竜が最も多様化し、終わりに大量絶滅が起きた" },
+    { "type": "text", "label": "恐竜が一切存在しない時代だった" },
+    { "type": "text", "label": "人類が恐竜を飼っていた時代だった" }
+  ],
+  "correct_index": 0,
+  "category": "overview",
+  "difficulty": 3,
+  "image_url": null,
+  "time_limit": 14
+},
+  {
+    "id": "triassic_sup_v3_01",
+    "question_text": "三畳紀において、恐竜がまだ主役ではなかった理由として最も自然なのはどれ？",
+    "mode": "text_choice",
+    "choices": [
+      { "type": "text", "label": "恐竜以外の主竜類（ワニ系統など）も多様で競争相手が多かった" },
+      { "type": "text", "label": "恐竜が空を飛べなかったから" },
+      { "type": "text", "label": "恐竜が海に適応していなかったから" },
+      { "type": "text", "label": "恐竜が植物を食べられなかったから" }
+    ],
+    "correct_index": 0,
+    "category": "overview",
+    "difficulty": 4,
+    "image_url": null,
+    "time_limit": 15
+  },
+  {
+    "id": "triassic_sup_v3_02",
+    "question_text": "恐竜・翼竜・海生爬虫類の関係について、より正確な理解はどれ？",
+    "mode": "text_choice",
+    "choices": [
+      { "type": "text", "label": "同時代に生きていたが、恐竜とは別の系統に属する生物も多い" },
+      { "type": "text", "label": "すべて恐竜の一部である" },
+      { "type": "text", "label": "すべて哺乳類に近い存在である" },
+      { "type": "text", "label": "すべて現代まで生き残っている" }
+    ],
+    "correct_index": 0,
+    "category": "classification",
+    "difficulty": 4,
+    "image_url": null,
+    "time_limit": 15
+  },
+  {
+    "id": "triassic_sup_v3_03",
+    "question_text": "三畳紀の終わりからジュラ紀初期にかけて、恐竜が勢いを増した要因として考えられるのはどれ？",
+    "mode": "text_choice",
+    "choices": [
+      { "type": "text", "label": "環境変化や生態系の入れ替わりにより恐竜が適応しやすかった" },
+      { "type": "text", "label": "恐竜が急に巨大化したから" },
+      { "type": "text", "label": "恐竜が空を自由に飛べるようになったから" },
+      { "type": "text", "label": "恐竜が人類に守られていたから" }
+    ],
+    "correct_index": 0,
+    "category": "overview",
+    "difficulty": 4,
+    "image_url": null,
+    "time_limit": 15
+  },
+  {
+    "id": "triassic_sup_v3_04",
+    "question_text": "恐竜の進化について「登場直後」の特徴として近いのはどれ？",
+    "mode": "text_choice",
+    "choices": [
+      { "type": "text", "label": "小型で種類も限られており、段階的に多様化した" },
+      { "type": "text", "label": "登場と同時に巨大種ばかりになった" },
+      { "type": "text", "label": "登場直後にほとんどが絶滅した" },
+      { "type": "text", "label": "登場時点で現在と同じ姿だった" }
+    ],
+    "correct_index": 0,
+    "category": "overview",
+    "difficulty": 4,
+    "image_url": null,
+    "time_limit": 15
+  },
+  {
+    "id": "triassic_sup_v3_05",
+    "question_text": "三畳紀の地球で大陸が一つにまとまっていたこと（パンゲア大陸）がもたらした影響として考えられるのはどれ？",
+    "mode": "text_choice",
+    "choices": [
+      { "type": "text", "label": "内陸部が乾燥しやすい気候になった" },
+      { "type": "text", "label": "海がほとんど消滅した" },
+      { "type": "text", "label": "地球全体が氷河に覆われた" },
+      { "type": "text", "label": "太陽との距離が近くなった" }
+    ],
+    "correct_index": 0,
+    "category": "environment",
+    "difficulty": 4,
+    "image_url": null,
+    "time_limit": 15
+  },
+  {
+    "id": "triassic_sup_v3_06",
+    "question_text": "三畳紀の恐竜を理解するうえで重要な視点として最も適切なのはどれ？",
+    "mode": "text_choice",
+    "choices": [
+      { "type": "text", "label": "恐竜単体ではなく、同時代の他生物や環境と合わせて見る" },
+      { "type": "text", "label": "恐竜の名前だけを覚える" },
+      { "type": "text", "label": "後の時代の恐竜と同じ基準で見る" },
+      { "type": "text", "label": "恐竜以外の生物は無視する" }
+    ],
+    "correct_index": 0,
+    "category": "overview",
+    "difficulty": 4,
+    "image_url": null,
+    "time_limit": 15
+  },
+  {
+    "id": "triassic_sup_v3_07",
+    "question_text": "三畳紀のあとに続く時代として、恐竜の進化が大きく進むのはどれ？",
+    "mode": "text_choice",
+    "choices": [
+      { "type": "text", "label": "ジュラ紀" },
+      { "type": "text", "label": "デボン紀" },
+      { "type": "text", "label": "カンブリア紀" },
+      { "type": "text", "label": "新生代" }
+    ],
+    "correct_index": 0,
+    "category": "era",
+    "difficulty": 4,
+    "image_url": null,
+    "time_limit": 15
+  },
+  {
+    "id": "triassic_sup_v3_08",
+    "question_text": "三畳紀の恐竜が後の時代より目立たなく見える理由として最も近いのはどれ？",
+    "mode": "text_choice",
+    "choices": [
+      { "type": "text", "label": "恐竜の多様化や大型化が本格化する前の段階だった" },
+      { "type": "text", "label": "恐竜がほとんど存在しなかった" },
+      { "type": "text", "label": "恐竜が海中で生活していた" },
+      { "type": "text", "label": "恐竜がすべて夜行性だった" }
+    ],
+    "correct_index": 0,
+    "category": "overview",
+    "difficulty": 4,
+    "image_url": null,
+    "time_limit": 15
+  },
+  {
+    "id": "triassic_sup_v3_09",
+    "question_text": "三畳紀の生物史を一言で表すなら、最も近いのはどれ？",
+    "mode": "text_choice",
+    "choices": [
+      { "type": "text", "label": "大絶滅後の回復期で、新しいグループが台頭した時代" },
+      { "type": "text", "label": "恐竜が完全に地球を支配した時代" },
+      { "type": "text", "label": "生物がほとんど存在しなかった時代" },
+      { "type": "text", "label": "人類が文明を築いた時代" }
+    ],
+    "correct_index": 0,
+    "category": "overview",
+    "difficulty": 4,
+    "image_url": null,
+    "time_limit": 15
+  },
+  {
+    "id": "triassic_sup_v3_10",
+    "question_text": "三畳紀を恐竜史の中で位置づけると、最も自然なのはどれ？",
+    "mode": "text_choice",
+    "choices": [
+      { "type": "text", "label": "恐竜が登場し始め、後の繁栄につながる土台となった時代" },
+      { "type": "text", "label": "恐竜が最盛期を迎えた時代" },
+      { "type": "text", "label": "恐竜が一斉に絶滅した時代" },
+      { "type": "text", "label": "恐竜が存在しなかった時代" }
+    ],
+    "correct_index": 0,
+    "category": "overview",
+    "difficulty": 4,
+    "image_url": null,
+    "time_limit": 15
+  },
+{
+  "id": "jurassic_adv_v3_01",
+  "question_text": "ジュラ紀は、中生代のどの位置づけ？",
+  "mode": "text_choice",
+  "choices": [
+    { "type": "text", "label": "最初（前半）" },
+    { "type": "text", "label": "真ん中" },
+    { "type": "text", "label": "最後（後半）" },
+    { "type": "text", "label": "中生代ではない" }
+  ],
+  "correct_index": 1,
+  "category": "era",
+  "difficulty": 3,
+  "image_url": null,
+  "time_limit": 14
+},
+{
+  "id": "jurassic_adv_v3_02",
+  "question_text": "ジュラ紀の大型草食恐竜としてイメージしやすいのはどれ？",
+  "mode": "text_choice",
+  "choices": [
+    { "type": "text", "label": "首が長い竜脚類（りゅうきゃくるい）が栄えた" },
+    { "type": "text", "label": "角竜が主役だった" },
+    { "type": "text", "label": "鎧竜しかいなかった" },
+    { "type": "text", "label": "哺乳類が地上を支配した" }
+  ],
+  "correct_index": 0,
+  "category": "overview",
+  "difficulty": 3,
+  "image_url": null,
+  "time_limit": 14
+},
+{
+  "id": "jurassic_adv_v3_03",
+  "question_text": "アロサウルスは、ざっくり言うとどんな恐竜？",
+  "mode": "text_choice",
+  "choices": [
+    { "type": "text", "label": "ジュラ紀の代表的な大型肉食恐竜（獣脚類）" },
+    { "type": "text", "label": "白亜紀の代表的な角竜" },
+    { "type": "text", "label": "海にいた爬虫類（恐竜ではない）" },
+    { "type": "text", "label": "空を飛ぶ翼竜" }
+  ],
+  "correct_index": 0,
+  "category": "dinosaur",
+  "difficulty": 3,
+  "image_url": null,
+  "time_limit": 14
+},
+{
+  "id": "jurassic_adv_v3_04",
+  "question_text": "ステゴサウルスの特徴として分かりやすいのはどれ？",
+  "mode": "text_choice",
+  "choices": [
+    { "type": "text", "label": "背中の板状の骨と、しっぽのトゲ" },
+    { "type": "text", "label": "顔の3本の角" },
+    { "type": "text", "label": "体がよろいのように硬い" },
+    { "type": "text", "label": "くちばしのような口とトサカ" }
+  ],
+  "correct_index": 0,
+  "category": "feature",
+  "difficulty": 3,
+  "image_url": null,
+  "time_limit": 14
+},
+{
+  "id": "jurassic_adv_v3_05",
+  "question_text": "ジュラ紀の海にいた大きな爬虫類について正しい説明はどれ？",
+  "mode": "text_choice",
+  "choices": [
+    { "type": "text", "label": "海生爬虫類は恐竜とは別グループ" },
+    { "type": "text", "label": "海にいた爬虫類はすべて恐竜である" },
+    { "type": "text", "label": "海には生物がいなかった" },
+    { "type": "text", "label": "海の爬虫類は哺乳類である" }
+  ],
+  "correct_index": 0,
+  "category": "classification",
+  "difficulty": 3,
+  "image_url": null,
+  "time_limit": 14
+},
+{
+  "id": "jurassic_adv_v3_06",
+  "question_text": "「始祖鳥（アーケオプテリクス）」が有名なのは、どんな意味で？（ざっくり）",
+  "mode": "text_choice",
+  "choices": [
+    { "type": "text", "label": "鳥の進化を考える上で重要な化石として" },
+    { "type": "text", "label": "海の王として" },
+    { "type": "text", "label": "最大の角竜として" },
+    { "type": "text", "label": "恐竜を絶滅させた存在として" }
+  ],
+  "correct_index": 0,
+  "category": "evolution",
+  "difficulty": 3,
+  "image_url": null,
+  "time_limit": 14
+},
+{
+  "id": "jurassic_adv_v3_07",
+  "question_text": "ジュラ紀の恐竜を覚えるコツとして良いのはどれ？",
+  "mode": "text_choice",
+  "choices": [
+    { "type": "text", "label": "竜脚類（首長）・獣脚類（肉食）・装盾類（ステゴなど）で整理する" },
+    { "type": "text", "label": "全部ティラノサウルスとして覚える" },
+    { "type": "text", "label": "時代は無視して名前だけ暗記する" },
+    { "type": "text", "label": "海の生物だけ覚える" }
+  ],
+  "correct_index": 0,
+  "category": "tips",
+  "difficulty": 3,
+  "image_url": null,
+  "time_limit": 14
+},
+{
+  "id": "jurassic_adv_v3_08",
+  "question_text": "ジュラ紀のあとに来る時代はどれ？",
+  "mode": "text_choice",
+  "choices": [
+    { "type": "text", "label": "白亜紀" },
+    { "type": "text", "label": "三畳紀" },
+    { "type": "text", "label": "ペルム紀" },
+    { "type": "text", "label": "デボン紀" }
+  ],
+  "correct_index": 0,
+  "category": "era",
+  "difficulty": 3,
+  "image_url": null,
+  "time_limit": 14
+},
+{
+  "id": "jurassic_adv_v3_09",
+  "question_text": "ジュラ紀の地球環境について、一般的に言われやすい説明として近いのはどれ？",
+  "mode": "text_choice",
+  "choices": [
+    { "type": "text", "label": "大陸が分裂し始め、環境が多様化していった" },
+    { "type": "text", "label": "大陸が完全に1つに合体した" },
+    { "type": "text", "label": "地球が全面氷で覆われた" },
+    { "type": "text", "label": "海が消滅した" }
+  ],
+  "correct_index": 0,
+  "category": "environment",
+  "difficulty": 3,
+  "image_url": null,
+  "time_limit": 14
+},
+{
+  "id": "jurassic_adv_v3_10",
+  "question_text": "ジュラ紀のまとめとして一番自然なのはどれ？",
+  "mode": "text_choice",
+  "choices": [
+    { "type": "text", "label": "大型恐竜が栄え、恐竜の多様化が進んだ時代のひとつ" },
+    { "type": "text", "label": "恐竜が絶滅した時代" },
+    { "type": "text", "label": "人類が登場した時代" },
+    { "type": "text", "label": "恐竜が海でしか暮らせなかった時代" }
+  ],
+  "correct_index": 0,
+  "category": "overview",
+  "difficulty": 3,
+  "image_url": null,
+  "time_limit": 14
+},
+{
+  "id": "jurassic_sup_v3_01",
+  "question_text": "ジュラ紀において、恐竜・翼竜・海生爬虫類の関係として最も正確なのはどれ？",
+  "mode": "text_choice",
+  "choices": [
+    { "type": "text", "label": "同時代に共存したが、分類学的には別系統である" },
+    { "type": "text", "label": "すべて恐竜に含まれる" },
+    { "type": "text", "label": "すべて哺乳類に近い" },
+    { "type": "text", "label": "翼竜は恐竜の子孫である" }
+  ],
+  "correct_index": 0,
+  "category": "classification",
+  "difficulty": 4,
+  "image_url": null,
+  "time_limit": 15
+},
+{
+  "id": "jurassic_sup_v3_02",
+  "question_text": "ジュラ紀に竜脚類（首の長い大型草食恐竜）が多様化した背景として考えられるのはどれ？",
+  "mode": "text_choice",
+  "choices": [
+    { "type": "text", "label": "植物量の増加と体サイズ拡大に適した生態的地位" },
+    { "type": "text", "label": "捕食者が存在しなかったため" },
+    { "type": "text", "label": "すべて水中生活だったため" },
+    { "type": "text", "label": "哺乳類が競争相手だったため" }
+  ],
+  "correct_index": 0,
+  "category": "ecology",
+  "difficulty": 4,
+  "image_url": null,
+  "time_limit": 15
+},
+{
+  "id": "jurassic_sup_v3_03",
+  "question_text": "アロサウルスが生態系で果たしていた役割として最も自然なのはどれ？",
+  "mode": "text_choice",
+  "choices": [
+    { "type": "text", "label": "大型草食恐竜を捕食する頂点級捕食者の一角" },
+    { "type": "text", "label": "主に腐肉のみを食べる動物" },
+    { "type": "text", "label": "水中で生活する魚食性動物" },
+    { "type": "text", "label": "植物のみを食べる草食恐竜" }
+  ],
+  "correct_index": 0,
+  "category": "ecology",
+  "difficulty": 4,
+  "image_url": null,
+  "time_limit": 15
+},
+{
+  "id": "jurassic_sup_v3_04",
+  "question_text": "始祖鳥（アーケオプテリクス）が進化研究で重要視される理由はどれ？",
+  "mode": "text_choice",
+  "choices": [
+    { "type": "text", "label": "恐竜と鳥類の特徴を併せ持つ形態を示すため" },
+    { "type": "text", "label": "最大級の翼竜だったため" },
+    { "type": "text", "label": "恐竜を絶滅させた存在だから" },
+    { "type": "text", "label": "完全に現代鳥類と同じ姿だから" }
+  ],
+  "correct_index": 0,
+  "category": "evolution",
+  "difficulty": 4,
+  "image_url": null,
+  "time_limit": 15
+},
+{
+  "id": "jurassic_sup_v3_05",
+  "question_text": "ステゴサウルスの尾のトゲ（サゴマイザー）の機能として有力なのはどれ？",
+  "mode": "text_choice",
+  "choices": [
+    { "type": "text", "label": "捕食者に対する防御用の武器" },
+    { "type": "text", "label": "体温調節専用の器官" },
+    { "type": "text", "label": "飛行補助のため" },
+    { "type": "text", "label": "水中推進用のヒレ" }
+  ],
+  "correct_index": 0,
+  "category": "function",
+  "difficulty": 4,
+  "image_url": null,
+  "time_limit": 15
+},
+{
+  "id": "jurassic_sup_v3_06",
+  "question_text": "ジュラ紀における地球環境の変化として妥当なのはどれ？",
+  "mode": "text_choice",
+  "choices": [
+    { "type": "text", "label": "パンゲア大陸が分裂し始め、環境の地域差が拡大した" },
+    { "type": "text", "label": "大陸が完全に一体化した" },
+    { "type": "text", "label": "地球全体が氷河に覆われた" },
+    { "type": "text", "label": "海がほぼ消滅した" }
+  ],
+  "correct_index": 0,
+  "category": "environment",
+  "difficulty": 4,
+  "image_url": null,
+  "time_limit": 15
+},
+{
+  "id": "jurassic_sup_v3_07",
+  "question_text": "ジュラ紀の恐竜が後の白亜紀恐竜と異なる点として近いのはどれ？",
+  "mode": "text_choice",
+  "choices": [
+    { "type": "text", "label": "角竜や鳥脚類がまだ大きく多様化していない" },
+    { "type": "text", "label": "恐竜がほとんど存在しない" },
+    { "type": "text", "label": "すべての恐竜が羽毛を失っている" },
+    { "type": "text", "label": "哺乳類が支配的だった" }
+  ],
+  "correct_index": 0,
+  "category": "comparison",
+  "difficulty": 4,
+  "image_url": null,
+  "time_limit": 15
+},
+{
+  "id": "jurassic_sup_v3_08",
+  "question_text": "ジュラ紀の海に生息していた爬虫類について正しいのはどれ？",
+  "mode": "text_choice",
+  "choices": [
+    { "type": "text", "label": "魚竜・首長竜などは恐竜とは別系統の海生爬虫類" },
+    { "type": "text", "label": "すべて恐竜の一種である" },
+    { "type": "text", "label": "哺乳類に直接進化した" },
+    { "type": "text", "label": "現代のワニと同一種である" }
+  ],
+  "correct_index": 0,
+  "category": "classification",
+  "difficulty": 4,
+  "image_url": null,
+  "time_limit": 15
+},
+{
+  "id": "jurassic_sup_v3_09",
+  "question_text": "ジュラ紀を恐竜史の中で位置づけると最も近いのはどれ？",
+  "mode": "text_choice",
+  "choices": [
+    { "type": "text", "label": "大型恐竜が広く繁栄し、生態系が拡張した時代" },
+    { "type": "text", "label": "恐竜が初めて出現した時代" },
+    { "type": "text", "label": "恐竜が一斉に絶滅した時代" },
+    { "type": "text", "label": "人類が恐竜と共存した時代" }
+  ],
+  "correct_index": 0,
+  "category": "overview",
+  "difficulty": 4,
+  "image_url": null,
+  "time_limit": 15
+},
+{
+  "id": "jurassic_sup_v3_10",
+  "question_text": "ジュラ紀後半から白亜紀にかけての恐竜進化の流れとして妥当なのはどれ？",
+  "mode": "text_choice",
+  "choices": [
+    { "type": "text", "label": "恐竜の多様化がさらに進み、分類群が増えていった" },
+    { "type": "text", "label": "恐竜の種類が急激に減少した" },
+    { "type": "text", "label": "恐竜がすべて小型化した" },
+    { "type": "text", "label": "恐竜が海へ完全移行した" }
+  ],
+  "correct_index": 0,
+  "category": "evolution",
+  "difficulty": 4,
+  "image_url": null,
+  "time_limit": 15
+}
+]

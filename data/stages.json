@@ -1,0 +1,327 @@
+[
+  {
+    "id": "stage_triassic_beg",
+    "name": "三畳紀・初級",
+    "description": "恐竜のはじまり！三畳紀の基礎を10問でおさらい。",
+    "mode": "story",
+    "question_ids": [
+      "triassic_beg_01",
+      "triassic_beg_02",
+      "triassic_beg_03",
+      "triassic_beg_04",
+      "triassic_beg_05",
+      "triassic_beg_06",
+      "triassic_beg_07",
+      "triassic_beg_08",
+      "triassic_beg_09",
+      "triassic_beg_10"
+    ],
+    "reward_coin": 100,
+    "unlock_condition": { "type": "always" }
+  },
+  {
+    "id": "stage_triassic_mid",
+    "name": "三畳紀・中級",
+    "description": "三畳紀をもう一歩深掘り。進化や環境の理解にチャレンジ！",
+    "mode": "story",
+    "question_ids": [
+      "triassic_mid_01",
+      "triassic_mid_02",
+      "triassic_mid_03",
+      "triassic_mid_04",
+      "triassic_mid_05",
+      "triassic_mid_06",
+      "triassic_mid_07",
+      "triassic_mid_08",
+      "triassic_mid_09",
+      "triassic_mid_10"
+    ],
+    "reward_coin": 130,
+    "unlock_condition": { "type": "stage_clear", "stage_id": "stage_triassic_beg" }
+  },
+{
+  "id": "stage_triassic_adv_v3",
+  "name": "三畳紀・上級",
+  "description": "三畳紀を環境や生物史まで含めて理解！",
+  "mode": "story",
+  "question_ids": [
+    "triassic_adv_v3_01",
+    "triassic_adv_v3_02",
+    "triassic_adv_v3_03",
+    "triassic_adv_v3_04",
+    "triassic_adv_v3_05",
+    "triassic_adv_v3_06",
+    "triassic_adv_v3_07",
+    "triassic_adv_v3_08",
+    "triassic_adv_v3_09",
+    "triassic_adv_v3_10"
+  ],
+  "reward_coin": 160,
+  "unlock_condition": { "type": "stage_clear", "stage_id": "stage_triassic_mid" }
+},
+{
+  "id": "stage_triassic_sup_v3",
+  "name": "三畳紀・超級",
+  "description": "三畳紀の全体像を“恐竜以外も含めて”整理できればクリア！",
+  "mode": "story",
+  "question_ids": [
+    "triassic_sup_v3_01",
+    "triassic_sup_v3_02",
+    "triassic_sup_v3_03",
+    "triassic_sup_v3_04",
+    "triassic_sup_v3_05",
+    "triassic_sup_v3_06",
+    "triassic_sup_v3_07",
+    "triassic_sup_v3_08",
+    "triassic_sup_v3_09",
+    "triassic_sup_v3_10"
+  ],
+  "reward_coin": 230,
+  "unlock_condition": { "type": "stage_clear", "stage_id": "stage_triassic_adv_v3" }
+},
+  {
+    "id": "stage_jurassic_beg_v3",
+    "name": "ジュラ紀・初級",
+    "description": "巨大恐竜が活躍したジュラ紀の基礎を学ぼう。",
+    "mode": "story",
+    "question_ids": [
+      "jurassic_beg_v3_01",
+      "jurassic_beg_v3_02",
+      "jurassic_beg_v3_03",
+      "jurassic_beg_v3_04",
+      "jurassic_beg_v3_05",
+      "jurassic_beg_v3_06",
+      "jurassic_beg_v3_07",
+      "jurassic_beg_v3_08",
+      "jurassic_beg_v3_09",
+      "jurassic_beg_v3_10"
+    ],
+    "reward_coin": 110,
+    "unlock_condition": { "type": "stage_clear", "stage_id": "stage_triassic_mid" }
+  },
+  {
+    "id": "stage_jurassic_mid_v3",
+    "name": "ジュラ紀・中級",
+    "description": "見た目や進化にも注目してジュラ紀を深掘り！",
+    "mode": "story",
+    "question_ids": [
+      "jurassic_mid_v3_01",
+      "jurassic_mid_v3_02",
+      "jurassic_mid_v3_03",
+      "jurassic_mid_v3_04",
+      "jurassic_mid_v3_05",
+      "jurassic_mid_v3_06",
+      "jurassic_mid_v3_07",
+      "jurassic_mid_v3_08",
+      "jurassic_mid_v3_09",
+      "jurassic_mid_v3_10"
+    ],
+    "reward_coin": 140,
+    "unlock_condition": { "type": "stage_clear", "stage_id": "stage_jurassic_beg_v3" }
+  },
+{
+  "id": "stage_jurassic_adv_v3",
+  "name": "ジュラ紀・上級",
+  "description": "大型恐竜・分類・環境まで、ジュラ紀をしっかり理解！",
+  "mode": "story",
+  "question_ids": [
+    "jurassic_adv_v3_01",
+    "jurassic_adv_v3_02",
+    "jurassic_adv_v3_03",
+    "jurassic_adv_v3_04",
+    "jurassic_adv_v3_05",
+    "jurassic_adv_v3_06",
+    "jurassic_adv_v3_07",
+    "jurassic_adv_v3_08",
+    "jurassic_adv_v3_09",
+    "jurassic_adv_v3_10"
+  ],
+  "reward_coin": 170,
+  "unlock_condition": { "type": "stage_clear", "stage_id": "stage_jurassic_mid_v3" }
+},
+{
+  "id": "stage_jurassic_sup_v3",
+  "name": "ジュラ紀・超級",
+  "description": "恐竜以外も含めて“ジュラ紀の全体像”を整理できればクリア！",
+  "mode": "story",
+  "question_ids": [
+    "jurassic_sup_v3_01",
+    "jurassic_sup_v3_02",
+    "jurassic_sup_v3_03",
+    "jurassic_sup_v3_04",
+    "jurassic_sup_v3_05",
+    "jurassic_sup_v3_06",
+    "jurassic_sup_v3_07",
+    "jurassic_sup_v3_08",
+    "jurassic_sup_v3_09",
+    "jurassic_sup_v3_10"
+  ],
+  "reward_coin": 240,
+  "unlock_condition": { "type": "stage_clear", "stage_id": "stage_jurassic_adv_v3" }
+}
+,
+{
+  "id": "stage_cretaceous_beg_v3",
+  "name": "白亜紀・初級",
+  "description": "ティラノやトリケラが登場！白亜紀の基礎を学ぼう。",
+  "mode": "story",
+  "question_ids": [
+    "cretaceous_beg_v3_01",
+    "cretaceous_beg_v3_02",
+    "cretaceous_beg_v3_03",
+    "cretaceous_beg_v3_04",
+    "cretaceous_beg_v3_05",
+    "cretaceous_beg_v3_06",
+    "cretaceous_beg_v3_07",
+    "cretaceous_beg_v3_08",
+    "cretaceous_beg_v3_09",
+    "cretaceous_beg_v3_10"
+  ],
+  "reward_coin": 110,
+  "unlock_condition": { "type": "stage_clear", "stage_id": "stage_jurassic_mid_v3" }
+},
+{
+  "id": "stage_cretaceous_mid_v3",
+  "name": "白亜紀・中級",
+  "description": "白亜紀を深掘り！見た目クイズにも挑戦。",
+  "mode": "story",
+  "question_ids": [
+    "cretaceous_mid_v3_01",
+    "cretaceous_mid_v3_02",
+    "cretaceous_mid_v3_03",
+    "cretaceous_mid_v3_04",
+    "cretaceous_mid_v3_05",
+    "cretaceous_mid_v3_06",
+    "cretaceous_mid_v3_07",
+    "cretaceous_mid_v3_08",
+    "cretaceous_mid_v3_09",
+    "cretaceous_mid_v3_10"
+  ],
+  "reward_coin": 140,
+  "unlock_condition": { "type": "stage_clear", "stage_id": "stage_cretaceous_beg_v3" }
+}
+,
+{
+  "id": "stage_cretaceous_adv_v3",
+  "name": "白亜紀・上級",
+  "description": "植物・生態・分類も含めて白亜紀をしっかり理解！",
+  "mode": "story",
+  "question_ids": [
+    "cretaceous_adv_v3_01",
+    "cretaceous_adv_v3_02",
+    "cretaceous_adv_v3_03",
+    "cretaceous_adv_v3_04",
+    "cretaceous_adv_v3_05",
+    "cretaceous_adv_v3_06",
+    "cretaceous_adv_v3_07",
+    "cretaceous_adv_v3_08",
+    "cretaceous_adv_v3_09",
+    "cretaceous_adv_v3_10"
+  ],
+  "reward_coin": 170,
+  "unlock_condition": { "type": "stage_clear", "stage_id": "stage_cretaceous_mid_v3" }
+},
+{
+  "id": "stage_cretaceous_sup_v3",
+  "name": "白亜紀・超級",
+  "description": "知識と見分け力の総合テスト！白亜紀マスターへ。",
+  "mode": "story",
+  "question_ids": [
+    "cretaceous_sup_v3_01",
+    "cretaceous_sup_v3_02",
+    "cretaceous_sup_v3_03",
+    "cretaceous_sup_v3_04",
+    "cretaceous_sup_v3_05",
+    "cretaceous_sup_v3_06",
+    "cretaceous_sup_v3_07",
+    "cretaceous_sup_v3_08",
+    "cretaceous_sup_v3_09",
+    "cretaceous_sup_v3_10"
+  ],
+  "reward_coin": 220,
+  "unlock_condition": { "type": "stage_clear", "stage_id": "stage_cretaceous_adv_v3" }
+}
+,
+{
+  "id": "stage_jp_beg_v2",
+  "name": "ジュラシックパーク（映画）・初級",
+  "description": "映画『ジュラシック・パーク』の世界（映画設定）をクイズで楽しもう！※画像なし",
+  "mode": "story",
+  "question_ids": [
+    "jp_beg_v2_01",
+    "jp_beg_v2_02",
+    "jp_beg_v2_03",
+    "jp_beg_v2_04",
+    "jp_beg_v2_05",
+    "jp_beg_v2_06",
+    "jp_beg_v2_07",
+    "jp_beg_v2_08",
+    "jp_beg_v2_09",
+    "jp_beg_v2_10"
+  ],
+  "reward_coin": 120,
+  "unlock_condition": { "type": "stage_clear", "stage_id": "stage_cretaceous_sup_v3" }
+},
+{
+  "id": "stage_jp_mid_v2",
+  "name": "ジュラシックパーク（映画）・中級",
+  "description": "名シーン＆映画設定を深掘り！※画像なし",
+  "mode": "story",
+  "question_ids": [
+    "jp_mid_v2_01",
+    "jp_mid_v2_02",
+    "jp_mid_v2_03",
+    "jp_mid_v2_04",
+    "jp_mid_v2_05",
+    "jp_mid_v2_06",
+    "jp_mid_v2_07",
+    "jp_mid_v2_08",
+    "jp_mid_v2_09",
+    "jp_mid_v2_10"
+  ],
+  "reward_coin": 150,
+  "unlock_condition": { "type": "stage_clear", "stage_id": "stage_jp_beg_v2" }
+}
+,
+{
+  "id": "stage_jp_adv_v2",
+  "name": "ジュラシックパーク（映画）・上級",
+  "description": "映画設定を踏まえた理解チェック！",
+  "mode": "story",
+  "question_ids": [
+    "jp_adv_v2_01",
+    "jp_adv_v2_02",
+    "jp_adv_v2_03",
+    "jp_adv_v2_04",
+    "jp_adv_v2_05",
+    "jp_adv_v2_06",
+    "jp_adv_v2_07",
+    "jp_adv_v2_08",
+    "jp_adv_v2_09",
+    "jp_adv_v2_10"
+  ],
+  "reward_coin": 190,
+  "unlock_condition": { "type": "stage_clear", "stage_id": "stage_jp_mid_v2" }
+},
+{
+  "id": "stage_jp_sup_v3",
+  "name": "ジュラシックパーク（映画）・超級",
+  "description": "ジュラシックパークマニアなら分かる知識！",
+  "mode": "story",
+  "question_ids": [
+    "jp_sup_v3_01",
+    "jp_sup_v3_02",
+    "jp_sup_v3_03",
+    "jp_sup_v3_04",
+    "jp_sup_v3_05",
+    "jp_sup_v3_06",
+    "jp_sup_v3_07",
+    "jp_sup_v3_08",
+    "jp_sup_v3_09",
+    "jp_sup_v3_10"
+  ],
+  "reward_coin": 250,
+  "unlock_condition": { "type": "stage_clear", "stage_id": "stage_jp_adv_v2" }
+}
+
+]

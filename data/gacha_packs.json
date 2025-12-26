@@ -1,0 +1,35 @@
+[
+  {
+    "gacha_id": "gacha_starter_head_pack1",
+    "name": "スターター（ヘッド）",
+    "description": "はじめてのヘッドアイテム！",
+    "cost_coin": 100,
+    "pool": [
+      { "item_id": "head_pack1_01", "weight": 1 },
+      { "item_id": "head_pack1_02", "weight": 1 },
+      { "item_id": "head_pack1_03", "weight": 1 },
+      { "item_id": "head_pack1_04", "weight": 1 },
+      { "item_id": "head_pack1_05", "weight": 1 },
+      { "item_id": "head_pack1_06", "weight": 1 },
+      { "item_id": "head_pack1_07", "weight": 1 },
+      { "item_id": "head_pack1_08", "weight": 1 },
+      { "item_id": "head_pack1_09", "weight": 1 },
+      { "item_id": "head_pack1_10", "weight": 1 },
+      { "item_id": "head_pack1_11", "weight": 1 },
+      { "item_id": "head_pack1_12", "weight": 1 },
+      { "item_id": "head_pack1_13", "weight": 1 },
+      { "item_id": "head_pack1_14", "weight": 1 },
+      { "item_id": "head_pack1_15", "weight": 1 },
+      { "item_id": "head_pack1_16", "weight": 1 },
+      { "item_id": "head_pack1_17", "weight": 1 },
+      { "item_id": "head_pack1_18", "weight": 1 },
+      { "item_id": "head_pack1_19", "weight": 1 },
+      { "item_id": "head_pack1_20", "weight": 1 },
+      { "item_id": "head_pack1_21", "weight": 1 },
+      { "item_id": "head_pack1_22", "weight": 1 },
+      { "item_id": "head_pack1_23", "weight": 1 },
+      { "item_id": "head_pack1_24", "weight": 1 },
+      { "item_id": "head_pack1_25", "weight": 1 }
+    ]
+  }
+]

@@ -1,0 +1,181 @@
+<!doctype html>
+<html lang="ja">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover" />
+  <title>【DQA】Dino Quiz Adventure</title>
+
+  <style>
+    :root{
+      /* ===== Toy Pop Theme ===== */
+      --bg: #fff7cc;               /* クリームイエロー */
+      --bg2:#dbeafe;               /* ふんわりブルー */
+      --text:#1f2a44;              /* 濃いネイビー */
+      --muted:#52638a;
+
+      --blue:#2563eb;              /* しっかり青 */
+      --yellow:#fbbf24;            /* 元気イエロー */
+      --red:#ef4444;               /* ポップ赤 */
+      --mint:#22c55e;              /* ごほうび系 */
+
+      --accent: var(--blue);
+      --accent2: var(--yellow);
+      --accent3: var(--red);
+      --good: var(--mint);
+      --bad: var(--red);
+
+      --line: rgba(31,42,68,.14);
+      --shadow: 0 12px 28px rgba(31,42,68,.18);
+      --radius: 22px;
+    }
+
+    *{ box-sizing:border-box; }
+    html, body{ height:100%; }
+
+    body{
+      margin:0;
+      font-family: system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial, "Noto Sans JP", "Hiragino Kaku Gothic ProN", "Yu Gothic UI", sans-serif;
+      color: var(--text);
+      min-height:100vh;
+
+      /* ポップ背景（紙っぽい＋ドット感） */
+      background:
+        radial-gradient(16px 16px at 22px 22px, rgba(37,99,235,.10) 35%, transparent 36%) 0 0/44px 44px,
+        radial-gradient(14px 14px at 18px 18px, rgba(251,191,36,.14) 35%, transparent 36%) 0 0/52px 52px,
+        radial-gradient(1200px 700px at 20% -10%, rgba(37,99,235,.16), transparent 60%),
+        radial-gradient(1200px 700px at 80% 0%, rgba(251,191,36,.22), transparent 60%),
+        radial-gradient(1000px 700px at 40% 110%, rgba(239,68,68,.12), transparent 55%),
+        linear-gradient(180deg, var(--bg2), var(--bg));
+    }
+
+    main{
+      padding: 14px;
+      max-width: 520px;
+      margin: 0 auto;
+    }
+
+    /* ===== Cards ===== */
+    .card{
+      background: rgba(255,255,255,.86);
+      border: 2px solid rgba(31,42,68,.16);
+      border-radius: var(--radius);
+      box-shadow: var(--shadow);
+      overflow:hidden;
+    }
+    .card-inner{ padding: 14px; }
+
+    /* ===== Layout helpers ===== */
+    .row{ display:flex; gap:10px; align-items:center; flex-wrap:wrap; }
+    .space{ height: 12px; }
+
+    /* ===== Buttons ===== */
+    .btn{
+      appearance:none;
+      border: none;
+      border-radius: 18px;
+      padding: 12px 14px;
+      font-weight: 1000;
+      cursor:pointer;
+      width: 100%;
+      text-align:center;
+      color: #fff;
+
+      /* トイっぽい立体感 */
+      background: linear-gradient(180deg, rgba(255,255,255,.25), rgba(255,255,255,0)) , var(--accent);
+      box-shadow:
+        0 10px 18px rgba(37,99,235,.22),
+        0 3px 0 rgba(18,44,120,.28);
+      transform: translateY(0);
+    }
+    .btn:active{
+      transform: translateY(2px);
+      box-shadow:
+        0 7px 14px rgba(37,99,235,.18),
+        0 1px 0 rgba(18,44,120,.22);
+    }
+
+    .btn.secondary{
+      color: var(--text);
+      background: rgba(255,255,255,.92);
+      border: 2px solid rgba(31,42,68,.18);
+      box-shadow:
+        0 10px 18px rgba(31,42,68,.10),
+        0 3px 0 rgba(31,42,68,.12);
+    }
+    .btn.secondary:active{
+      transform: translateY(2px);
+      box-shadow:
+        0 7px 14px rgba(31,42,68,.08),
+        0 1px 0 rgba(31,42,68,.10);
+    }
+
+    .btn:disabled{
+      opacity:.55;
+      cursor:not-allowed;
+      transform:none;
+      box-shadow: none;
+    }
+
+    /* ===== Pills ===== */
+    .pill{
+      display:inline-flex;
+      align-items:center;
+      gap:6px;
+      padding: 6px 10px;
+      border-radius: 999px;
+      border: 2px solid rgba(31,42,68,.16);
+      color: var(--muted);
+      font-size: 12px;
+      background: rgba(255,255,255,.75);
+    }
+
+    /* ===== Lists / stage cards ===== */
+    .list{ display:flex; flex-direction:column; gap:10px; }
+    .stage{
+      display:block;
+      text-decoration:none;
+      color:inherit;
+      border: 2px solid rgba(31,42,68,.16);
+      background: rgba(255,255,255,.80);
+      border-radius: 18px;
+      padding: 12px;
+      box-shadow: 0 10px 18px rgba(31,42,68,.10);
+    }
+    .stage .name{ font-weight: 1000; margin: 0 0 4px; }
+    .stage .desc{ margin: 0; color: var(--muted); font-size: 12px; line-height: 1.4; }
+    .stage .meta{ margin-top: 8px; display:flex; gap:8px; flex-wrap:wrap; }
+    .stage[aria-disabled="true"]{ opacity:.55; pointer-events:none; }
+
+    /* ===== Notices ===== */
+    .notice{
+      padding: 10px 12px;
+      border-radius: 18px;
+      border: 2px dashed rgba(31,42,68,.18);
+      background: rgba(255,255,255,.75);
+      color: var(--muted);
+      font-size: 12px;
+      line-height: 1.5;
+    }
+
+    /* “正解/不正解”系の色をトイ寄せ */
+    .choice.correct, .quiz-choice.correct{
+      border-color: rgba(34,197,94,.55) !important;
+      background: rgba(34,197,94,.18) !important;
+    }
+    .choice.wrong, .quiz-choice.wrong{
+      border-color: rgba(239,68,68,.55) !important;
+      background: rgba(239,68,68,.18) !important;
+    }
+
+    code{ color: #1d4ed8; font-weight: 800; }
+  </style>
+</head>
+
+<body>
+  <main id="app">
+    <!-- js/main.js が描画します -->
+  </main>
+
+  <script type="module" src="/js/main.js"></script>
+</body>
+</html>
