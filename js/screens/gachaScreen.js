@@ -1,3 +1,13 @@
+// GitHub Pages (Project Pages) / ローカル両対応：このモジュール位置から assets を解決する
+const ROOT = new URL("../../", import.meta.url);
+const asset = (p) => new URL(String(p || "").replace(/^\/+/, ""), ROOT).toString();
+const normalizeAsset = (p) => {
+  if (!p) return "";
+  const s = String(p);
+  if (/^https?:\/\//.test(s) || /^data:/.test(s)) return s;
+  return asset(s);
+};
+
 function getMasters(state) {
   const m = state.masters ?? {};
   return {
@@ -20,12 +30,11 @@ export function renderGacha({ state, goto }) {
     `;
   }
 
-  // 今回は pack1（先頭）を想定
   const pack = packs[0];
   const gachaId = pack.gacha_id;
 
-  // ユーザー指定のバナー
-  const bannerPath = "/assets/images/gacha/banners/gacha_pack1.png";
+  // ✅ Pages対応（先頭/を使わない）
+  const bannerPath = asset("assets/images/gacha/banners/gacha_pack1.png");
 
   const coins = Number(save.economy?.coins ?? 0);
   const cost = Number(pack.cost_coin ?? 100);

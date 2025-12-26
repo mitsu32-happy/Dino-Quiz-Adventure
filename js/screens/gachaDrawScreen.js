@@ -1,5 +1,15 @@
 import { saveNow } from "../systems/saveManager.js";
 
+// GitHub Pages (Project Pages) / ローカル両対応：このモジュール位置から assets を解決する
+const ROOT = new URL("../../", import.meta.url);
+const asset = (p) => new URL(String(p || "").replace(/^\/+/, ""), ROOT).toString();
+const normalizeAsset = (p) => {
+  if (!p) return "";
+  const s = String(p);
+  if (/^https?:\/\//.test(s) || /^data:/.test(s)) return s;
+  return asset(s);
+};
+
 function pickWeighted(pool) {
   const list = Array.isArray(pool) ? pool : [];
   const total = list.reduce((s, p) => s + Math.max(0, Number(p.weight ?? 0)), 0);
@@ -43,9 +53,9 @@ export function renderGachaDraw({ state, goto, params }) {
   const cost = Number(pack.cost_coin ?? 100);
   const coins = Number(save.economy?.coins ?? 0);
 
-  // 今回の指定（pack1）
-  const bannerPath = "/assets/images/gacha/banners/gacha_pack1.png";
-  const moviePath = "/assets/images/gacha/movies/gacha_pack1.mp4";
+  // ✅ Pages対応
+  const bannerPath = asset("assets/images/gacha/banners/gacha_pack1.png");
+  const moviePath = asset("assets/images/gacha/movies/gacha_pack1.mp4");
 
   setTimeout(() => {
     const pullBtn = document.getElementById("pullBtn");
@@ -81,7 +91,7 @@ export function renderGachaDraw({ state, goto, params }) {
         <div class="result-card">
           <div class="result-title">獲得！</div>
           <div class="result-box">
-            <img class="result-img" src="${item.asset_path}" alt="" onerror="this.style.opacity=0.25" />
+            <img class="result-img" src="${normalizeAsset(item.asset_path)}" alt="" onerror="this.style.opacity=0.25" />
             <div class="result-name">${item.name ?? item.item_id}</div>
             <div class="result-sub">
               ${already ? `<span class="pill">すでに所持</span>` : `<span class="pill" style="color:var(--good)">NEW!</span>`}
@@ -103,7 +113,6 @@ export function renderGachaDraw({ state, goto, params }) {
       `;
 
       document.getElementById("againBtn")?.addEventListener("click", () => {
-        // 同じ画面で続ける
         goto(`#gachaDraw?gachaId=${encodeURIComponent(pack.gacha_id)}`);
       });
       document.getElementById("backToBannersBtn")?.addEventListener("click", () => goto("#gacha"));
@@ -114,7 +123,6 @@ export function renderGachaDraw({ state, goto, params }) {
     toHomeBtn?.addEventListener("click", () => goto("#home"));
     toAvatarBtn?.addEventListener("click", () => goto("#avatar"));
 
-    // 動画終了で閉じる→結果表示（後で差し込む）
     let pendingResult = null;
     video?.addEventListener("ended", () => {
       closeMovie();
@@ -132,20 +140,16 @@ export function renderGachaDraw({ state, goto, params }) {
     });
 
     pullBtn?.addEventListener("click", () => {
-      // コイン不足
       if (Number(save.economy?.coins ?? 0) < cost) return;
 
-      // 抽選
       const picked = pickWeighted(pack.pool);
       if (!picked?.item_id) return;
 
       const item = (items || []).find((it) => it.item_id === picked.item_id);
       if (!item) return;
 
-      // コイン消費
       save.economy.coins -= cost;
 
-      // 所持追加（重複は追加しない）
       const owned = Array.isArray(save.avatar?.ownedItemIds) ? save.avatar.ownedItemIds : [];
       if (!save.avatar) save.avatar = { equipped: { body: null, head: null, outfit: null, background: null }, ownedItemIds: [] };
       if (!Array.isArray(save.avatar.ownedItemIds)) save.avatar.ownedItemIds = owned;
@@ -153,17 +157,14 @@ export function renderGachaDraw({ state, goto, params }) {
       const already = save.avatar.ownedItemIds.includes(item.item_id);
       if (!already) save.avatar.ownedItemIds.push(item.item_id);
 
-      // 統計
       if (!save.gacha) save.gacha = { totalPulls: 0, lastPulledAt: null };
       save.gacha.totalPulls = Number(save.gacha.totalPulls ?? 0) + 1;
       save.gacha.lastPulledAt = new Date().toISOString();
 
       saveNow(save);
 
-      // 画面表示更新（所持コイン）
       if (coinsEl) coinsEl.textContent = `🪙 ${Number(save.economy?.coins ?? 0)}`;
 
-      // 演出開始 → 終了後に結果を表示
       pendingResult = { item, already };
       openMovie();
     });
@@ -210,7 +211,6 @@ export function renderGachaDraw({ state, goto, params }) {
       <div id="resultArea"></div>
     </div></div>
 
-    <!-- mp4 演出モーダル -->
     <div id="movieModal" class="movie-modal" style="display:none;">
       <div class="movie-sheet">
         <video id="movieVideo" class="movie-video" src="${moviePath}" playsinline webkit-playsinline></video>
@@ -268,7 +268,6 @@ export function renderGachaDraw({ state, goto, params }) {
         flex-wrap:wrap;
       }
 
-      /* ===== 演出モーダル（スマホ縦でも見やすく） ===== */
       .movie-modal{
         position: fixed;
         inset: 0;
@@ -294,7 +293,6 @@ export function renderGachaDraw({ state, goto, params }) {
         height: auto;
         display:block;
         background: #000;
-        /* ワイド動画を縦画面でも “収める” */
         aspect-ratio: 16 / 9;
         object-fit: contain;
       }

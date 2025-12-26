@@ -1,11 +1,20 @@
 import { saveNow } from "../systems/saveManager.js";
 import { playSe } from "../systems/audioManager.js";
 
+// GitHub Pages (Project Pages) / ローカル両対応：このモジュール位置から assets を解決する
+const ROOT = new URL("../../", import.meta.url);
+const asset = (p) => new URL(String(p || "").replace(/^\/+/, ""), ROOT).toString();
+const normalizeAsset = (p) => {
+  if (!p) return "";
+  const s = String(p);
+  if (/^https?:\/\//.test(s) || /^data:/.test(s)) return s;
+  return asset(s);
+};
+
 /**
  * タイムアタック
  * - CSSは外部化して1回だけ読み込む（多重評価による崩れ防止）
- * - レイアウトは quizScreen と同系統（2x2選択肢 + アバターゾーン + verdict + pause modal）
- * - SE: 出題 / 決定 / 正解 / 不正解 / タイマーwarn(<=10s) / urgent(<=5s)
+ * - レイアウトは quizScreen と同系統
  */
 
 function ensureCssLoadedOnce(href, id) {
@@ -59,8 +68,8 @@ function imgWithFallback(className, primarySrc, fallbackSrcList = []) {
 }
 
 export function renderTimeAttack({ state, goto }) {
-  // ✅ CSSを1回だけ読み込む（これが崩れ対策の本体）
-  ensureCssLoadedOnce("/assets/css/timeAttack.css", "time-attack-css");
+  // ✅ CSSを1回だけ読み込む（崩れ対策）
+  ensureCssLoadedOnce(asset("assets/css/timeAttack.css"), "time-attack-css");
 
   const { save, masters } = state;
   const TOTAL_SEC = 60;
@@ -101,7 +110,6 @@ export function renderTimeAttack({ state, goto }) {
   const q = questionById ? questionById.get(qid) : allQuestions.find((x) => x.id === qid);
 
   if (!q) {
-    // 事故回避：runを捨てて戻す
     state.timeAttackRun = null;
     goto("#home");
     return "";
@@ -114,14 +122,14 @@ export function renderTimeAttack({ state, goto }) {
   const eqHead = getItemById(avatarItems, eq.head);
 
   const bgCandidates = [
-    "/assets/images/quiz/avatar_bg.png",
-    "/assets/images/quiz/avetar_bg.png",
-    "/images/quiz/avatar_bg.png",
-    "/images/quiz/avetar_bg.png",
+    asset("assets/images/quiz/avatar_bg.png"),
+    asset("assets/images/quiz/avetar_bg.png"),
+    asset("images/quiz/avatar_bg.png"),
+    asset("images/quiz/avetar_bg.png"),
   ];
   const standCandidates = [
-    "/assets/images/quiz/quiz_stand.png",
-    "/images/quiz/quiz_stand.png",
+    asset("assets/images/quiz/quiz_stand.png"),
+    asset("images/quiz/quiz_stand.png"),
   ];
 
   const avatarZoneHtml = `
@@ -129,8 +137,8 @@ export function renderTimeAttack({ state, goto }) {
       <div class="avatar-stage">
         ${imgWithFallback("az-bg", bgCandidates[0], bgCandidates.slice(1))}
         <div class="az-actor">
-          ${eqBody?.asset_path ? `<img class="az-layer az-body" src="${eqBody.asset_path}" alt="" onerror="this.style.display='none'">` : ``}
-          ${eqHead?.asset_path ? `<img class="az-layer az-head" src="${eqHead.asset_path}" alt="" onerror="this.style.display='none'">` : ``}
+          ${eqBody?.asset_path ? `<img class="az-layer az-body" src="${normalizeAsset(eqBody.asset_path)}" alt="" onerror="this.style.display='none'">` : ``}
+          ${eqHead?.asset_path ? `<img class="az-layer az-head" src="${normalizeAsset(eqHead.asset_path)}" alt="" onerror="this.style.display='none'">` : ``}
           ${imgWithFallback("az-layer az-stand", standCandidates[0], standCandidates.slice(1))}
         </div>
       </div>
@@ -142,13 +150,12 @@ export function renderTimeAttack({ state, goto }) {
     const isImage = c?.type === "image" && c?.image_url;
     return `
       <button class="choice-btn" data-idx="${idx}" type="button">
-        ${isImage ? `<img class="choice-img" src="${c.image_url}" alt="" onerror="this.style.display='none'">` : ``}
+        ${isImage ? `<img class="choice-img" src="${normalizeAsset(c.image_url)}" alt="" onerror="this.style.display='none'">` : ``}
         <div class="choice-text">${c?.label ?? ""}</div>
       </button>
     `;
   }).join("");
 
-  // DOMイベント/タイマー
   setTimeout(() => {
     const timerEl = document.getElementById("taTimerText");
     const scoreEl = document.getElementById("taScoreText");
@@ -164,10 +171,8 @@ export function renderTimeAttack({ state, goto }) {
 
     let answeredThisQ = false;
 
-    // ✅ 出題SE
     playSe("assets/sounds/se/se_question.mp3", { volume: 0.9 });
 
-    // ✅ タイマーSE（ループ管理）
     let warnSe = null;
     let urgentSe = null;
     function stopTimerSe() {
@@ -180,7 +185,6 @@ export function renderTimeAttack({ state, goto }) {
       const sec = Math.ceil(run.remainMs / 1000);
       if (timerEl) timerEl.textContent = `⏱ ${clamp(sec, 0, 999)}`;
 
-      // 残り10秒でwarn、5秒でurgent
       if (sec <= 5) {
         if (!urgentSe) {
           stopTimerSe();
@@ -194,9 +198,7 @@ export function renderTimeAttack({ state, goto }) {
     }
 
     function setScoreText() {
-      if (scoreEl) {
-        scoreEl.textContent = `正解 ${run.correct} / 回答 ${run.answered}`;
-      }
+      if (scoreEl) scoreEl.textContent = `正解 ${run.correct} / 回答 ${run.answered}`;
     }
 
     function setChoicesEnabled(enabled) {
@@ -219,7 +221,6 @@ export function renderTimeAttack({ state, goto }) {
       run.finished = true;
       stopTimerSe();
 
-      // resultScreen 側が参照しやすい形に寄せる
       state.currentRun = {
         mode: "time_attack",
         stageId: "time_attack",
@@ -228,7 +229,6 @@ export function renderTimeAttack({ state, goto }) {
         totalCount: run.answered,
       };
 
-      // ベスト保持（save側の置き場は既存に合わせて最小限）
       save.stats = save.stats || {};
       save.stats.timeAttackBest = Math.max(save.stats.timeAttackBest || 0, run.correct);
       saveNow(save);
@@ -243,7 +243,6 @@ export function renderTimeAttack({ state, goto }) {
       goto("#timeAttack");
     }
 
-    // タイマー開始（requestAnimationFrame）
     setTimerText();
     setScoreText();
 
@@ -257,7 +256,6 @@ export function renderTimeAttack({ state, goto }) {
         if (run.remainMs <= 0) {
           run.remainMs = 0;
           setTimerText();
-          // タイムアップ：終了（BGMなしなのでSEは鳴らさない/必要なら追加OK）
           finishToResult();
           return;
         }
@@ -267,7 +265,6 @@ export function renderTimeAttack({ state, goto }) {
     };
     requestAnimationFrame(tick);
 
-    // 一時停止
     pauseBtn?.addEventListener("click", () => {
       if (run.finished) return;
       playSe("assets/sounds/se/se_decide.mp3", { volume: 0.8 });
@@ -290,7 +287,6 @@ export function renderTimeAttack({ state, goto }) {
       }
     });
 
-    // 回答
     choiceButtons.forEach((btn) => {
       btn.addEventListener("click", () => {
         if (run.finished || run.paused) return;
@@ -304,12 +300,8 @@ export function renderTimeAttack({ state, goto }) {
         run.answered += 1;
         if (isCorrect) run.correct += 1;
 
-        // ✅ 決定→正誤
         playSe("assets/sounds/se/se_decide.mp3", { volume: 0.8 });
-        playSe(
-          isCorrect ? "assets/sounds/se/se_correct.mp3" : "assets/sounds/se/se_wrong.mp3",
-          { volume: 0.95 }
-        );
+        playSe(isCorrect ? "assets/sounds/se/se_correct.mp3" : "assets/sounds/se/se_wrong.mp3", { volume: 0.95 });
 
         setScoreText();
         setChoicesEnabled(false);
@@ -325,7 +317,6 @@ export function renderTimeAttack({ state, goto }) {
       });
     });
 
-    // タイプライター（止めたいならここだけ無効化できます）
     const fullText = String(q.question_text ?? "");
     let i = 0;
     const speedMs = 32;

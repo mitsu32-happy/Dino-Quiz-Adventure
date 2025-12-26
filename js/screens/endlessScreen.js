@@ -1,6 +1,16 @@
 import { saveNow } from "../systems/saveManager.js";
 import { playSe } from "../systems/audioManager.js";
 
+// GitHub Pages (Project Pages) / ローカル両対応：このモジュール位置から assets を解決する
+const ROOT = new URL("../../", import.meta.url);
+const asset = (p) => new URL(String(p || "").replace(/^\/+/, ""), ROOT).toString();
+const normalizeAsset = (p) => {
+  if (!p) return "";
+  const s = String(p);
+  if (/^https?:\/\//.test(s) || /^data:/.test(s)) return s;
+  return asset(s);
+};
+
 /**
  * エンドレス（ステージクイズ画面と同じ構成に寄せる版）
  * - CSSは外部化して1回だけ読み込む（多重評価による崩れ防止）
@@ -16,11 +26,6 @@ function ensureCssLoadedOnce(href, id) {
   document.head.appendChild(link);
 }
 
-function clamp(n, min, max) {
-  return Math.max(min, Math.min(max, n));
-}
-
-// 正解Indexのキーゆれ対策
 function getCorrectIndex(q) {
   const v = q?.correct_choice_index ?? q?.correct_index ?? q?.answer_index ?? q?.correct;
   const n = Number(v);
@@ -40,7 +45,6 @@ function getItemById(items, id) {
   return (items || []).find((it) => it?.item_id === id) ?? null;
 }
 
-// 画像パスフォールバック（quizScreen.js と同様）
 function imgWithFallback(className, primarySrc, fallbackSrcList = []) {
   const fallbacks = [primarySrc, ...fallbackSrcList].filter(Boolean);
   const data = encodeURIComponent(JSON.stringify(fallbacks));
@@ -68,14 +72,14 @@ function buildAvatarZoneHtml(state) {
   const eqHead = getItemById(avatarItems, eq.head);
 
   const bgCandidates = [
-    "/assets/images/quiz/avatar_bg.png",
-    "/assets/images/quiz/avetar_bg.png",
-    "/images/quiz/avatar_bg.png",
-    "/images/quiz/avetar_bg.png",
+    asset("assets/images/quiz/avatar_bg.png"),
+    asset("assets/images/quiz/avetar_bg.png"),
+    asset("images/quiz/avatar_bg.png"),
+    asset("images/quiz/avetar_bg.png"),
   ];
   const standCandidates = [
-    "/assets/images/quiz/quiz_stand.png",
-    "/images/quiz/quiz_stand.png",
+    asset("assets/images/quiz/quiz_stand.png"),
+    asset("images/quiz/quiz_stand.png"),
   ];
 
   return `
@@ -83,8 +87,8 @@ function buildAvatarZoneHtml(state) {
       <div class="avatar-stage">
         ${imgWithFallback("az-bg", bgCandidates[0], bgCandidates.slice(1))}
         <div class="az-actor">
-          ${eqBody?.asset_path ? `<img class="az-layer az-body" src="${eqBody.asset_path}" alt="" onerror="this.style.display='none'">` : ``}
-          ${eqHead?.asset_path ? `<img class="az-layer az-head" src="${eqHead.asset_path}" alt="" onerror="this.style.display='none'">` : ``}
+          ${eqBody?.asset_path ? `<img class="az-layer az-body" src="${normalizeAsset(eqBody.asset_path)}" alt="" onerror="this.style.display='none'">` : ``}
+          ${eqHead?.asset_path ? `<img class="az-layer az-head" src="${normalizeAsset(eqHead.asset_path)}" alt="" onerror="this.style.display='none'">` : ``}
           ${imgWithFallback("az-layer az-stand", standCandidates[0], standCandidates.slice(1))}
         </div>
       </div>
@@ -114,12 +118,10 @@ function ensureEndlessRun(state) {
 }
 
 export function renderEndless({ state, goto }) {
-  // ✅ CSSを1回だけ読み込む（崩れ対策）
-  ensureCssLoadedOnce("/assets/css/endless.css", "endless-css");
+  ensureCssLoadedOnce(asset("assets/css/endless.css"), "endless-css");
 
   const { save, masters } = state;
 
-  // progress 初期（必要なら）
   if (!save.progress) save.progress = {};
   if (!save.progress.modes) save.progress.modes = {};
   save.progress.modes.endlessLastPlayedAt = new Date().toISOString();
@@ -144,7 +146,6 @@ export function renderEndless({ state, goto }) {
   const q = masters?.questionById?.get(qid);
 
   if (!q) {
-    // 不整合：スキップ
     run.cursor += 1;
     goto("#endless");
     return `<div class="card"><div class="card-inner">読み込み中...</div></div>`;
@@ -159,14 +160,13 @@ export function renderEndless({ state, goto }) {
       const label = (c?.label ?? "").trim();
       return `
         <button class="choice-btn" data-idx="${idx}" type="button">
-          ${isImage ? `<img class="choice-img" src="${c.image_url}" alt="" onerror="this.style.display='none'">` : ``}
+          ${isImage ? `<img class="choice-img" src="${normalizeAsset(c.image_url)}" alt="" onerror="this.style.display='none'">` : ``}
           <div class="choice-text">${label}</div>
         </button>
       `;
     })
     .join("");
 
-  // イベント付与（render 内 setTimeout）
   setTimeout(() => {
     let answered = false;
     let paused = false;
@@ -181,7 +181,6 @@ export function renderEndless({ state, goto }) {
 
     const choiceButtons = Array.from(document.querySelectorAll(".choice-btn"));
 
-    // ✅ 出題SE
     playSe("assets/sounds/se/se_question.mp3", { volume: 0.9 });
 
     function setHud() {
@@ -210,7 +209,6 @@ export function renderEndless({ state, goto }) {
       closePause();
       setChoicesEnabled(false);
 
-      // Resultへ渡す（報酬付与は resultScreen 側）
       state.currentRun = {
         mode: "endless",
         stageId: "endless",
@@ -238,10 +236,8 @@ export function renderEndless({ state, goto }) {
       verdictEl.className = `verdict ${ok ? "good" : "bad"}`;
     }
 
-    // HUD 初期表示
     setHud();
 
-    // 一時停止（決定SE）
     pauseBtn?.addEventListener("click", () => {
       playSe("assets/sounds/se/se_decide.mp3", { volume: 0.8 });
       openPause();
@@ -251,7 +247,6 @@ export function renderEndless({ state, goto }) {
       closePause();
     });
     retireBtn?.addEventListener("click", () => {
-      // エンドレスは「リタイア」でも結果へ
       playSe("assets/sounds/se/se_decide.mp3", { volume: 0.8 });
       closePause();
       finish("retire");
@@ -263,7 +258,6 @@ export function renderEndless({ state, goto }) {
       }
     });
 
-    // 選択（決定→正誤SE）
     choiceButtons.forEach((btn) => {
       btn.addEventListener("click", () => {
         if (answered) return;
@@ -276,10 +270,7 @@ export function renderEndless({ state, goto }) {
         const isCorrect = correctIdx != null ? idx === correctIdx : false;
 
         playSe("assets/sounds/se/se_decide.mp3", { volume: 0.8 });
-        playSe(
-          isCorrect ? "assets/sounds/se/se_correct.mp3" : "assets/sounds/se/se_wrong.mp3",
-          { volume: 0.95 }
-        );
+        playSe(isCorrect ? "assets/sounds/se/se_correct.mp3" : "assets/sounds/se/se_wrong.mp3", { volume: 0.95 });
 
         if (isCorrect) run.correct += 1;
         else run.miss += 1;
@@ -288,7 +279,6 @@ export function renderEndless({ state, goto }) {
         setChoicesEnabled(false);
         showVerdict(isCorrect);
 
-        // 3ミスで終了
         if (run.miss >= MAX_MISS) {
           setTimeout(() => finish("miss"), 600);
           return;
@@ -300,7 +290,6 @@ export function renderEndless({ state, goto }) {
       });
     });
 
-    // タイプライター
     const fullText = String(q.question_text ?? "");
     let i = 0;
     const speedMs = 38;

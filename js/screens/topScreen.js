@@ -1,79 +1,44 @@
-// js/screens/topScreen.js
-import { playSe } from "../systems/audioManager.js";
-
+// GitHub Pages (Project Pages) / ローカル両対応：このモジュール位置から assets を解決する
 const ROOT = new URL("../../", import.meta.url);
 const asset = (p) => new URL(String(p || "").replace(/^\/+/, ""), ROOT).toString();
+const normalizeAsset = (p) => {
+  if (!p) return "";
+  const s = String(p);
+  if (/^https?:\/\//.test(s) || /^data:/.test(s)) return s;
+  return asset(s);
+};
 
 export function renderTop({ goto }) {
+  const bg = asset("assets/images/top_bg.png");
+
   setTimeout(() => {
-    const startBtn = document.getElementById("startBtn");
-    startBtn?.addEventListener("click", () => {
-      playSe("assets/sounds/se/se_decide.mp3", { volume: 0.85 });
-      goto("#home");
-    });
+    document.getElementById("startBtn")?.addEventListener("click", () => goto("#home"));
   }, 0);
 
-  const topBg = asset("assets/images/top_bg.png");
-
   return `
-    <div class="top-screen">
-      <img
-        class="top-bg"
-        src="${topBg}"
-        alt="Top Background"
-        onerror="this.style.display='none'"
-      />
+    <div class="top-screen" style="min-height:100vh;display:flex;align-items:center;justify-content:center;padding:18px;">
+      <div class="top-bg" style="
+        position:fixed; inset:0; z-index:-1;
+        background-image:url('${bg}');
+        background-size:cover; background-position:center;
+        filter:saturate(1.05);
+      "></div>
 
-      <div class="start-wrapper">
-        <button id="startBtn" class="start-btn">
-          START
-        </button>
+      <div class="card" style="width:min(520px,100%);">
+        <div class="card-inner" style="text-align:center;">
+          <h1 style="margin:0;font-size:22px;line-height:1.25;font-weight:1000;">
+            Dino Quiz Adventure<br><span style="font-size:14px;color:var(--muted);">-目指せ！恐竜博士！-</span>
+          </h1>
+
+          <div class="space"></div>
+
+          <button id="startBtn" class="btn" type="button">はじめる</button>
+
+          <div style="margin-top:10px;font-size:12px;color:var(--muted);">
+            ※初回はデータ読み込みに少し時間がかかる場合があります
+          </div>
+        </div>
       </div>
     </div>
-
-    <style>
-      .top-screen {
-        position: relative;
-        width: 100%;
-        height: 100vh;
-        overflow: hidden;
-      }
-
-      .top-bg {
-        position: absolute;
-        inset: 0;
-        width: 100%;
-        height: 100%;
-        object-fit: cover;
-      }
-
-      .start-wrapper {
-        position: absolute;
-        left: 50%;
-        bottom: 22%;
-        transform: translateX(-50%);
-        z-index: 2;
-      }
-
-      .start-btn {
-        font-size: 26px;
-        font-weight: 900;
-        letter-spacing: 0.12em;
-        padding: 16px 42px;
-        border-radius: 999px;
-        border: none;
-        color: var(--bg);
-        background: var(--accent);
-        cursor: pointer;
-        animation: startBlink 1.2s infinite ease-in-out;
-        box-shadow: 0 0 24px rgba(110,231,255,.6);
-      }
-
-      @keyframes startBlink {
-        0%   { opacity: 1; transform: scale(1); }
-        50%  { opacity: 0.35; transform: scale(0.97); }
-        100% { opacity: 1; transform: scale(1); }
-      }
-    </style>
   `;
 }

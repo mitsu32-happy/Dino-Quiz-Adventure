@@ -1,5 +1,15 @@
 import { saveNow } from "../systems/saveManager.js";
 
+// GitHub Pages (Project Pages) / ローカル両対応：このモジュール位置から assets を解決する
+const ROOT = new URL("../../", import.meta.url);
+const asset = (p) => new URL(String(p || "").replace(/^\/+/, ""), ROOT).toString();
+const normalizeAsset = (p) => {
+  if (!p) return "";
+  const s = String(p);
+  if (/^https?:\/\//.test(s) || /^data:/.test(s)) return s;
+  return asset(s);
+};
+
 function ensureDefaultAvatarOwned(state) {
   const { masters, save } = state;
   const items = masters?.avatar_items ?? masters?.avatarItems ?? [];
@@ -36,12 +46,12 @@ function getItemById(items, id) {
 
 function safeImg(src) {
   if (!src) return "";
-  return `<img class="av-img" src="${src}" alt="" onerror="this.style.opacity=0.25" />`;
+  return `<img class="av-img" src="${normalizeAsset(src)}" alt="" onerror="this.style.opacity=0.25" />`;
 }
 
 function safeLayer(src, cls) {
   if (!src) return "";
-  return `<img class="av-layer ${cls}" src="${src}" alt="" onerror="this.style.opacity=0.25" />`;
+  return `<img class="av-layer ${cls}" src="${normalizeAsset(src)}" alt="" onerror="this.style.opacity=0.25" />`;
 }
 
 export function renderAvatar({ state, goto }) {
@@ -59,7 +69,6 @@ export function renderAvatar({ state, goto }) {
     `;
   }
 
-  // 初期所持の補完（ボディ16体は所持扱い）
   ensureDefaultAvatarOwned(state);
   saveNow(save);
 
@@ -101,7 +110,6 @@ export function renderAvatar({ state, goto }) {
     `;
   }).join("");
 
-  // DOM
   setTimeout(() => {
     document.querySelectorAll("[data-eq-type]")?.forEach((el) => {
       el.addEventListener("click", () => {
@@ -142,7 +150,6 @@ export function renderAvatar({ state, goto }) {
 
       <div class="space"></div>
 
-      <!-- 合成プレビュー -->
       <div class="preview">
         <div class="preview-box">
           <div class="preview-title">いまの装備（合成表示）</div>
@@ -170,7 +177,6 @@ export function renderAvatar({ state, goto }) {
 
           <div class="space"></div>
 
-          <!-- デバッグ用：個別プレビュー（必要なければ後で消します） -->
           <details class="debug">
             <summary>個別表示（確認用）</summary>
             <div class="debug-grid">
@@ -219,7 +225,6 @@ export function renderAvatar({ state, goto }) {
         .preview-row{ grid-template-columns: 140px 1fr; }
       }
 
-      /* ===== 合成表示 ===== */
       .composite{
         width: 160px;
         aspect-ratio: 1/1;
@@ -263,7 +268,6 @@ export function renderAvatar({ state, goto }) {
       .info-value{ font-weight: 1000; font-size: 13px; }
       .preview-note{ color:var(--muted); font-size:12px; margin-top:10px; }
 
-      /* 確認用（後で消せる） */
       .debug{ margin-top: 6px; }
       .debug summary{
         cursor:pointer;
@@ -290,7 +294,6 @@ export function renderAvatar({ state, goto }) {
         margin-bottom: 6px;
       }
 
-      /* ===== 一覧 ===== */
       .grid{
         display:grid;
         grid-template-columns: repeat(3, minmax(0, 1fr));
