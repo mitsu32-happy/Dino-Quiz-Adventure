@@ -143,22 +143,23 @@
     "image_url": null,
     "time_limit": 10
   },
-  {
-    "id": "triassic_beg_10",
-    "question_text": "三畳紀の恐竜について正しい説明はどれ？",
-    "mode": "text_choice",
-    "choices": [
-      { "type": "text", "label": "恐竜が地球を完全に支配していた" },
-      { "type": "text", "label": "恐竜はまだ発展途中で、種類も多くなかった" },
-      { "type": "text", "label": "恐竜は存在しなかった" },
-      { "type": "text", "label": "恐竜はすべて草食だった" }
-    ],
-    "correct_index": 1,
-    "category": "overview",
-    "difficulty": 1,
-    "image_url": null,
-    "time_limit": 10
-  },
+{
+  "id": "triassic_beg_10",
+  "question_text": "三畳紀の恐竜について、より正しい説明はどれ？",
+  "mode": "text_choice",
+  "choices": [
+    { "type": "text", "label": "恐竜はまだ登場しておらず、存在しなかった" },
+    { "type": "text", "label": "恐竜は発展途上で、種類も多くなかった" },
+    { "type": "text", "label": "恐竜が地球上の動物を完全に支配していた" },
+    { "type": "text", "label": "恐竜はすべて草食だった" }
+  ],
+  "correct_index": 1,
+  "category": "overview",
+  "difficulty": 1,
+  "image_url": null,
+  "time_limit": 10
+}
+,
 
   {
     "id": "triassic_mid_01",
@@ -337,22 +338,22 @@
     "image_url": null,
     "time_limit": 10
   },
-  {
-    "id": "jurassic_beg_v3_02",
-    "question_text": "次のうち、ジュラ紀に生きていた恐竜はどれ？",
-    "mode": "text_choice",
-    "choices": [
-      { "type": "text", "label": "ステゴサウルス" },
-      { "type": "text", "label": "トリケラトプス" },
-      { "type": "text", "label": "ティラノサウルス" },
-      { "type": "text", "label": "ヴェロキラプトル" }
-    ],
-    "correct_index": 0,
-    "category": "dinosaur",
-    "difficulty": 1,
-    "image_url": null,
-    "time_limit": 10
-  },
+{
+  "id": "jurassic_beg_v3_02",
+  "question_text": "次のうち、ジュラ紀の大型草食恐竜として有名なのはどれ？",
+  "mode": "text_choice",
+  "choices": [
+    { "type": "text", "label": "ディプロドクス" },
+    { "type": "text", "label": "トリケラトプス" },
+    { "type": "text", "label": "ティラノサウルス" },
+    { "type": "text", "label": "ヴェロキラプトル" }
+  ],
+  "correct_index": 0,
+  "category": "dinosaur",
+  "difficulty": 1,
+  "image_url": null,
+  "time_limit": 10
+},
   {
     "id": "jurassic_beg_v3_03",
     "question_text": "ジュラ紀の草食恐竜として多かった特徴はどれ？",
@@ -626,22 +627,23 @@
     "image_url": null,
     "time_limit": 12
   },
-  {
-    "id": "jurassic_mid_v3_10",
-    "question_text": "ジュラ紀は恐竜の進化において、どんな位置づけ？",
-    "mode": "text_choice",
-    "choices": [
-      { "type": "text", "label": "恐竜が本格的に繁栄した時代" },
-      { "type": "text", "label": "恐竜が衰退した時代" },
-      { "type": "text", "label": "恐竜が絶滅した時代" },
-      { "type": "text", "label": "恐竜が出現する前の時代" }
-    ],
-    "correct_index": 0,
-    "category": "overview",
-    "difficulty": 2,
-    "image_url": null,
-    "time_limit": 12
-  }
+{
+  "id": "jurassic_mid_v3_10",
+  "question_text": "ジュラ紀に特に繁栄した大型草食恐竜のグループとして近いのはどれ？",
+  "mode": "text_choice",
+  "choices": [
+    { "type": "text", "label": "竜脚類（サウロポッド）" },
+    { "type": "text", "label": "角竜類（ケラトプス類）" },
+    { "type": "text", "label": "鳥脚類（ハドロサウルス類）" },
+    { "type": "text", "label": "曲竜類（アンキロサウルス類）" }
+  ],
+  "correct_index": 0,
+  "category": "classification",
+  "difficulty": 2,
+  "image_url": null,
+  "time_limit": 10
+}
+
 ,
 {
   "id": "cretaceous_beg_v3_01",
@@ -1429,22 +1431,22 @@
     "image_url": null,
     "time_limit": 15
   },
-  {
-    "id": "jp_beg_v2_10",
-    "question_text": "映画シリーズで繰り返し描かれるテーマとして近いのはどれ？（映画設定）",
-    "mode": "text_choice",
-    "choices": [
-      { "type": "text", "label": "生命を完全に制御できるという過信の危うさ" },
-      { "type": "text", "label": "恐竜の家畜化は簡単である" },
-      { "type": "text", "label": "恐竜は人類の味方である" },
-      { "type": "text", "label": "恐竜は感情を持たない機械である" }
-    ],
-    "correct_index": 0,
-    "category": "theme",
-    "difficulty": 1,
-    "image_url": null,
-    "time_limit": 15
-  },
+{
+  "id": "jp_beg_v2_10",
+  "question_text": "映画で科学者が繰り返し警告する内容として近いのはどれ？（映画設定）",
+  "mode": "text_choice",
+  "choices": [
+    { "type": "text", "label": "自然や生命は予測どおりに制御できない" },
+    { "type": "text", "label": "恐竜は人に必ずなつく" },
+    { "type": "text", "label": "遺伝子操作は絶対に事故を起こさない" },
+    { "type": "text", "label": "危険はあっても必ず利益が上回る" }
+  ],
+  "correct_index": 0,
+  "category": "theme",
+  "difficulty": 1,
+  "image_url": null,
+  "time_limit": 10
+},
 
   {
     "id": "jp_mid_v2_01",
@@ -2568,4 +2570,1293 @@
   "image_url": null,
   "time_limit": 15
 }
+,
+{
+  "id": "name_beg_v1_01",
+  "question_text": "「ティラノサウルス」の意味としてもっとも近いものはどれ？",
+  "mode": "text_choice",
+  "choices": [
+    { "type": "text", "label": "暴君のトカゲ" },
+    { "type": "text", "label": "翼のあるトカゲ" },
+    { "type": "text", "label": "速いトカゲ" },
+    { "type": "text", "label": "大きなワニ" }
+  ],
+  "correct_index": 0,
+  "category": "etymology",
+  "difficulty": 1,
+  "image_url": null,
+  "time_limit": 10
+},
+{
+  "id": "name_beg_v1_02",
+  "question_text": "「トリケラトプス」の名前に含まれる意味はどれ？",
+  "mode": "text_choice",
+  "choices": [
+    { "type": "text", "label": "三つの角" },
+    { "type": "text", "label": "二枚の板" },
+    { "type": "text", "label": "長い首" },
+    { "type": "text", "label": "鋭い爪" }
+  ],
+  "correct_index": 0,
+  "category": "etymology",
+  "difficulty": 1,
+  "image_url": null,
+  "time_limit": 10
+},
+{
+  "id": "name_beg_v1_03",
+  "question_text": "「ヴェロキラプトル」の名前の意味として正しいものはどれ？",
+  "mode": "text_choice",
+  "choices": [
+    { "type": "text", "label": "速い盗賊" },
+    { "type": "text", "label": "角のある顔" },
+    { "type": "text", "label": "重い尾" },
+    { "type": "text", "label": "小さな翼" }
+  ],
+  "correct_index": 0,
+  "category": "etymology",
+  "difficulty": 1,
+  "image_url": null,
+  "time_limit": 10
+},
+{
+  "id": "name_beg_v1_04",
+  "question_text": "「アンキロサウルス」の名前の由来として正しいものはどれ？",
+  "mode": "text_choice",
+  "choices": [
+    { "type": "text", "label": "曲がった（融合した）トカゲ" },
+    { "type": "text", "label": "長い歯のトカゲ" },
+    { "type": "text", "label": "水の中のトカゲ" },
+    { "type": "text", "label": "光るトカゲ" }
+  ],
+  "correct_index": 0,
+  "category": "etymology",
+  "difficulty": 1,
+  "image_url": null,
+  "time_limit": 10
+},
+{
+  "id": "name_beg_v1_05",
+  "question_text": "「ステゴサウルス」の名前に関係する言葉はどれ？",
+  "mode": "text_choice",
+  "choices": [
+    { "type": "text", "label": "屋根" },
+    { "type": "text", "label": "森" },
+    { "type": "text", "label": "砂漠" },
+    { "type": "text", "label": "嵐" }
+  ],
+  "correct_index": 0,
+  "category": "etymology",
+  "difficulty": 1,
+  "image_url": null,
+  "time_limit": 10
+},
+{
+  "id": "name_beg_v1_06",
+  "question_text": "「ブラキオサウルス」の名前の意味としてもっとも近いものはどれ？",
+  "mode": "text_choice",
+  "choices": [
+    { "type": "text", "label": "腕のトカゲ" },
+    { "type": "text", "label": "海のトカゲ" },
+    { "type": "text", "label": "森のトカゲ" },
+    { "type": "text", "label": "剣のトカゲ" }
+  ],
+  "correct_index": 0,
+  "category": "etymology",
+  "difficulty": 1,
+  "image_url": null,
+  "time_limit": 10
+},
+{
+  "id": "name_beg_v1_07",
+  "question_text": "「イグアノドン」という名前の由来に関係するものはどれ？",
+  "mode": "text_choice",
+  "choices": [
+    { "type": "text", "label": "イグアナの歯" },
+    { "type": "text", "label": "トゲのある背中" },
+    { "type": "text", "label": "硬い甲羅" },
+    { "type": "text", "label": "長い首" }
+  ],
+  "correct_index": 0,
+  "category": "etymology",
+  "difficulty": 1,
+  "image_url": null,
+  "time_limit": 10
+},
+{
+  "id": "name_beg_v1_08",
+  "question_text": "「パキケファロサウルス」の名前の意味として正しいものはどれ？",
+  "mode": "text_choice",
+  "choices": [
+    { "type": "text", "label": "厚い頭のトカゲ" },
+    { "type": "text", "label": "三本指のトカゲ" },
+    { "type": "text", "label": "小さな歯のトカゲ" },
+    { "type": "text", "label": "丸い尾のトカゲ" }
+  ],
+  "correct_index": 0,
+  "category": "etymology",
+  "difficulty": 1,
+  "image_url": null,
+  "time_limit": 10
+},
+{
+  "id": "name_beg_v1_09",
+  "question_text": "「スピノサウルス」の名前に最も関係する体の特徴はどれ？",
+  "mode": "text_choice",
+  "choices": [
+    { "type": "text", "label": "背中のとがった突起（帆のような部分）" },
+    { "type": "text", "label": "三本の角" },
+    { "type": "text", "label": "尾の先のこん棒" },
+    { "type": "text", "label": "長い羽毛" }
+  ],
+  "correct_index": 0,
+  "category": "etymology",
+  "difficulty": 1,
+  "image_url": null,
+  "time_limit": 10
+},
+{
+  "id": "name_beg_v1_10",
+  "question_text": "アンキロサウルスはこの中でどれ？",
+  "mode": "image_choice",
+  "choices": [
+    { "type": "image", "label": "アンキロサウルス", "image_url": "/assets/images/questions/name_beg_v1_10_ankylosaurus.png" },
+    { "type": "image", "label": "ステゴサウルス", "image_url": "/assets/images/questions/name_beg_v1_10_stegosaurus.png" },
+    { "type": "image", "label": "トリケラトプス", "image_url": "/assets/images/questions/name_beg_v1_10_triceratops.png" },
+    { "type": "image", "label": "パラサウロロフス", "image_url": "/assets/images/questions/name_beg_v1_10_parasaurolophus.png" }
+  ],
+  "correct_index": 0,
+  "category": "identify",
+  "difficulty": 1,
+  "image_url": null,
+  "time_limit": 12
+},
+
+{
+  "id": "name_mid_v1_01",
+  "question_text": "「〜サウルス（-saurus）」が恐竜名によく付く理由として正しいものはどれ？",
+  "mode": "text_choice",
+  "choices": [
+    { "type": "text", "label": "「トカゲ」を意味する語が語源にあるから" },
+    { "type": "text", "label": "発見者が全員トカゲ好きだから" },
+    { "type": "text", "label": "必ずトカゲの仲間だから" },
+    { "type": "text", "label": "必ず小型だから" }
+  ],
+  "correct_index": 0,
+  "category": "etymology",
+  "difficulty": 2,
+  "image_url": null,
+  "time_limit": 11
+},
+{
+  "id": "name_mid_v1_02",
+  "question_text": "「〜ドン（-don）」が付く名前に多い由来はどれ？",
+  "mode": "text_choice",
+  "choices": [
+    { "type": "text", "label": "歯（歯の形）に関係する" },
+    { "type": "text", "label": "翼の形に関係する" },
+    { "type": "text", "label": "角の数に関係する" },
+    { "type": "text", "label": "体色に関係する" }
+  ],
+  "correct_index": 0,
+  "category": "etymology",
+  "difficulty": 2,
+  "image_url": null,
+  "time_limit": 11
+},
+{
+  "id": "name_mid_v1_03",
+  "question_text": "次のうち、名前の由来が「地域名（地名）」であるものはどれ？",
+  "mode": "text_choice",
+  "choices": [
+    { "type": "text", "label": "アマルガサウルス" },
+    { "type": "text", "label": "アルゼンチノサウルス" },
+    { "type": "text", "label": "アロサウルス" },
+    { "type": "text", "label": "アンキロサウルス" }
+  ],
+  "correct_index": 1,
+  "category": "name_origin",
+  "difficulty": 2,
+  "image_url": null,
+  "time_limit": 11
+},
+{
+  "id": "name_mid_v1_04",
+  "question_text": "「オヴィラプトル（Oviraptor）」という名前の由来に関して、現在よく言われる説明はどれ？",
+  "mode": "text_choice",
+  "choices": [
+    { "type": "text", "label": "当初の解釈（卵泥棒）には誤解が含まれる可能性がある" },
+    { "type": "text", "label": "必ず他の恐竜の卵を食べていたと証明されている" },
+    { "type": "text", "label": "卵を産まない恐竜だった" },
+    { "type": "text", "label": "卵を運ぶための袋があった" }
+  ],
+  "correct_index": 0,
+  "category": "naming_history",
+  "difficulty": 2,
+  "image_url": null,
+  "time_limit": 12
+},
+{
+  "id": "name_mid_v1_05",
+  "question_text": "「パキケファロサウルス」と「ステゴケラス」など、同じ仲間の名前に多い共通点はどれ？",
+  "mode": "text_choice",
+  "choices": [
+    { "type": "text", "label": "頭の骨の特徴を表す語が入ることが多い" },
+    { "type": "text", "label": "必ず水辺で暮らすことを表す" },
+    { "type": "text", "label": "必ず羽毛を表す語が入る" },
+    { "type": "text", "label": "必ず海の生物を表す語が入る" }
+  ],
+  "correct_index": 0,
+  "category": "etymology",
+  "difficulty": 2,
+  "image_url": null,
+  "time_limit": 11
+},
+{
+  "id": "name_mid_v1_06",
+  "question_text": "「ディノ（dino）」という言葉のもとになった意味として正しいものはどれ？",
+  "mode": "text_choice",
+  "choices": [
+    { "type": "text", "label": "恐ろしい（おそろしい）" },
+    { "type": "text", "label": "小さい" },
+    { "type": "text", "label": "優しい" },
+    { "type": "text", "label": "冷たい" }
+  ],
+  "correct_index": 0,
+  "category": "etymology",
+  "difficulty": 2,
+  "image_url": null,
+  "time_limit": 11
+},
+{
+  "id": "name_mid_v1_07",
+  "question_text": "パキケファロサウルスはこの中でどれ？",
+  "mode": "image_choice",
+  "choices": [
+    { "type": "image", "label": "パキケファロサウルス", "image_url": "/assets/images/questions/name_mid_v1_07_pachycephalosaurus.png" },
+    { "type": "image", "label": "アンキロサウルス", "image_url": "/assets/images/questions/name_mid_v1_07_ankylosaurus.png" },
+    { "type": "image", "label": "ステゴサウルス", "image_url": "/assets/images/questions/name_mid_v1_07_stegosaurus.png" },
+    { "type": "image", "label": "トリケラトプス", "image_url": "/assets/images/questions/name_mid_v1_07_triceratops.png" }
+  ],
+  "correct_index": 0,
+  "category": "identify",
+  "difficulty": 2,
+  "image_url": null,
+  "time_limit": 12
+},
+{
+  "id": "name_mid_v1_08",
+  "question_text": "「デイノニクス」の名前の意味としてもっとも近いものはどれ？",
+  "mode": "text_choice",
+  "choices": [
+    { "type": "text", "label": "恐ろしいツメ" },
+    { "type": "text", "label": "三つの角" },
+    { "type": "text", "label": "厚い頭" },
+    { "type": "text", "label": "速い足" }
+  ],
+  "correct_index": 0,
+  "category": "etymology",
+  "difficulty": 2,
+  "image_url": null,
+  "time_limit": 11
+},
+{
+  "id": "name_mid_v1_09",
+  "question_text": "「パラサウロロフス」の名前の由来として正しいものはどれ？",
+  "mode": "text_choice",
+  "choices": [
+    { "type": "text", "label": "トカゲの近く（近縁）を意味する語が入る" },
+    { "type": "text", "label": "長い首を意味する語が入る" },
+    { "type": "text", "label": "三つの角を意味する語が入る" },
+    { "type": "text", "label": "海を意味する語が入る" }
+  ],
+  "correct_index": 0,
+  "category": "etymology",
+  "difficulty": 2,
+  "image_url": null,
+  "time_limit": 11
+},
+{
+  "id": "name_mid_v1_10",
+  "question_text": "長い首をもつ竜脚類はこの中でどれ？",
+  "mode": "image_choice",
+  "choices": [
+    { "type": "image", "label": "ブラキオサウルス", "image_url": "/assets/images/questions/name_mid_v1_10_brachiosaurus.png" },
+    { "type": "image", "label": "ステゴサウルス", "image_url": "/assets/images/questions/name_mid_v1_10_stegosaurus.png" },
+    { "type": "image", "label": "アンキロサウルス", "image_url": "/assets/images/questions/name_mid_v1_10_ankylosaurus.png" },
+    { "type": "image", "label": "パキケファロサウルス", "image_url": "/assets/images/questions/name_mid_v1_10_pachycephalosaurus.png" }
+  ],
+  "correct_index": 0,
+  "category": "identify",
+  "difficulty": 2,
+  "image_url": null,
+  "time_limit": 12
+},
+
+{
+  "id": "name_adv_v1_01",
+  "question_text": "学名（属名）としての恐竜名に近い説明はどれ？",
+  "mode": "text_choice",
+  "choices": [
+    { "type": "text", "label": "生物の分類上の「属」を表す名前" },
+    { "type": "text", "label": "発見者のニックネーム" },
+    { "type": "text", "label": "必ず和名の直訳" },
+    { "type": "text", "label": "必ず生息地の国名だけで作る" }
+  ],
+  "correct_index": 0,
+  "category": "taxonomy",
+  "difficulty": 3,
+  "image_url": null,
+  "time_limit": 12
+},
+{
+  "id": "name_adv_v1_02",
+  "question_text": "同じ恐竜が研究の進展で別の属名に移されることがある理由として適切なのはどれ？",
+  "mode": "text_choice",
+  "choices": [
+    { "type": "text", "label": "化石の特徴の解釈や分類の見直しが起こるため" },
+    { "type": "text", "label": "恐竜は成長すると別種になるため" },
+    { "type": "text", "label": "国際ルールで10年ごとに改名するため" },
+    { "type": "text", "label": "名前が長いと禁止されるため" }
+  ],
+  "correct_index": 0,
+  "category": "taxonomy",
+  "difficulty": 3,
+  "image_url": null,
+  "time_limit": 12
+},
+{
+  "id": "name_adv_v1_03",
+  "question_text": "恐竜名に入る「-raptor（ラプトル）」が示すことが多いイメージはどれ？",
+  "mode": "text_choice",
+  "choices": [
+    { "type": "text", "label": "略奪者・捕食者を連想させる語が語源" },
+    { "type": "text", "label": "水中生活を示す合図" },
+    { "type": "text", "label": "角の数を示す合図" },
+    { "type": "text", "label": "必ず羽を持つ合図" }
+  ],
+  "correct_index": 0,
+  "category": "etymology",
+  "difficulty": 3,
+  "image_url": null,
+  "time_limit": 12
+},
+{
+  "id": "name_adv_v1_04",
+  "question_text": "次のうち、名前の由来が「発見者（人物）」に関連するものとして最も近いものはどれ？",
+  "mode": "text_choice",
+  "choices": [
+    { "type": "text", "label": "恐竜名に人名が入ることがある" },
+    { "type": "text", "label": "恐竜名は必ず発見者の姓だけで決まる" },
+    { "type": "text", "label": "恐竜名に人名を入れるのは禁止" },
+    { "type": "text", "label": "恐竜名は必ず王様の名前になる" }
+  ],
+  "correct_index": 0,
+  "category": "naming_rules",
+  "difficulty": 3,
+  "image_url": null,
+  "time_limit": 12
+},
+{
+  "id": "name_adv_v1_05",
+  "question_text": "恐竜名の語源説明で「ギリシャ語・ラテン語に由来する」が多い理由はどれ？",
+  "mode": "text_choice",
+  "choices": [
+    { "type": "text", "label": "学名の命名で伝統的に用いられてきたため" },
+    { "type": "text", "label": "当時の恐竜がギリシャにしかいなかったため" },
+    { "type": "text", "label": "発掘現場が必ずヨーロッパだから" },
+    { "type": "text", "label": "文字数を減らすための法律があるから" }
+  ],
+  "correct_index": 0,
+  "category": "naming_rules",
+  "difficulty": 3,
+  "image_url": null,
+  "time_limit": 12
+},
+{
+  "id": "name_adv_v1_06",
+  "question_text": "「パキリノサウルス」の名前の意味に含まれる要素として正しいものはどれ？",
+  "mode": "text_choice",
+  "choices": [
+    { "type": "text", "label": "厚い鼻" },
+    { "type": "text", "label": "長い腕" },
+    { "type": "text", "label": "大きな帆" },
+    { "type": "text", "label": "硬い尾" }
+  ],
+  "correct_index": 0,
+  "category": "etymology",
+  "difficulty": 3,
+  "image_url": null,
+  "time_limit": 12
+},
+{
+  "id": "name_adv_v1_07",
+  "question_text": "恐竜名の「-ceratops（ケラトプス）」が示す意味として正しいものはどれ？",
+  "mode": "text_choice",
+  "choices": [
+    { "type": "text", "label": "角のある顔（角＋顔）" },
+    { "type": "text", "label": "屋根のトカゲ" },
+    { "type": "text", "label": "厚い頭" },
+    { "type": "text", "label": "速い足" }
+  ],
+  "correct_index": 0,
+  "category": "etymology",
+  "difficulty": 3,
+  "image_url": null,
+  "time_limit": 12
+},
+{
+  "id": "name_adv_v1_08",
+  "question_text": "尾の先にこん棒のような武器をもつ恐竜はこの中でどれ？",
+  "mode": "image_choice",
+  "choices": [
+    { "type": "image", "label": "アンキロサウルス", "image_url": "/assets/images/questions/name_adv_v1_08_ankylosaurus.png" },
+    { "type": "image", "label": "ステゴサウルス", "image_url": "/assets/images/questions/name_adv_v1_08_stegosaurus.png" },
+    { "type": "image", "label": "トリケラトプス", "image_url": "/assets/images/questions/name_adv_v1_08_triceratops.png" },
+    { "type": "image", "label": "ガリミムス", "image_url": "/assets/images/questions/name_adv_v1_08_gallimimus.png" }
+  ],
+  "correct_index": 0,
+  "category": "identify",
+  "difficulty": 3,
+  "image_url": null,
+  "time_limit": 13
+},
+{
+  "id": "name_adv_v1_09",
+  "question_text": "恐竜名の「-dromeus（ドロメウス）」に近い意味はどれ？",
+  "mode": "text_choice",
+  "choices": [
+    { "type": "text", "label": "走る者" },
+    { "type": "text", "label": "泳ぐ者" },
+    { "type": "text", "label": "飛ぶ者" },
+    { "type": "text", "label": "穴を掘る者" }
+  ],
+  "correct_index": 0,
+  "category": "etymology",
+  "difficulty": 3,
+  "image_url": null,
+  "time_limit": 12
+},
+{
+  "id": "name_adv_v1_10",
+  "question_text": "恐竜名の和名（カタカナ名）について正しい説明はどれ？",
+  "mode": "text_choice",
+  "choices": [
+    { "type": "text", "label": "学名の発音・表記をもとに定着することが多い" },
+    { "type": "text", "label": "必ず直訳して漢字で表す" },
+    { "type": "text", "label": "国が法律で統一して決める" },
+    { "type": "text", "label": "発見者が必ず日本人の場合だけ付く" }
+  ],
+  "correct_index": 0,
+  "category": "name_origin",
+  "difficulty": 3,
+  "image_url": null,
+  "time_limit": 12
+},
+
+{
+  "id": "name_sup_v1_01",
+  "question_text": "「ブロントサウルス」という名前について、近年よく語られる点として適切なのはどれ？",
+  "mode": "text_choice",
+  "choices": [
+    { "type": "text", "label": "分類の見直しで独立した属として扱う説が提案された" },
+    { "type": "text", "label": "完全に架空で学名として一度も使われていない" },
+    { "type": "text", "label": "必ずティラノサウルスの別名である" },
+    { "type": "text", "label": "恐竜ではなく翼竜の名前である" }
+  ],
+  "correct_index": 0,
+  "category": "taxonomy",
+  "difficulty": 4,
+  "image_url": null,
+  "time_limit": 13
+},
+{
+  "id": "name_sup_v1_02",
+  "question_text": "恐竜名が変わる原因として、化石が「別の生物のものだった」と判明するケースがある。これは何が起きた例？",
+  "mode": "text_choice",
+  "choices": [
+    { "type": "text", "label": "誤同定（取り違え）" },
+    { "type": "text", "label": "突然変異で改名" },
+    { "type": "text", "label": "気候変動で改名" },
+    { "type": "text", "label": "国境変更で改名" }
+  ],
+  "correct_index": 0,
+  "category": "naming_history",
+  "difficulty": 4,
+  "image_url": null,
+  "time_limit": 13
+},
+{
+  "id": "name_sup_v1_03",
+  "question_text": "「スピノサウルス」の復元図が時期によって変わりやすい理由として適切なのはどれ？",
+  "mode": "text_choice",
+  "choices": [
+    { "type": "text", "label": "標本の追加や解釈の違いで体の形の議論が続いているため" },
+    { "type": "text", "label": "恐竜は季節で体型が変わるため" },
+    { "type": "text", "label": "骨は毎年生え変わるため" },
+    { "type": "text", "label": "映画の都合で学術的に固定されているため" }
+  ],
+  "correct_index": 0,
+  "category": "naming_history",
+  "difficulty": 4,
+  "image_url": null,
+  "time_limit": 13
+},
+{
+  "id": "name_sup_v1_04",
+  "question_text": "恐竜の学名で「〜ensis（エンシス）」のような語尾が付くことがある。これは何を示すことが多い？",
+  "mode": "text_choice",
+  "choices": [
+    { "type": "text", "label": "地名（〜産、〜に由来）" },
+    { "type": "text", "label": "体重（〜トン）" },
+    { "type": "text", "label": "角の数" },
+    { "type": "text", "label": "速さ" }
+  ],
+  "correct_index": 0,
+  "category": "etymology",
+  "difficulty": 4,
+  "image_url": null,
+  "time_limit": 13
+},
+{
+  "id": "name_sup_v1_05",
+  "question_text": "学名の命名で「同じ名前を先に使った方が優先される」という考え方に近いのはどれ？",
+  "mode": "text_choice",
+  "choices": [
+    { "type": "text", "label": "先取権（優先権）のルール" },
+    { "type": "text", "label": "人気投票のルール" },
+    { "type": "text", "label": "発見地優先のルール" },
+    { "type": "text", "label": "体長優先のルール" }
+  ],
+  "correct_index": 0,
+  "category": "naming_rules",
+  "difficulty": 4,
+  "image_url": null,
+  "time_limit": 13
+},
+{
+  "id": "name_sup_v1_06",
+  "question_text": "恐竜名の由来として「神話・伝説」に関係する命名が行われることもある。これについて正しい説明はどれ？",
+  "mode": "text_choice",
+  "choices": [
+    { "type": "text", "label": "学名の由来は地名・特徴・人物など多様で、神話由来もあり得る" },
+    { "type": "text", "label": "学名は必ず地質時代だけで決まる" },
+    { "type": "text", "label": "学名に固有名詞を入れるのは禁止" },
+    { "type": "text", "label": "学名は必ず英語で作る" }
+  ],
+  "correct_index": 0,
+  "category": "naming_rules",
+  "difficulty": 4,
+  "image_url": null,
+  "time_limit": 13
+},
+{
+  "id": "name_sup_v1_07",
+  "question_text": "恐竜の「属」と「種」を区別する際の考え方として最も近いものはどれ？",
+  "mode": "text_choice",
+  "choices": [
+    { "type": "text", "label": "属は近縁な種をまとめる枠で、種はより細かな単位" },
+    { "type": "text", "label": "属は個体のニックネームで、種は化石の番号" },
+    { "type": "text", "label": "属は国名で、種は時代名" },
+    { "type": "text", "label": "属は必ず1種類しか含めない" }
+  ],
+  "correct_index": 0,
+  "category": "taxonomy",
+  "difficulty": 4,
+  "image_url": null,
+  "time_limit": 13
+},
+{
+  "id": "name_sup_v1_08",
+  "question_text": "細長いワニのような口先をもつスピノサウルス類のイメージに近いものはどれ？",
+  "mode": "image_choice",
+  "choices": [
+    { "type": "image", "label": "スピノサウルス", "image_url": "/assets/images/questions/name_sup_v1_08_spinosaurus.png" },
+    { "type": "image", "label": "トリケラトプス", "image_url": "/assets/images/questions/name_sup_v1_08_triceratops.png" },
+    { "type": "image", "label": "ステゴサウルス", "image_url": "/assets/images/questions/name_sup_v1_08_stegosaurus.png" },
+    { "type": "image", "label": "アンキロサウルス", "image_url": "/assets/images/questions/name_sup_v1_08_ankylosaurus.png" }
+  ],
+  "correct_index": 0,
+  "category": "identify",
+  "difficulty": 4,
+  "image_url": null,
+  "time_limit": 14
+},
+{
+  "id": "name_sup_v1_09",
+  "question_text": "恐竜名の説明で「ホロタイプ（模式標本）」という言葉が出る。意味として最も近いのはどれ？",
+  "mode": "text_choice",
+  "choices": [
+    { "type": "text", "label": "その種を定義する基準となる標本" },
+    { "type": "text", "label": "その恐竜の最大個体" },
+    { "type": "text", "label": "最初に発掘された恐竜全体" },
+    { "type": "text", "label": "展示用に作った模型" }
+  ],
+  "correct_index": 0,
+  "category": "taxonomy",
+  "difficulty": 4,
+  "image_url": null,
+  "time_limit": 13
+},
+{
+  "id": "name_sup_v1_10",
+  "question_text": "恐竜名が「無効」とされることがある理由として適切なのはどれ？",
+  "mode": "text_choice",
+  "choices": [
+    { "type": "text", "label": "記載が不十分で、分類に使える特徴が足りないと判断される場合がある" },
+    { "type": "text", "label": "長すぎる名前は禁止だから" },
+    { "type": "text", "label": "発見地が海だったから" },
+    { "type": "text", "label": "草食恐竜には使えないから" }
+  ],
+  "correct_index": 0,
+  "category": "taxonomy",
+  "difficulty": 4,
+  "image_url": null,
+  "time_limit": 13
+},
+
+{
+  "id": "body_beg_v1_01",
+  "question_text": "肉食恐竜に多い歯の特徴として正しいものはどれ？",
+  "mode": "text_choice",
+  "choices": [
+    { "type": "text", "label": "肉を切り裂きやすい鋭い歯" },
+    { "type": "text", "label": "平らで広いすりつぶし歯" },
+    { "type": "text", "label": "永久に生えない歯" },
+    { "type": "text", "label": "針のように極端に細い歯だけ" }
+  ],
+  "correct_index": 0,
+  "category": "anatomy",
+  "difficulty": 1,
+  "image_url": null,
+  "time_limit": 10
+},
+{
+  "id": "body_beg_v1_02",
+  "question_text": "草食恐竜に多い口のつくりとして正しいものはどれ？",
+  "mode": "text_choice",
+  "choices": [
+    { "type": "text", "label": "植物を噛みつぶしやすい歯やくちばし" },
+    { "type": "text", "label": "毒を出す牙" },
+    { "type": "text", "label": "吸盤のある口" },
+    { "type": "text", "label": "口がなく皮膚で食べる" }
+  ],
+  "correct_index": 0,
+  "category": "anatomy",
+  "difficulty": 1,
+  "image_url": null,
+  "time_limit": 10
+},
+{
+  "id": "body_beg_v1_03",
+  "question_text": "二足歩行の恐竜で、長い尾が果たした役割として最も近いものはどれ？",
+  "mode": "text_choice",
+  "choices": [
+    { "type": "text", "label": "体のバランスをとる" },
+    { "type": "text", "label": "体温を下げるためのうちわ" },
+    { "type": "text", "label": "水を吸い上げるホース" },
+    { "type": "text", "label": "仲間に音を聞かせる楽器" }
+  ],
+  "correct_index": 0,
+  "category": "anatomy",
+  "difficulty": 1,
+  "image_url": null,
+  "time_limit": 10
+},
+{
+  "id": "body_beg_v1_04",
+  "question_text": "トリケラトプスの頭にある大きなフリル（えり飾り）の用途として考えられているものはどれ？",
+  "mode": "text_choice",
+  "choices": [
+    { "type": "text", "label": "防御や見せびらかしなど複数の可能性がある" },
+    { "type": "text", "label": "必ず飛ぶための翼だった" },
+    { "type": "text", "label": "必ず水中呼吸のエラだった" },
+    { "type": "text", "label": "必ず太陽光で発電した" }
+  ],
+  "correct_index": 0,
+  "category": "anatomy",
+  "difficulty": 1,
+  "image_url": null,
+  "time_limit": 11
+},
+{
+  "id": "body_beg_v1_05",
+  "question_text": "ステゴサウルスの背中の板（プレート）について考えられている働きはどれ？",
+  "mode": "text_choice",
+  "choices": [
+    { "type": "text", "label": "体温調節や見せびらかしなどの説がある" },
+    { "type": "text", "label": "飛行のための翼" },
+    { "type": "text", "label": "水中での推進力" },
+    { "type": "text", "label": "餌を掘るためのスコップ" }
+  ],
+  "correct_index": 0,
+  "category": "anatomy",
+  "difficulty": 1,
+  "image_url": null,
+  "time_limit": 11
+},
+{
+  "id": "body_beg_v1_06",
+  "question_text": "アンキロサウルスの尾の先のこん棒が役立ったと考えられるのはどれ？",
+  "mode": "text_choice",
+  "choices": [
+    { "type": "text", "label": "身を守るための武器" },
+    { "type": "text", "label": "空を飛ぶための舵" },
+    { "type": "text", "label": "水を吸うための器官" },
+    { "type": "text", "label": "巣作りのための針" }
+  ],
+  "correct_index": 0,
+  "category": "anatomy",
+  "difficulty": 1,
+  "image_url": null,
+  "time_limit": 10
+},
+{
+  "id": "body_beg_v1_07",
+  "question_text": "竜脚類（首が長い草食恐竜）に多い体の特徴はどれ？",
+  "mode": "text_choice",
+  "choices": [
+    { "type": "text", "label": "大きな体と長い首、柱のような脚" },
+    { "type": "text", "label": "短い首と翼" },
+    { "type": "text", "label": "二枚貝の殻" },
+    { "type": "text", "label": "ヒレとエラ" }
+  ],
+  "correct_index": 0,
+  "category": "anatomy",
+  "difficulty": 1,
+  "image_url": null,
+  "time_limit": 10
+},
+{
+  "id": "body_beg_v1_08",
+  "question_text": "恐竜の足跡化石から分かりやすい情報はどれ？",
+  "mode": "text_choice",
+  "choices": [
+    { "type": "text", "label": "歩き方や移動の向き" },
+    { "type": "text", "label": "体の色" },
+    { "type": "text", "label": "鳴き声の高さ" },
+    { "type": "text", "label": "目の色" }
+  ],
+  "correct_index": 0,
+  "category": "fossil",
+  "difficulty": 1,
+  "image_url": null,
+  "time_limit": 10
+},
+{
+  "id": "body_beg_v1_09",
+  "question_text": "羽毛をもつ恐竜がいたことが分かる根拠として適切なのはどれ？",
+  "mode": "text_choice",
+  "choices": [
+    { "type": "text", "label": "羽毛の痕跡が残る化石が見つかっている" },
+    { "type": "text", "label": "現代のトカゲに羽毛がある" },
+    { "type": "text", "label": "映画で羽毛が描かれている" },
+    { "type": "text", "label": "恐竜は必ず鳥だから" }
+  ],
+  "correct_index": 0,
+  "category": "evidence",
+  "difficulty": 1,
+  "image_url": null,
+  "time_limit": 11
+},
+{
+  "id": "body_beg_v1_10",
+  "question_text": "背中に大きな板が並ぶ恐竜はこの中でどれ？",
+  "mode": "image_choice",
+  "choices": [
+    { "type": "image", "label": "ステゴサウルス", "image_url": "/assets/images/questions/body_beg_v1_10_stegosaurus.png" },
+    { "type": "image", "label": "トリケラトプス", "image_url": "/assets/images/questions/body_beg_v1_10_triceratops.png" },
+    { "type": "image", "label": "アンキロサウルス", "image_url": "/assets/images/questions/body_beg_v1_10_ankylosaurus.png" },
+    { "type": "image", "label": "ブラキオサウルス", "image_url": "/assets/images/questions/body_beg_v1_10_brachiosaurus.png" }
+  ],
+  "correct_index": 0,
+  "category": "identify",
+  "difficulty": 1,
+  "image_url": null,
+  "time_limit": 12
+},
+
+{
+  "id": "body_mid_v1_01",
+  "question_text": "ハドロサウルス類（カモノハシ恐竜）に多い「歯のしくみ」として正しいものはどれ？",
+  "mode": "text_choice",
+  "choices": [
+    { "type": "text", "label": "たくさんの歯が並ぶ「歯列（歯のバッテリー）」が発達する" },
+    { "type": "text", "label": "牙が1本だけある" },
+    { "type": "text", "label": "歯が一生生えない" },
+    { "type": "text", "label": "歯の代わりに吸盤がある" }
+  ],
+  "correct_index": 0,
+  "category": "anatomy",
+  "difficulty": 2,
+  "image_url": null,
+  "time_limit": 11
+},
+{
+  "id": "body_mid_v1_02",
+  "question_text": "パラサウロロフスの頭のとさか（冠）について考えられている役割として適切なのはどれ？",
+  "mode": "text_choice",
+  "choices": [
+    { "type": "text", "label": "音や見た目によるコミュニケーションに関係した可能性がある" },
+    { "type": "text", "label": "必ず毒を注入する針だった" },
+    { "type": "text", "label": "必ずエラとして使った" },
+    { "type": "text", "label": "必ず太陽光で体温を上げた" }
+  ],
+  "correct_index": 0,
+  "category": "anatomy",
+  "difficulty": 2,
+  "image_url": null,
+  "time_limit": 11
+},
+{
+  "id": "body_mid_v1_03",
+  "question_text": "恐竜の胃の中から見つかることがある「胃石（いせき）」の説明として正しいものはどれ？",
+  "mode": "text_choice",
+  "choices": [
+    { "type": "text", "label": "食べ物をすりつぶすのを助けた可能性がある石" },
+    { "type": "text", "label": "卵を温めるための石" },
+    { "type": "text", "label": "武器として口に入れていた石" },
+    { "type": "text", "label": "体温を下げるための氷の化石" }
+  ],
+  "correct_index": 0,
+  "category": "diet",
+  "difficulty": 2,
+  "image_url": null,
+  "time_limit": 11
+},
+{
+  "id": "body_mid_v1_04",
+  "question_text": "鳥盤類（草食系に多い）で見られる「くちばし」に近い説明はどれ？",
+  "mode": "text_choice",
+  "choices": [
+    { "type": "text", "label": "植物を切り取るのに役立ったと考えられる" },
+    { "type": "text", "label": "必ず水中で呼吸するための管" },
+    { "type": "text", "label": "必ず毒の針が生える部分" },
+    { "type": "text", "label": "必ず発電する器官" }
+  ],
+  "correct_index": 0,
+  "category": "anatomy",
+  "difficulty": 2,
+  "image_url": null,
+  "time_limit": 11
+},
+{
+  "id": "body_mid_v1_05",
+  "question_text": "獣脚類の中には骨が軽くなる「空洞（気嚢に関係する）」が見られるものがいる。これの利点として近いのはどれ？",
+  "mode": "text_choice",
+  "choices": [
+    { "type": "text", "label": "体を軽くし、呼吸や運動に関係した可能性がある" },
+    { "type": "text", "label": "骨を重くして水に沈みやすくする" },
+    { "type": "text", "label": "骨を透明にして敵に見えなくする" },
+    { "type": "text", "label": "骨を磁石にする" }
+  ],
+  "correct_index": 0,
+  "category": "physiology",
+  "difficulty": 2,
+  "image_url": null,
+  "time_limit": 12
+},
+{
+  "id": "body_mid_v1_06",
+  "question_text": "恐竜の「骨が一部つながって硬くなる（癒合）」が起こることがある。これの説明として正しいものはどれ？",
+  "mode": "text_choice",
+  "choices": [
+    { "type": "text", "label": "成長や負荷に応じて骨のつくりが変わることがある" },
+    { "type": "text", "label": "恐竜は必ず金属の骨になる" },
+    { "type": "text", "label": "化石になると骨が生き返る" },
+    { "type": "text", "label": "骨は一切変化しない" }
+  ],
+  "correct_index": 0,
+  "category": "anatomy",
+  "difficulty": 2,
+  "image_url": null,
+  "time_limit": 11
+},
+{
+  "id": "body_mid_v1_07",
+  "question_text": "頭に長いとさか（冠）がある恐竜はこの中でどれ？",
+  "mode": "image_choice",
+  "choices": [
+    { "type": "image", "label": "パラサウロロフス", "image_url": "/assets/images/questions/body_mid_v1_07_parasaurolophus.png" },
+    { "type": "image", "label": "トリケラトプス", "image_url": "/assets/images/questions/body_mid_v1_07_triceratops.png" },
+    { "type": "image", "label": "アンキロサウルス", "image_url": "/assets/images/questions/body_mid_v1_07_ankylosaurus.png" },
+    { "type": "image", "label": "ステゴサウルス", "image_url": "/assets/images/questions/body_mid_v1_07_stegosaurus.png" }
+  ],
+  "correct_index": 0,
+  "category": "identify",
+  "difficulty": 2,
+  "image_url": null,
+  "time_limit": 12
+},
+{
+  "id": "body_mid_v1_08",
+  "question_text": "恐竜の皮膚の化石（皮膚印象）から分かることとして適切なのはどれ？",
+  "mode": "text_choice",
+  "choices": [
+    { "type": "text", "label": "うろこ模様など表面の質感" },
+    { "type": "text", "label": "正確な体温" },
+    { "type": "text", "label": "必ず体色" },
+    { "type": "text", "label": "必ず鳴き声" }
+  ],
+  "correct_index": 0,
+  "category": "evidence",
+  "difficulty": 2,
+  "image_url": null,
+  "time_limit": 11
+},
+{
+  "id": "body_mid_v1_09",
+  "question_text": "角竜類の角やフリルの大きさが個体で違う理由として考えられるものはどれ？",
+  "mode": "text_choice",
+  "choices": [
+    { "type": "text", "label": "年齢差や性差、種の違いなど複数の可能性がある" },
+    { "type": "text", "label": "食べた草の種類で毎日変わる" },
+    { "type": "text", "label": "天気で伸び縮みする" },
+    { "type": "text", "label": "骨ではなく風船だから" }
+  ],
+  "correct_index": 0,
+  "category": "variation",
+  "difficulty": 2,
+  "image_url": null,
+  "time_limit": 12
+},
+{
+  "id": "body_mid_v1_10",
+  "question_text": "尾の先がこん棒のようになっている恐竜はこの中でどれ？",
+  "mode": "image_choice",
+  "choices": [
+    { "type": "image", "label": "アンキロサウルス", "image_url": "/assets/images/questions/body_mid_v1_10_ankylosaurus.png" },
+    { "type": "image", "label": "ブラキオサウルス", "image_url": "/assets/images/questions/body_mid_v1_10_brachiosaurus.png" },
+    { "type": "image", "label": "ステゴサウルス", "image_url": "/assets/images/questions/body_mid_v1_10_stegosaurus.png" },
+    { "type": "image", "label": "ティラノサウルス", "image_url": "/assets/images/questions/body_mid_v1_10_tyrannosaurus.png" }
+  ],
+  "correct_index": 0,
+  "category": "identify",
+  "difficulty": 2,
+  "image_url": null,
+  "time_limit": 12
+},
+
+{
+  "id": "body_adv_v1_01",
+  "question_text": "恐竜の成長速度を推測する手がかりとしてよく使われるのはどれ？",
+  "mode": "text_choice",
+  "choices": [
+    { "type": "text", "label": "骨の組織（骨の成長線など）" },
+    { "type": "text", "label": "歯の色" },
+    { "type": "text", "label": "足跡の深さだけ" },
+    { "type": "text", "label": "岩の硬さ" }
+  ],
+  "correct_index": 0,
+  "category": "evidence",
+  "difficulty": 3,
+  "image_url": null,
+  "time_limit": 12
+},
+{
+  "id": "body_adv_v1_02",
+  "question_text": "恐竜の体温に関する研究で、よく議論される立場として近いものはどれ？",
+  "mode": "text_choice",
+  "choices": [
+    { "type": "text", "label": "種や系統によって体温の維持のしかたが違った可能性がある" },
+    { "type": "text", "label": "恐竜は必ず冷血だけ" },
+    { "type": "text", "label": "恐竜は必ず恒温で哺乳類と同じ" },
+    { "type": "text", "label": "恐竜は体温が存在しない" }
+  ],
+  "correct_index": 0,
+  "category": "physiology",
+  "difficulty": 3,
+  "image_url": null,
+  "time_limit": 13
+},
+{
+  "id": "body_adv_v1_03",
+  "question_text": "鳥類に近い獣脚類で、呼吸に関係する仕組みとして示唆されるものはどれ？",
+  "mode": "text_choice",
+  "choices": [
+    { "type": "text", "label": "気嚢（きのう）のような仕組みがあった可能性" },
+    { "type": "text", "label": "エラ呼吸" },
+    { "type": "text", "label": "皮膚呼吸だけ" },
+    { "type": "text", "label": "木の根で呼吸" }
+  ],
+  "correct_index": 0,
+  "category": "physiology",
+  "difficulty": 3,
+  "image_url": null,
+  "time_limit": 12
+},
+{
+  "id": "body_adv_v1_04",
+  "question_text": "恐竜の羽毛の役割として、現在よく考えられているものはどれ？",
+  "mode": "text_choice",
+  "choices": [
+    { "type": "text", "label": "保温・ディスプレイ・繁殖行動など複数の可能性" },
+    { "type": "text", "label": "必ず水中推進のヒレ" },
+    { "type": "text", "label": "必ず毒針" },
+    { "type": "text", "label": "必ず金属の鎧" }
+  ],
+  "correct_index": 0,
+  "category": "anatomy",
+  "difficulty": 3,
+  "image_url": null,
+  "time_limit": 12
+},
+{
+  "id": "body_adv_v1_05",
+  "question_text": "ステゴサウルスの背板の血管が注目される理由として近いものはどれ？",
+  "mode": "text_choice",
+  "choices": [
+    { "type": "text", "label": "体温調節に関係した可能性を考える材料になる" },
+    { "type": "text", "label": "背板が必ず翼になるから" },
+    { "type": "text", "label": "背板が必ず音を出すから" },
+    { "type": "text", "label": "背板が必ず餌を作るから" }
+  ],
+  "correct_index": 0,
+  "category": "anatomy",
+  "difficulty": 3,
+  "image_url": null,
+  "time_limit": 12
+},
+{
+  "id": "body_adv_v1_06",
+  "question_text": "恐竜の目の位置（前向き／横向き）から推測しやすいことはどれ？",
+  "mode": "text_choice",
+  "choices": [
+    { "type": "text", "label": "視野の広さや立体視のしやすさ" },
+    { "type": "text", "label": "必ず体色" },
+    { "type": "text", "label": "必ず寿命" },
+    { "type": "text", "label": "必ず知能指数" }
+  ],
+  "correct_index": 0,
+  "category": "senses",
+  "difficulty": 3,
+  "image_url": null,
+  "time_limit": 12
+},
+{
+  "id": "body_adv_v1_07",
+  "question_text": "角竜類のフリルの骨にあいた穴（窓）がある種で見られる。これについて適切なのはどれ？",
+  "mode": "text_choice",
+  "choices": [
+    { "type": "text", "label": "種によって形が違い、見分けの手がかりになる" },
+    { "type": "text", "label": "必ず呼吸用の穴" },
+    { "type": "text", "label": "必ず音を増幅するスピーカー" },
+    { "type": "text", "label": "必ず水をためるタンク" }
+  ],
+  "correct_index": 0,
+  "category": "anatomy",
+  "difficulty": 3,
+  "image_url": null,
+  "time_limit": 12
+},
+{
+  "id": "body_adv_v1_08",
+  "question_text": "頭に大きなフリル（えり飾り）がある恐竜はこの中でどれ？",
+  "mode": "image_choice",
+  "choices": [
+    { "type": "image", "label": "トリケラトプス", "image_url": "/assets/images/questions/body_adv_v1_08_triceratops.png" },
+    { "type": "image", "label": "ステゴサウルス", "image_url": "/assets/images/questions/body_adv_v1_08_stegosaurus.png" },
+    { "type": "image", "label": "アンキロサウルス", "image_url": "/assets/images/questions/body_adv_v1_08_ankylosaurus.png" },
+    { "type": "image", "label": "ガリミムス", "image_url": "/assets/images/questions/body_adv_v1_08_gallimimus.png" }
+  ],
+  "correct_index": 0,
+  "category": "identify",
+  "difficulty": 3,
+  "image_url": null,
+  "time_limit": 13
+},
+{
+  "id": "body_adv_v1_09",
+  "question_text": "恐竜の「尾の骨（尾椎）」の形が種で大きく違う理由として適切なのはどれ？",
+  "mode": "text_choice",
+  "choices": [
+    { "type": "text", "label": "姿勢・移動・武器化など役割が違ったため" },
+    { "type": "text", "label": "尾は飾りで必ず同じだから" },
+    { "type": "text", "label": "尾は骨ではなく木だから" },
+    { "type": "text", "label": "尾は毎日抜け替わるから" }
+  ],
+  "correct_index": 0,
+  "category": "anatomy",
+  "difficulty": 3,
+  "image_url": null,
+  "time_limit": 12
+},
+{
+  "id": "body_adv_v1_10",
+  "question_text": "化石で「関節の面」がよく観察される理由として近いものはどれ？",
+  "mode": "text_choice",
+  "choices": [
+    { "type": "text", "label": "動きの範囲や姿勢を推測する材料になる" },
+    { "type": "text", "label": "体色が分かる" },
+    { "type": "text", "label": "必ず鳴き声が分かる" },
+    { "type": "text", "label": "必ず羽毛の色が分かる" }
+  ],
+  "correct_index": 0,
+  "category": "evidence",
+  "difficulty": 3,
+  "image_url": null,
+  "time_limit": 12
+},
+
+{
+  "id": "body_sup_v1_01",
+  "question_text": "恐竜の一部で見つかる「髄骨（ずいこつ）」が示す可能性としてよく挙げられるのはどれ？",
+  "mode": "text_choice",
+  "choices": [
+    { "type": "text", "label": "繁殖期のメスでカルシウムを蓄えた可能性" },
+    { "type": "text", "label": "必ず毒を持つ証拠" },
+    { "type": "text", "label": "必ず水中生活の証拠" },
+    { "type": "text", "label": "必ず羽毛がない証拠" }
+  ],
+  "correct_index": 0,
+  "category": "evidence",
+  "difficulty": 4,
+  "image_url": null,
+  "time_limit": 13
+},
+{
+  "id": "body_sup_v1_02",
+  "question_text": "恐竜の体色を議論する研究で使われる手がかりとして知られるのはどれ？",
+  "mode": "text_choice",
+  "choices": [
+    { "type": "text", "label": "羽毛などに残る色素小体（メラノソーム）の形" },
+    { "type": "text", "label": "骨の硬さだけ" },
+    { "type": "text", "label": "岩の色" },
+    { "type": "text", "label": "足跡の向きだけ" }
+  ],
+  "correct_index": 0,
+  "category": "evidence",
+  "difficulty": 4,
+  "image_url": null,
+  "time_limit": 13
+},
+{
+  "id": "body_sup_v1_03",
+  "question_text": "皮膚の下にある「骨質の小さな板（皮骨＝オステオダーム）」が発達する恐竜がいる。利点として近いのはどれ？",
+  "mode": "text_choice",
+  "choices": [
+    { "type": "text", "label": "防御に役立った可能性" },
+    { "type": "text", "label": "空を飛ぶための翼膜" },
+    { "type": "text", "label": "水中呼吸のエラ" },
+    { "type": "text", "label": "光合成" }
+  ],
+  "correct_index": 0,
+  "category": "anatomy",
+  "difficulty": 4,
+  "image_url": null,
+  "time_limit": 13
+},
+{
+  "id": "body_sup_v1_04",
+  "question_text": "スピノサウルス類の体の特徴として議論されやすい点はどれ？",
+  "mode": "text_choice",
+  "choices": [
+    { "type": "text", "label": "水辺での生活への適応（骨の重さや尾など）をどう解釈するか" },
+    { "type": "text", "label": "角の数が必ず3本で固定" },
+    { "type": "text", "label": "羽毛が必ず長い尾羽になる" },
+    { "type": "text", "label": "必ず飛行能力がある" }
+  ],
+  "correct_index": 0,
+  "category": "physiology",
+  "difficulty": 4,
+  "image_url": null,
+  "time_limit": 13
+},
+{
+  "id": "body_sup_v1_05",
+  "question_text": "恐竜の「かみつきの強さ」を推定する際に用いられることが多いのはどれ？",
+  "mode": "text_choice",
+  "choices": [
+    { "type": "text", "label": "頭骨の形や筋肉の付着部からの推定" },
+    { "type": "text", "label": "体色の濃さ" },
+    { "type": "text", "label": "化石の匂い" },
+    { "type": "text", "label": "地層の深さだけ" }
+  ],
+  "correct_index": 0,
+  "category": "evidence",
+  "difficulty": 4,
+  "image_url": null,
+  "time_limit": 13
+},
+{
+  "id": "body_sup_v1_06",
+  "question_text": "恐竜の聴覚や平衡感覚の研究で注目される部位として近いのはどれ？",
+  "mode": "text_choice",
+  "choices": [
+    { "type": "text", "label": "内耳（半規管など）の形" },
+    { "type": "text", "label": "しっぽの模様" },
+    { "type": "text", "label": "歯の色" },
+    { "type": "text", "label": "爪の光沢" }
+  ],
+  "correct_index": 0,
+  "category": "senses",
+  "difficulty": 4,
+  "image_url": null,
+  "time_limit": 13
+},
+{
+  "id": "body_sup_v1_07",
+  "question_text": "恐竜の歩行速度を推定する議論で、足跡化石から用いられる情報はどれ？",
+  "mode": "text_choice",
+  "choices": [
+    { "type": "text", "label": "歩幅や足跡の並び（ストライドなど）" },
+    { "type": "text", "label": "体の色" },
+    { "type": "text", "label": "鳴き声" },
+    { "type": "text", "label": "角の数" }
+  ],
+  "correct_index": 0,
+  "category": "trace_fossil",
+  "difficulty": 4,
+  "image_url": null,
+  "time_limit": 13
+},
+{
+  "id": "body_sup_v1_08",
+  "question_text": "体に骨のよろい（オステオダーム）のイメージが強い恐竜はこの中でどれ？",
+  "mode": "image_choice",
+  "choices": [
+    { "type": "image", "label": "アンキロサウルス", "image_url": "/assets/images/questions/body_sup_v1_08_ankylosaurus.png" },
+    { "type": "image", "label": "ガリミムス", "image_url": "/assets/images/questions/body_sup_v1_08_gallimimus.png" },
+    { "type": "image", "label": "ブラキオサウルス", "image_url": "/assets/images/questions/body_sup_v1_08_brachiosaurus.png" },
+    { "type": "image", "label": "パラサウロロフス", "image_url": "/assets/images/questions/body_sup_v1_08_parasaurolophus.png" }
+  ],
+  "correct_index": 0,
+  "category": "identify",
+  "difficulty": 4,
+  "image_url": null,
+  "time_limit": 14
+},
+{
+  "id": "body_sup_v1_09",
+  "question_text": "恐竜の「群れ」の議論で、同じ方向に並ぶ足跡列が示す可能性として適切なのはどれ？",
+  "mode": "text_choice",
+  "choices": [
+    { "type": "text", "label": "複数個体が同じ方向へ移動した可能性" },
+    { "type": "text", "label": "必ず親子関係が証明される" },
+    { "type": "text", "label": "必ず同じ種だけが通る" },
+    { "type": "text", "label": "必ず一匹の足跡が増えた" }
+  ],
+  "correct_index": 0,
+  "category": "behavior",
+  "difficulty": 4,
+  "image_url": null,
+  "time_limit": 13
+},
+{
+  "id": "body_sup_v1_10",
+  "question_text": "化石に残る「咬み跡（かみあと）」が重要視される理由として近いのはどれ？",
+  "mode": "text_choice",
+  "choices": [
+    { "type": "text", "label": "捕食・死肉食・争いなど行動の手がかりになる" },
+    { "type": "text", "label": "体色が分かる" },
+    { "type": "text", "label": "必ず寿命が分かる" },
+    { "type": "text", "label": "必ず体温が測れる" }
+  ],
+  "correct_index": 0,
+  "category": "evidence",
+  "difficulty": 4,
+  "image_url": null,
+  "time_limit": 13
+}
+
 ]

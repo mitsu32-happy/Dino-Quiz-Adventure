@@ -322,6 +322,101 @@
   ],
   "reward_coin": 250,
   "unlock_condition": { "type": "stage_clear", "stage_id": "stage_jp_adv_v2" }
+},
+{
+  "id": "stage_name_beg_v1",
+  "name": "恐竜の名前・初級",
+  "description": "有名恐竜の名前を中心に、基本を確認しよう。",
+  "mode": "story",
+  "question_ids": [
+    "name_beg_v1_01","name_beg_v1_02","name_beg_v1_03","name_beg_v1_04","name_beg_v1_05",
+    "name_beg_v1_06","name_beg_v1_07","name_beg_v1_08","name_beg_v1_09","name_beg_v1_10"
+  ],
+  "reward_coin": 120,
+  "unlock_condition": { "type": "always" }
+},
+{
+  "id": "stage_name_mid_v1",
+  "name": "恐竜の名前・中級",
+  "description": "似た名前や紛らわしい恐竜に挑戦。",
+  "mode": "story",
+  "question_ids": [
+    "name_mid_v1_01","name_mid_v1_02","name_mid_v1_03","name_mid_v1_04","name_mid_v1_05",
+    "name_mid_v1_06","name_mid_v1_07","name_mid_v1_08","name_mid_v1_09","name_mid_v1_10"
+  ],
+  "reward_coin": 150,
+  "unlock_condition": { "type": "stage_clear", "stage_id": "stage_name_beg_v1" }
+},
+{
+  "id": "stage_name_adv_v1",
+  "name": "恐竜の名前・上級",
+  "description": "分類や語源も踏まえて恐竜名を理解しよう。",
+  "mode": "story",
+  "question_ids": [
+    "name_adv_v1_01","name_adv_v1_02","name_adv_v1_03","name_adv_v1_04","name_adv_v1_05",
+    "name_adv_v1_06","name_adv_v1_07","name_adv_v1_08","name_adv_v1_09","name_adv_v1_10"
+  ],
+  "reward_coin": 180,
+  "unlock_condition": { "type": "stage_clear", "stage_id": "stage_name_mid_v1" }
+},
+{
+  "id": "stage_name_sup_v1",
+  "name": "恐竜の名前・超級",
+  "description": "名前の由来や再分類など、マニアックな知識に挑戦。",
+  "mode": "story",
+  "question_ids": [
+    "name_sup_v1_01","name_sup_v1_02","name_sup_v1_03","name_sup_v1_04","name_sup_v1_05",
+    "name_sup_v1_06","name_sup_v1_07","name_sup_v1_08","name_sup_v1_09","name_sup_v1_10"
+  ],
+  "reward_coin": 240,
+  "unlock_condition": { "type": "stage_clear", "stage_id": "stage_name_adv_v1" }
+},
+{
+  "id": "stage_body_beg_v1",
+  "name": "体のひみつ・初級",
+  "description": "恐竜の体の基本的な特徴を学ぼう。",
+  "mode": "story",
+  "question_ids": [
+    "body_beg_v1_01","body_beg_v1_02","body_beg_v1_03","body_beg_v1_04","body_beg_v1_05",
+    "body_beg_v1_06","body_beg_v1_07","body_beg_v1_08","body_beg_v1_09","body_beg_v1_10"
+  ],
+  "reward_coin": 120,
+  "unlock_condition": { "type": "always" }
+},
+{
+  "id": "stage_body_mid_v1",
+  "name": "体のひみつ・中級",
+  "description": "体の構造とその役割を考えよう。",
+  "mode": "story",
+  "question_ids": [
+    "body_mid_v1_01","body_mid_v1_02","body_mid_v1_03","body_mid_v1_04","body_mid_v1_05",
+    "body_mid_v1_06","body_mid_v1_07","body_mid_v1_08","body_mid_v1_09","body_mid_v1_10"
+  ],
+  "reward_coin": 150,
+  "unlock_condition": { "type": "stage_clear", "stage_id": "stage_body_beg_v1" }
+},
+{
+  "id": "stage_body_adv_v1",
+  "name": "体のひみつ・上級",
+  "description": "専門的な体の特徴や進化を理解しよう。",
+  "mode": "story",
+  "question_ids": [
+    "body_adv_v1_01","body_adv_v1_02","body_adv_v1_03","body_adv_v1_04","body_adv_v1_05",
+    "body_adv_v1_06","body_adv_v1_07","body_adv_v1_08","body_adv_v1_09","body_adv_v1_10"
+  ],
+  "reward_coin": 180,
+  "unlock_condition": { "type": "stage_clear", "stage_id": "stage_body_mid_v1" }
+},
+{
+  "id": "stage_body_sup_v1",
+  "name": "体のひみつ・超級",
+  "description": "機能仮説や議論点まで含めて理解できればクリア。",
+  "mode": "story",
+  "question_ids": [
+    "body_sup_v1_01","body_sup_v1_02","body_sup_v1_03","body_sup_v1_04","body_sup_v1_05",
+    "body_sup_v1_06","body_sup_v1_07","body_sup_v1_08","body_sup_v1_09","body_sup_v1_10"
+  ],
+  "reward_coin": 240,
+  "unlock_condition": { "type": "stage_clear", "stage_id": "stage_body_adv_v1" }
 }
-
 ]
