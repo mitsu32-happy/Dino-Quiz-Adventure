@@ -23,6 +23,16 @@ function clamp(n, min, max) {
   return Math.max(min, Math.min(max, n));
 }
 
+function shuffle(arr) {
+  const a = arr.slice();
+  for (let i = a.length - 1; i > 0; i--) {
+    const j = (Math.random() * (i + 1)) | 0;
+    [a[i], a[j]] = [a[j], a[i]];
+  }
+  return a;
+}
+
+
 function isStageUnlocked(stage, save) {
   const cond = stage.unlock_condition?.type ?? "always";
   if (cond === "always") return true;
@@ -165,16 +175,20 @@ export function renderQuiz({ state, goto, params }) {
     </div>
   `;
 
-  // 選択肢（2x2）
+  // 選択肢（2x2）※表示順をシャッフル（data-idx は元indexのまま）
   const choices = Array.isArray(q.choices) ? q.choices : [];
-  const choicesHtml = choices.map((c, idx) => {
+
+  const order = shuffle(choices.map((_, i) => i));
+
+  const choicesHtml = order.map((origIdx) => {
+    const c = choices[origIdx];
     const isImage = c?.type === "image" && c?.image_url;
     const label = (c?.label ?? "").trim();
 
     return `
-      <button class="choice-btn" data-idx="${idx}" type="button">
+      <button class="choice-btn" data-idx="${origIdx}" type="button">
         ${isImage ? `<img class="choice-img" src="${normalizeAsset(c.image_url)}" alt="" onerror="this.style.display='none'">` : ``}
-        <div class="choice-text">${label}</div>
+        ${isImage ? `` : `<div class="choice-text">${label}</div>`}
       </button>
     `;
   }).join("");

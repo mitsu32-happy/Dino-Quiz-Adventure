@@ -187,12 +187,18 @@ export function renderTimeAttack({ state, goto }) {
   `;
 
   const choices = Array.isArray(q.choices) ? q.choices : [];
-  const choicesHtml = choices.map((c, idx) => {
+
+  const order = shuffle(choices.map((_, i) => i));
+
+  const choicesHtml = order.map((origIdx) => {
+    const c = choices[origIdx];
     const isImage = c?.type === "image" && c?.image_url;
+    const label = (c?.label ?? "").trim();
+
     return `
-      <button class="choice-btn" data-idx="${idx}" type="button">
+      <button class="choice-btn" data-idx="${origIdx}" type="button">
         ${isImage ? `<img class="choice-img" src="${normalizeAsset(c.image_url)}" alt="" onerror="this.style.display='none'">` : ``}
-        <div class="choice-text">${c?.label ?? ""}</div>
+        ${isImage ? `` : `<div class="choice-text">${label}</div>`}
       </button>
     `;
   }).join("");
