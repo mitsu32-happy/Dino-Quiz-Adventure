@@ -1,5 +1,5 @@
 // js/screens/battleRoomLobbyScreen.js
-import { playBgm, playSe } from "../systems/audioManager.js";
+import { playSe } from "../systems/audioManager.js";
 
 const ROOT = new URL("../../", import.meta.url);
 const asset = (p) => new URL(String(p || "").replace(/^\/+/, ""), ROOT).toString();
@@ -14,121 +14,44 @@ function pickRandomQuestionIds(masters, n = 10) {
   return all.slice(0, Math.min(n, all.length));
 }
 
-function resolveTitleJa(masters, maybeIdOrName) {
-  const v = (maybeIdOrName ?? "—").toString();
-  const list = masters?.titles;
-  if (!Array.isArray(list)) return v;
-
-  const hit = list.find((t) => {
-    const id = (t?.id ?? t?.title_id ?? t?.titleId ?? t?.key ?? t?.code ?? "").toString();
-    const name = (t?.name ?? t?.title_name ?? t?.titleName ?? "").toString();
-    return id === v || name === v;
-  });
-
-  const name =
-    hit?.name ??
-    hit?.title_name ??
-    hit?.titleName ??
-    hit?.title_name_ja ??
-    hit?.name_ja ??
-    null;
-
-  return name ? String(name) : v;
-}
-
-// --- avatar helpers (id / item_id 両対応) ---
-function getAvatarItems(masters) {
-  return masters?.avatarItems || masters?.avatar_items || masters?.avatarItemsMaster || [];
-}
-function getItemKey(it) {
-  return String(it?.item_id ?? it?.id ?? "");
-}
-function getItemById(items, id) {
-  if (!id || !Array.isArray(items)) return null;
-  const s = String(id);
-  return items.find((x) => getItemKey(x) === s) || null;
-}
-function getItemAssetPath(item) {
-  if (!item) return "";
-  return (
-    item.asset_path ||
-    item.assetPath ||
-    item.path ||
-    item.image ||
-    item.imagePath ||
-    item.iconPath ||
-    item.src ||
-    ""
-  );
-}
-function resolveEquippedFromAny(obj) {
-  if (!obj) return null;
-  if (obj.equipped && typeof obj.equipped === "object") return obj.equipped;
-  if (typeof obj.body !== "undefined" || typeof obj.head !== "undefined") return obj;
-  if (obj.avatar) return resolveEquippedFromAny(obj.avatar);
-  if (obj.profile) return resolveEquippedFromAny(obj.profile);
-  return null;
-}
-
 function normalizePlayer(p) {
   if (!p) return null;
-  const prof = p.profile || p;
-  return {
-    clientId: p.clientId || prof.clientId || null,
-    profile: {
-      name: prof.name ?? "PLAYER",
-      titleName: prof.titleName ?? prof.title ?? prof.titleId ?? "—",
-      wins: Number(prof.wins ?? 0),
-      losses: Number(prof.losses ?? 0),
-      avatar: prof.avatar ?? null,
-      avatarEquipped: prof.avatarEquipped ?? null,
-    },
-  };
+  const clientId = p.clientId ?? p.profile?.clientId ?? null;
+  if (!clientId) return null;
+  const profile = p.profile || p;
+  return { clientId, profile };
 }
 
-function buildOnlineRun({ roomId, hostClientId, myClientId, players, questionIds }) {
-  const run = {
-    mode: "battle_online_local",
-    roomId,
-    hostClientId,
-    players,
-    questionIds,
-    index: 0,
-    points: [0, 0, 0, 0],
-    correctCounts: [0, 0, 0, 0],
-    correctTimeSum: [0, 0, 0, 0],
-    answers: [],
-    online: {
-      roomId,
-      hostClientId,
-      myClientId,
-      isHost: hostClientId === myClientId,
-      clientIdToPi: {},
-      sync: {
-        qIndex: 0,
-        startAtMs: 0,
-        answersByIndex: {},
-        lastResultIndex: -1,
-      },
-    },
-  };
-  players.forEach((pp, i) => {
-    if (pp?.clientId) run.online.clientIdToPi[pp.clientId] = i;
-  });
-  return run;
+// ✅ 重複排除して4枠に詰める
+function playersToSlots(room) {
+  const raw = Array.isArray(room?.players) ? room.players : [];
+  const norm = raw.map(normalizePlayer).filter(Boolean);
+
+  const seen = new Set();
+  const uniq = [];
+  for (const p of norm) {
+    if (seen.has(p.clientId)) continue;
+    seen.add(p.clientId);
+    uniq.push(p);
+  }
+
+  const slots = [];
+  for (let i = 0; i < 4; i++) slots.push(uniq[i] || null);
+  return slots;
 }
 
 export function renderBattleRoomLobby({ state, goto }) {
   const bc = state.battleClient;
-  const me = bc.getMe();
-  const roomId = me.roomId ?? "";
 
   let latestRoom = bc.getState()?.room || null;
+  const me = bc.getMe();
+
+  const displayRoomId = (me.roomId || latestRoom?.roomId || "");
 
   const html = `
     <div class="card"><div class="card-inner">
       <h2>ルーム待機</h2>
-      <p class="notice">ルームID：<b>${roomId}</b></p>
+      <p class="notice">ルームID：<b id="roomIdText">${displayRoomId}</b></p>
 
       <div id="playerGrid" class="player-grid"></div>
 
@@ -141,217 +64,83 @@ export function renderBattleRoomLobby({ state, goto }) {
     </div></div>
 
     <style>
-      .player-grid{
-        display:grid;
-        grid-template-columns:repeat(4, minmax(0, 1fr));
-        gap:8px;
-        margin-top:10px;
-      }
-
+      .player-grid{ display:grid; grid-template-columns:repeat(2, 1fr); gap:10px; }
       .player-box{
-        background:#fff;
-        border:2px solid rgba(0,0,0,.15);
-        border-radius:12px;
-        padding:8px 6px;
-        text-align:center;
-        font-size:12px;
+        border:2px solid rgba(0,0,0,.15); border-radius:16px;
+        padding:10px; background:rgba(255,255,255,.8);
+        min-height:110px;
       }
-      .player-box.empty{ opacity:.4; display:flex; align-items:center; justify-content:center; }
-
-      .player-name{
-        font-weight:900;
-        font-size: clamp(11px, 3.0vw, 14px);
-        text-align:center;
-      }
-      .player-title{
-        font-size: clamp(10px, 2.6vw, 12px);
-        opacity:.85;
-        margin-top:2px;
-        text-align:center;
-      }
-      .player-wl{
-        font-size:11px;
-        opacity:.8;
-        margin-top:2px;
-        text-align:center;
-        white-space:nowrap;
-      }
-
-      .player-avatar{
-        --av: clamp(36px, 10vw, 44px);
-        width: var(--av);
-        height: var(--av);
-        margin:6px auto 0;
-        border-radius:10px;
-        background:rgba(0,0,0,.06);
-        display:flex;
-        align-items:center;
-        justify-content:center;
-        overflow:hidden;
-        position:relative;
-      }
-      .player-avatar .mini-layer{
-        position:absolute;
-        left:50%;
-        top:50%;
-        transform:translate(-50%,-50%);
-        width: var(--av);
-        height: var(--av);
-        object-fit:contain;
-        pointer-events:none;
-      }
-      .player-avatar .fallback{
-        width: var(--av);
-        height: var(--av);
-        display:flex;
-        align-items:center;
-        justify-content:center;
-        font-weight:1000;
-      }
-
+      .player-box.empty{ opacity:.55; display:flex; align-items:center; justify-content:center; font-weight:900; }
+      .player-name{ font-weight:1000; text-align:center; margin-bottom:6px; }
+      .player-title{ font-size:12px; opacity:.85; text-align:center; }
       .row-btn{ display:flex; gap:10px; }
-      .row-btn .btn{ flex:1; }
-
-      @media (max-width: 360px){
-        .player-grid{ gap:6px; }
-        .player-box{ padding:7px 5px; }
-      }
+      .row-btn .btn{ width:100%; }
+      .notice{ font-size: 13px; }
     </style>
   `;
 
-  function renderAvatarMini(prof) {
-    const items = getAvatarItems(state.masters);
-
-    // 1) equipped優先（id / item_id 両対応で検索）
-    const eq =
-      resolveEquippedFromAny(prof?.avatar?.equipped) ||
-      resolveEquippedFromAny(prof?.avatarEquipped) ||
-      resolveEquippedFromAny(prof?.avatar);
-
-    if (eq) {
-      const bodyItem = getItemById(items, eq.body);
-      const headItem = getItemById(items, eq.head);
-
-      const bodyPath = getItemAssetPath(bodyItem);
-      const headPath = getItemAssetPath(headItem);
-
-      const bodyImg = bodyPath
-        ? `<img class="mini-layer" src="${asset(bodyPath)}" alt="" onerror="this.style.opacity=0.25">`
-        : "";
-      const headImg = headPath
-        ? `<img class="mini-layer" src="${asset(headPath)}" alt="" onerror="this.style.opacity=0.25">`
-        : "";
-
-      if (bodyImg || headImg) return `${bodyImg || `<div class="fallback">🧑</div>`}${headImg}`;
-    }
-
-    // 2) iconPath/文字列パスの旧形式
-    if (typeof prof?.avatar === "string" && prof.avatar.trim()) {
-      return `<img class="mini-layer" src="${asset(prof.avatar)}" alt="" onerror="this.style.opacity=0.25">`;
-    }
-    if (prof?.avatar && typeof prof.avatar === "object" && typeof prof.avatar.iconPath === "string") {
-      return `<img class="mini-layer" src="${asset(prof.avatar.iconPath)}" alt="" onerror="this.style.opacity=0.25">`;
-    }
-
-    return `<div class="fallback">🧑</div>`;
-  }
-
-function renderPlayersFromRoom(room) {
-  const grid = document.getElementById("playerGrid");
-  if (!grid) return;
-
-  const raw = Array.isArray(room?.players) ? room.players : [];
-
-  // 1) normalize
-  const normalized = raw.map(normalizePlayer).filter(Boolean);
-
-  // 2) clientId重複排除（稀に同一者が複数スロットに見える問題の防波堤）
-  const uniq = [];
-  const seen = new Set();
-  for (const p of normalized) {
-    const cid = p?.clientId ?? null;
-    if (!cid) continue;
-    if (seen.has(cid)) continue;
-    seen.add(cid);
-    uniq.push(p);
-  }
-
-  // 3) 4枠へ詰める
-  const slots = [];
-  for (let i = 0; i < 4; i++) slots.push(uniq[i] || null);
-
-  grid.innerHTML = "";
-  for (let i = 0; i < 4; i++) {
-    const p = slots[i];
-    if (!p) {
-      grid.innerHTML += `<div class="player-box empty">空き</div>`;
-      continue;
-    }
-
-    const prof = p.profile || {};
-    const titleJa = resolveTitleJa(state.masters, prof.titleName);
-
-    grid.innerHTML += `
-      <div class="player-box">
-        <div class="player-name">${prof.name ?? "PLAYER"}</div>
-        <div class="player-avatar">${renderAvatarMini(prof)}</div>
-        <div class="player-title">${titleJa}</div>
-        <div class="player-wl">${prof.wins ?? 0}勝 ${prof.losses ?? 0}敗</div>
-      </div>
-    `;
-  }
-}
-
-
   setTimeout(() => {
-    playBgm("assets/sounds/bgm/bgm_main.mp3");
+    const grid = document.getElementById("playerGrid");
+    const roomIdEl = document.getElementById("roomIdText");
 
-    renderPlayersFromRoom(latestRoom);
+    function renderRoom(room) {
+      if (!grid) return;
+      latestRoom = room || latestRoom;
 
-    bc.on("room:update", (room) => {
-      latestRoom = room;
-      renderPlayersFromRoom(room);
-    });
+      const rid = (bc.getMe().roomId || latestRoom?.roomId || "");
+      if (roomIdEl) roomIdEl.textContent = rid;
 
-    bc.on("game:event", (ev) => {
-      if (ev?.type !== "game:begin") return;
+      const slots = playersToSlots(latestRoom);
 
-      const begin = ev.beginPayload;
-      const players = (begin.players || []).map(normalizePlayer).filter(Boolean);
-      const questionIds = begin.questionIds || [];
+      grid.innerHTML = "";
+      for (let i = 0; i < 4; i++) {
+        const p = slots[i];
+        if (!p) {
+          grid.innerHTML += `<div class="player-box empty">空き</div>`;
+          continue;
+        }
+        const prof = p.profile || {};
+        const name = prof.name ?? "Player";
+        const title = prof.titleName ?? "—";
+        grid.innerHTML += `
+          <div class="player-box">
+            <div class="player-name">${name}</div>
+            <div class="player-title">${title}</div>
+          </div>
+        `;
+      }
+    }
 
-      state.currentRun = buildOnlineRun({
-        roomId: begin.roomId,
-        hostClientId: begin.hostClientId,
-        myClientId: bc.clientId,
-        players,
-        questionIds,
-      });
+    renderRoom(latestRoom);
 
+    // ✅ 多重購読防止
+    if (!state.__lobbySubscribed) {
+      state.__lobbySubscribed = true;
+      state.__lobbyOnRoomUpdate = (room) => renderRoom(room);
+      bc.on("room:update", state.__lobbyOnRoomUpdate);
+      state.__lobbyOnClosed = () => {
+        alert("ルームが解散されました。");
+        goto("#battle");
+      };
+      bc.on("room:closed", state.__lobbyOnClosed);
+    }
+
+    document.getElementById("startBtn")?.addEventListener("click", () => {
+      if (!latestRoom) return;
+      playSe("assets/sounds/se/se_decide.mp3", { volume: 0.9 });
+
+      const questionIds = pickRandomQuestionIds(state.masters, 10);
+      bc.emitGameEvent({ type: "game:begin", roomId: latestRoom.roomId, questionIds });
       goto(`#battleQuiz?i=0&t=${Date.now()}`);
     });
 
     document.getElementById("leaveBtn")?.addEventListener("click", async () => {
       playSe("assets/sounds/se/se_decide.mp3", { volume: 0.9 });
       await bc.leaveRoom();
+      // 次回入場のために購読フラグも解除
+      state.__lobbySubscribed = false;
       goto("#battle");
     });
-
-document.getElementById("startBtn")?.addEventListener("click", () => {
-  if (!latestRoom) return;
-
-  playSe("assets/sounds/se/se_decide.mp3", { volume: 0.9 });
-
-  // ✅ server.js が期待する形式：roomId と questionIds をトップレベルに置く
-  const roomId = latestRoom.roomId;
-  const questionIds = pickRandomQuestionIds(state.masters, 10);
-
-  bc.emitGameEvent({
-    type: "game:begin",
-    roomId,
-    questionIds,
-  });
-});
   }, 0);
 
   return html;
