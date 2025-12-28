@@ -130,22 +130,51 @@ export function renderBattleMenu({ state, goto }) {
     // 他画面と同様のBGM（audioManager 側で重複制御される想定）
     playBgm("assets/sounds/bgm/bgm_main.mp3");
 
-    document.getElementById("cpuBtn")?.addEventListener("click", () => {
+    // ✅ 多重バインド対策：
+    // 既存のイベントが残っていても確実に「1個だけ」にするため、
+    // 対象要素を clone -> replace してから addEventListener する。
+    const bindSafe = (id, onClick) => {
+      const el = document.getElementById(id);
+      if (!el || !el.parentNode) return;
+
+      const newEl = el.cloneNode(true); // 既存リスナーを全消し
+      el.parentNode.replaceChild(newEl, el);
+
+      newEl.addEventListener("click", () => {
+        // ✅ 連打・二重発火ガード
+        if (newEl.dataset.busy === "1") return;
+        newEl.dataset.busy = "1";
+        newEl.disabled = true;
+
+        try {
+          onClick();
+        } finally {
+          // 画面遷移に失敗した場合でも戻せるように短時間で解除
+          setTimeout(() => {
+            if (!newEl.isConnected) return;
+            newEl.disabled = false;
+            newEl.dataset.busy = "0";
+          }, 400);
+        }
+      });
+    };
+
+    bindSafe("cpuBtn", () => {
       playSe("assets/sounds/se/se_decide.mp3", { volume: 0.9 });
       goto("#battleCpuSetup");
     });
 
-    document.getElementById("createBtn")?.addEventListener("click", () => {
+    bindSafe("createBtn", () => {
       playSe("assets/sounds/se/se_decide.mp3", { volume: 0.9 });
       goto("#battleRoomCreate");
     });
 
-    document.getElementById("joinBtn")?.addEventListener("click", () => {
+    bindSafe("joinBtn", () => {
       playSe("assets/sounds/se/se_decide.mp3", { volume: 0.9 });
       goto("#battleRoomJoin");
     });
 
-    document.getElementById("backBtn")?.addEventListener("click", () => {
+    bindSafe("backBtn", () => {
       playSe("assets/sounds/se/se_decide.mp3", { volume: 0.9 });
       goto("#home");
     });
