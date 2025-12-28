@@ -1,16 +1,12 @@
 // js/systems/battleClient.js
 export function createBattleClient(options = {}) {
   if (!window.io) {
-    throw new Error(
-      "Socket.IO client が見つかりません（window.io）。index.html で socket.io の script を読み込んでください。"
-    );
+    throw new Error("Socket.IO client が見つかりません（window.io）。");
   }
 
-  // Render URL をここに入れてください（既に設定済みなら options.serverUrl で渡してOK）
-  const defaultServerUrl = "https://dino-quiz-battle-server.onrender.com";
-  const serverUrl = options.serverUrl || defaultServerUrl;
+  const serverUrl = options.serverUrl || "https://dino-quiz-battle-server.onrender.com";
 
-  // 端末固定ID（同一端末が複数接続しても1枠に固定するため）
+  // 端末固定ID（同一端末が複数接続しても 1枠に固定）
   const STORAGE_KEY = "dino_quiz_battle_player_key_v1";
   let playerKey = localStorage.getItem(STORAGE_KEY);
   if (!playerKey) {
@@ -18,21 +14,16 @@ export function createBattleClient(options = {}) {
     localStorage.setItem(STORAGE_KEY, playerKey);
   }
 
-  const playerProfile = options.playerProfile || {};
+  const socket = window.io(serverUrl, { transports: ["websocket"], withCredentials: true });
 
-  const socket = window.io(serverUrl, {
-    transports: ["websocket"],
-    withCredentials: true,
-  });
+  const handlers = new Map();
+  let lastRoom = null;
 
-  const handlers = new Map(); // eventType -> Set(fn)
-
-  let lastRoomUpdate = null;
-  let me = {
+  const me = {
     clientId: null,
-    playerKey,
     roomId: null,
     isHost: false,
+    playerKey,
   };
 
   function on(type, fn) {
@@ -48,27 +39,41 @@ export function createBattleClient(options = {}) {
     for (const fn of set) fn(payload);
   }
 
+  function buildProfile() {
+    // 画面側から渡された最新状態を使う（名前/称号/アバター）
+    const p = (options.getPlayerProfile && options.getPlayerProfile()) || options.playerProfile || {};
+    const prof = { ...(p || {}) };
+
+    // ✅ 必ず playerKey を載せる
+    prof.playerKey = playerKey;
+
+    // ✅ avatar.equipped が入っていない場合の保険（よくあるズレ）
+    // - prof.avatarEquipped に入っててもOK
+    // - prof.avatar.equipped に入っててもOK
+    if (!prof.avatar) prof.avatar = {};
+    if (!prof.avatar.equipped && prof.avatarEquipped) {
+      prof.avatar.equipped = { ...(prof.avatarEquipped || {}) };
+    }
+
+    return prof;
+  }
+
   socket.on("connect", () => {
     me.clientId = socket.id;
   });
 
   socket.on("room:update", (room) => {
-    lastRoomUpdate = room;
-    if (room?.roomId) me.roomId = room.roomId;
-    if (room?.hostClientId && me.clientId) me.isHost = room.hostClientId === me.clientId;
+    lastRoom = room;
+    me.roomId = room?.roomId ?? me.roomId;
+    me.isHost = !!(room?.hostClientId && me.clientId && room.hostClientId === me.clientId);
     emitLocal("room:update", room);
   });
 
-  socket.on("room:closed", () => {
-    emitLocal("room:closed", {});
-  });
-
-  socket.on("game:event", (ev) => {
-    emitLocal("game:event", ev);
-  });
+  socket.on("room:closed", () => emitLocal("room:closed", {}));
+  socket.on("game:event", (ev) => emitLocal("game:event", ev));
 
   async function createRoom() {
-    const profile = { ...playerProfile, playerKey };
+    const profile = buildProfile();
     return await new Promise((resolve) => {
       socket.emit("room:create", { profile }, (res) => {
         if (!res?.ok) return resolve(false);
@@ -81,46 +86,33 @@ export function createBattleClient(options = {}) {
 
   async function joinRoom(roomId) {
     const rid = String(roomId || "").trim().toUpperCase();
-    const profile = { ...playerProfile, playerKey };
+    const profile = buildProfile();
     return await new Promise((resolve) => {
-      socket.emit("room:join", { roomId: rid, profile }, (res) => {
-        resolve(!!res?.ok);
-      });
+      socket.emit("room:join", { roomId: rid, profile }, (res) => resolve(!!res?.ok));
     });
   }
 
-  async function leaveRoom() {
+  function leaveRoom() {
     socket.emit("room:leave");
     me.roomId = null;
     me.isHost = false;
-    lastRoomUpdate = null;
+    lastRoom = null;
     return true;
   }
 
   function emitGameEvent(payload) {
-    socket.emit("game:event", payload);
-  }
-
-  function sendAnswer({ choiceIndex, answeredAtMs }) {
-    emitGameEvent({
-      type: "game:answer",
-      roomId: me.roomId,
-      choiceIndex,
-      answeredAtMs: answeredAtMs || Date.now(),
-    });
+    socket.emit("game:event", { ...(payload || {}), roomId: me.roomId });
   }
 
   return {
     socket,
-    clientId: () => me.clientId,
-    getMe: () => ({ ...me }),
-    getState: () => ({ room: lastRoomUpdate }),
     on,
     off,
+    getMe: () => ({ ...me }),
+    getState: () => ({ room: lastRoom }),
     createRoom,
     joinRoom,
     leaveRoom,
     emitGameEvent,
-    sendAnswer,
   };
 }
