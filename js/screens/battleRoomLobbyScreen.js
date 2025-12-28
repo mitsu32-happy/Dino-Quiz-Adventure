@@ -322,20 +322,21 @@ export function renderBattleRoomLobby({ state, goto }) {
       goto("#battle");
     });
 
-    document.getElementById("startBtn")?.addEventListener("click", () => {
-      if (!latestRoom) return;
+document.getElementById("startBtn")?.addEventListener("click", () => {
+  if (!latestRoom) return;
 
-      playSe("assets/sounds/se/se_decide.mp3", { volume: 0.9 });
+  playSe("assets/sounds/se/se_decide.mp3", { volume: 0.9 });
 
-      const beginPayload = {
-        roomId: latestRoom.roomId,
-        hostClientId: latestRoom.hostClientId,
-        players: latestRoom.players,
-        questionIds: pickRandomQuestionIds(state.masters, 10),
-      };
+  // ✅ server.js が期待する形式：roomId と questionIds をトップレベルに置く
+  const roomId = latestRoom.roomId;
+  const questionIds = pickRandomQuestionIds(state.masters, 10);
 
-      bc.emitGameEvent({ type: "game:begin", beginPayload });
-    });
+  bc.emitGameEvent({
+    type: "game:begin",
+    roomId,
+    questionIds,
+  });
+});
   }, 0);
 
   return html;
