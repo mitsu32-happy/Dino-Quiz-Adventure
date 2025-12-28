@@ -194,39 +194,106 @@ io.on("connection", (socket) => {
   // ======================
   // game:event
   // ======================
-  socket.on("game:event", (ev) => {
-    const roomId = String(ev?.roomId || "").trim().toUpperCase();
-    const room = rooms.get(roomId);
-    if (!room) return;
+// 互換のため、旧/新どちらのイベント名でも受ける
+function handleGameEvent(ev) {
+  // ★ここに、元の socket.on("game:event", ...) の中身を「そのまま」移動してください
+  const roomId = String(ev?.roomId || "").trim().toUpperCase();
+  const room = rooms.get(roomId);
+  if (!room) return;
 
-    const game = room.game;
+  const game = room.game;
 
-    // ---- game begin (host only) ----
-    if (ev.type === "game:begin") {
-      if (socket.id !== room.hostClientId) return;
+  // ---- game begin (host only) ----
+  if (ev.type === "game:begin") {
+    if (socket.id !== room.hostClientId) return;
 
-      game.status = "playing";
-      game.questionIds = Array.isArray(ev.questionIds) ? ev.questionIds : [];
-      game.index = 0;
-      game.answersByIndex = {};
-      game.scores = {};
-      game.timeLimitSec = Number(ev.timeLimitSec ?? 20) || 20;
+    game.status = "playing";
+    game.questionIds = Array.isArray(ev.questionIds) ? ev.questionIds : [];
+    game.index = 0;
+    game.answersByIndex = {};
+    game.scores = {};
+    game.timeLimitSec = Number(ev.timeLimitSec ?? 20) || 20;
 
-      // 初期スコア：playerKey をキーにする
-      for (const p of room.players) {
-        const pk = getPlayerKeyFromProfile(p.profile) || p.clientId;
-        game.scores[pk] = 0;
+    for (const p of room.players) {
+      const pk = getPlayerKeyFromProfile(p.profile) || p.clientId;
+      game.scores[pk] = 0;
+    }
+
+    io.to(room.roomId).emit("game:event", {
+      type: "game:begin",
+      beginPayload: {
+        roomId: room.roomId,
+        hostClientId: room.hostClientId,
+        players: roomPlayersArray(room),
+        questionIds: game.questionIds,
+      },
+    });
+    return;
+  }
+
+  // ---- answer ----
+  if (ev.type === "game:answer") {
+    if (game.status !== "playing") return;
+
+    const me = room.players.find((p) => p.clientId === socket.id);
+    const playerKey = getPlayerKeyFromProfile(me?.profile) || socket.id;
+
+    const qIndex = game.index;
+    if (!game.answersByIndex[qIndex]) game.answersByIndex[qIndex] = {};
+    if (game.answersByIndex[qIndex][playerKey]) return;
+
+    const answeredAtMs = Number(ev.clientAnsweredAt ?? ev.answeredAtMs ?? ev.timeMs) || Date.now();
+    const choiceIndex = Number(ev.choiceIndex);
+
+    game.answersByIndex[qIndex][playerKey] = { choiceIndex, answeredAtMs };
+
+    io.to(room.roomId).emit("game:event", { type: "game:answer", playerKey, qIndex });
+
+    const need = room.players.length;
+    const got = Object.keys(game.answersByIndex[qIndex]).length;
+
+    if (got >= need) {
+      const qid = game.questionIds[qIndex];
+      const correctIdx = getCorrectIndexByQid(qid);
+
+      const correctList = [];
+      for (const [pk, a] of Object.entries(game.answersByIndex[qIndex])) {
+        if (Number(a.choiceIndex) === -1) continue;
+        if (correctIdx === null) continue;
+        if (Number(a.choiceIndex) === Number(correctIdx)) {
+          correctList.push({ playerKey: pk, answeredAtMs: Number(a.answeredAtMs) || Date.now() });
+        }
+      }
+
+      const awards = awardPointsBySpeed(correctList);
+      for (const pk of Object.keys(game.scores)) {
+        game.scores[pk] = Number(game.scores[pk] ?? 0) + Number(awards.get(pk) ?? 0);
       }
 
       io.to(room.roomId).emit("game:event", {
-        type: "game:begin",
-        beginPayload: {
-          roomId: room.roomId,
-          hostClientId: room.hostClientId,
-          players: roomPlayersArray(room),
-          questionIds: game.questionIds,
-        },
+        type: "game:questionEnd",
+        qIndex,
+        answers: game.answersByIndex[qIndex],
+        scores: game.scores,
       });
+
+      game.index++;
+      if (game.index >= game.questionIds.length) {
+        game.status = "finished";
+        io.to(room.roomId).emit("game:event", { type: "game:finished", scores: game.scores });
+      } else {
+        io.to(room.roomId).emit("game:event", { type: "game:next", index: game.index });
+      }
+    }
+    return;
+  }
+}
+
+// ✅ クライアント（battleClient.js）が送っている正しいイベント名
+socket.on("client:gameEvent", handleGameEvent);
+
+// ✅ 念のため旧名でも受ける（将来の混乱防止）
+socket.on("game:event", handleGameEvent);
 
       return;
     }
