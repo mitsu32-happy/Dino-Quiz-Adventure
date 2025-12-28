@@ -62,11 +62,25 @@ function parseHash() {
   return { parts, params };
 }
 
+/**
+ * ✅ 重要：同じhashへgotoしても再描画されるようにする
+ * - home: モーダル保存で goto("#home") → 同一hashで再描画されず閉じない問題を解消
+ * - avatar: 装備変更で goto("#avatar") → 同一hashで再描画されず反映されない問題を解消
+ */
 function goto(hash) {
-  location.hash = hash;
+  const next = String(hash || "");
+  if (!next) return;
+
+  if (location.hash === next) {
+    // hashchangeが発火しないので、明示的に再ルート
+    route();
+    return;
+  }
+  location.hash = next;
 }
 
 async function init() {
+  // initAudio は await 不要（同期）だが、既存のままでもOK
   await initAudio();
 
   state.masters = await loadAllMasters();
@@ -87,7 +101,8 @@ function route() {
 
   // TOP
   if (parts[0] === "top") {
-    stopBgm();
+    // ✅ トップBGMを鳴らす（autoplay制限は audioManager が pending で吸収）
+    playBgm("top");
     setView(renderTop({ state, goto }));
     return;
   }

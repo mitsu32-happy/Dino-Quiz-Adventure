@@ -1,17 +1,57 @@
+// js/screens/topScreen.js
+import * as audio from "../systems/audioManager.js";
+
 // GitHub Pages (Project Pages) / ローカル両対応：このモジュール位置から assets を解決する
 const ROOT = new URL("../../", import.meta.url);
 const asset = (p) => new URL(String(p || "").replace(/^\/+/, ""), ROOT).toString();
+
+function tryUnlockAudio() {
+  // ✅ audioManager 側の実装差異に強くする（存在するものだけ呼ぶ）
+  const fns = [
+    audio.ensureAudioUnlocked,
+    audio.resumeAudio,
+    audio.resumeAudioContext,
+    audio.unlockAudio,
+    audio.resumeBgm,
+    audio.playBgmIfPaused,
+  ].filter((fn) => typeof fn === "function");
+
+  for (const fn of fns) {
+    try {
+      fn();
+    } catch (_) {
+      // 無音でも進行できるように握りつぶし
+    }
+  }
+}
 
 export function renderTop({ goto }) {
   const bg = asset("assets/images/top_bg.png");
 
   setTimeout(() => {
     const start = document.getElementById("startBtn");
-    if (!start) return;
+    const screen = document.querySelector(".top-screen");
+    if (!start || !screen) return;
 
-    // クリック / タップでホームへ
-    start.addEventListener("click", () => goto("#home"));
-    start.addEventListener("touchstart", () => goto("#home"), { passive: true });
+    // ✅ 最初のユーザー操作で音を解禁（BGMが「再生指示は出てたがブロック」でも復帰しやすくする）
+    let unlocked = false;
+    const unlockOnce = () => {
+      if (unlocked) return;
+      unlocked = true;
+      tryUnlockAudio();
+    };
+
+    // 画面のどこをタップしてもOK（START押下も含む）
+    screen.addEventListener("pointerdown", unlockOnce, { passive: true });
+    screen.addEventListener("touchstart", unlockOnce, { passive: true });
+
+    // START → ホーム
+    const goHome = () => {
+      unlockOnce();
+      goto("#home");
+    };
+    start.addEventListener("click", goHome);
+    start.addEventListener("touchstart", goHome, { passive: true });
   }, 0);
 
   return `

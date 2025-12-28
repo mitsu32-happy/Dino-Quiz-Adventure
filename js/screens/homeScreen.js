@@ -82,7 +82,7 @@ export function renderHome({ state, goto, params }) {
     },
     {
       key: "timeAttack",
-      label: "タイムアタック",
+      label: "ﾀｲﾑｱﾀｯｸ",
       icon: asset("assets/images/icon_timeattack.png"),
       onClick: () => goto("#timeAttack"),
       disabled: false,
@@ -149,13 +149,36 @@ export function renderHome({ state, goto, params }) {
       const modal = document.getElementById("playerModal");
       if (modal) modal.style.display = "none";
     });
-    document.getElementById("playerSaveBtn")?.addEventListener("click", () => {
-      safePlay("assets/sounds/se/se_decide.mp3", { volume: 0.85 });
-      const input = document.getElementById("playerNameInput");
-      save.player.name = (input?.value ?? "").trim();
-      saveNow(save);
-      goto("#home");
-    });
+document.getElementById("playerSaveBtn")?.addEventListener("click", () => {
+  safePlay("assets/sounds/se/se_decide.mp3", { volume: 0.85 });
+
+  const modal = document.getElementById("playerModal");
+  const input = document.getElementById("playerNameInput");
+  if (!input) return;
+
+  // ✅ IME変換中の文字を確定させる（日本語入力対策）
+  input.blur();
+
+  // 次のtickで確定後の value を読む
+  setTimeout(() => {
+    save.player.name = String(input.value ?? "").trim();
+    saveNow(save);
+
+    // ✅ その場で閉じる（見た目の安定）
+    if (modal) modal.style.display = "none";
+
+    // ✅ 表示も即時反映（再描画に依存しない）
+    const nameBtn = document.getElementById("playerNameBtn");
+    if (nameBtn) {
+      const name = save.player?.name || "プレイヤー名未設定";
+      nameBtn.textContent = `👤 ${name}`;
+    }
+
+    // ルート再描画もしておく（保険）
+    goto("#home");
+  }, 0);
+});
+
 
     // 称号モーダル
     document.getElementById("titleBtn")?.addEventListener("click", () => {
@@ -605,19 +628,29 @@ export function renderHome({ state, goto, params }) {
         background: rgba(255,255,255,.92);
       }
 
-      .icon-label{
-        width: 100%;
-        font-weight: 1000;
-        font-size: 12px;
-        color: var(--text);
-        text-align:center;
-        letter-spacing: .02em;
-        padding: 6px 8px;
-        border-radius: 14px;
-        border: 2px solid rgba(31,42,68,.18);
-        background: rgba(255,255,255,.96);
-        text-shadow: none;
-      }
+.icon-label{
+  width: 100%;
+  font-weight: 1000;
+
+  /* ✅ 画面幅に応じて自動で縮む（最小10px / 最大12px） */
+  font-size: clamp(10px, 3.2vw, 12px);
+
+  color: var(--text);
+  text-align:center;
+  letter-spacing: .02em;
+
+  padding: 6px 6px;
+  border-radius: 14px;
+  border: 2px solid rgba(31,42,68,.18);
+  background: rgba(255,255,255,.96);
+  text-shadow: none;
+
+  /* ✅ 1行固定 */
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
 
       /* ===== モーダル：白カード ===== */
       .modal{
