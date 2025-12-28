@@ -35,6 +35,10 @@ export function createDefaultSave() {
     gacha: { totalPulls: 0, lastPulledAt: null },
     titles: { equippedTitleId: null, unlockedTitleIds: [] },
     options: { bgmVolume: 0.8, seVolume: 0.9, vibration: true },
+    battle: {
+      cpu: { wins: 0, losses: 0 },
+      pvp: { wins: 0, losses: 0 },
+    },
   };
 }
 
@@ -65,6 +69,39 @@ export function validateSaveV1(obj) {
   return { ok: true };
 }
 
+function normalizeSaveV1(save) {
+  // 既存セーブ互換のため「足りないキーを補完」する（破壊的変更はしない）
+  let changed = false;
+
+  // battle（今回追加）
+  if (!save.battle || typeof save.battle !== "object") {
+    save.battle = {
+      cpu: { wins: 0, losses: 0 },
+      pvp: { wins: 0, losses: 0 },
+    };
+    changed = true;
+  } else {
+    if (!save.battle.cpu || typeof save.battle.cpu !== "object") {
+      save.battle.cpu = { wins: 0, losses: 0 };
+      changed = true;
+    } else {
+      if (typeof save.battle.cpu.wins !== "number") { save.battle.cpu.wins = 0; changed = true; }
+      if (typeof save.battle.cpu.losses !== "number") { save.battle.cpu.losses = 0; changed = true; }
+    }
+
+    if (!save.battle.pvp || typeof save.battle.pvp !== "object") {
+      save.battle.pvp = { wins: 0, losses: 0 };
+      changed = true;
+    } else {
+      if (typeof save.battle.pvp.wins !== "number") { save.battle.pvp.wins = 0; changed = true; }
+      if (typeof save.battle.pvp.losses !== "number") { save.battle.pvp.losses = 0; changed = true; }
+    }
+  }
+
+  return changed;
+}
+
+
 export function ensureSaveLoaded() {
   const raw = localStorage.getItem(SAVE_STORAGE_KEY);
   if (!raw) {
@@ -77,6 +114,13 @@ export function ensureSaveLoaded() {
     const save = JSON.parse(raw);
     const v = validateSaveV1(save);
     if (!v.ok) throw new Error(`Invalid save: ${v.reason}`);
+
+    // 既存セーブ互換：不足キーを補完（battleなど）
+    const changed = normalizeSaveV1(save);
+    if (changed) {
+      localStorage.setItem(SAVE_STORAGE_KEY, JSON.stringify(save));
+    }
+
     return save;
   } catch {
     const save = createDefaultSave();
@@ -112,6 +156,9 @@ export function importSaveJson(jsonText) {
 
   const v = validateSaveV1(obj);
   if (!v.ok) return { ok: false, reason: v.reason };
+
+  // 復元データが古い可能性があるので補完（battleなど）
+  normalizeSaveV1(obj);
 
   return { ok: true, save: obj };
 }

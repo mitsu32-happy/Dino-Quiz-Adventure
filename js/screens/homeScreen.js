@@ -224,12 +224,32 @@ export function renderHome({ state, goto, params }) {
     });
   }, 0);
 
-  const iconButton = (b) => `
-    <button class="icon-btn ${b.disabled ? "is-disabled" : ""}" data-home-btn="${b.key}" type="button">
-      <img class="icon-img" src="${b.icon}" alt="" onerror="this.style.opacity=0.25" />
-      <div class="icon-label">${b.label}</div>
-    </button>
-  `;
+  const iconButton = (b) => {
+    // クリックイベントが何らかの理由で死んでも、hash遷移だけは確実に走らせる保険
+    const hrefMap = {
+      story: "#home?section=story",
+      timeAttack: "#timeAttack",
+      endless: "#endless",
+      battle: "#battle",
+      avatar: "#avatar",
+      gacha: "#gacha",
+      options: "#options",
+    };
+    const href = hrefMap[b.key] || "#home";
+
+    return `
+      <button
+        class="icon-btn ${b.disabled ? "is-disabled" : ""}"
+        data-home-btn="${b.key}"
+        type="button"
+        ${b.disabled ? "disabled" : ""}
+        onclick="location.hash='${href}'"
+      >
+        <img class="icon-img" src="${b.icon}" alt="" onerror="this.style.opacity=0.25" />
+        <div class="icon-label">${b.label}</div>
+      </button>
+    `;
+  };
 
   const storyListHtml = storyStages
     .map((s) => {

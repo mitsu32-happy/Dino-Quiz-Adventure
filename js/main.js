@@ -17,6 +17,17 @@ import { renderGachaDraw } from "./screens/gachaDrawScreen.js";
 import { renderTimeAttack } from "./screens/timeAttackScreen.js";
 import { renderEndless } from "./screens/endlessScreen.js";
 
+// ===== Battle =====
+import { renderBattleMenu } from "./screens/battleMenuScreen.js";
+import { renderBattleCpuSetup } from "./screens/battleCpuSetupScreen.js";
+import { renderBattleQuiz } from "./screens/battleQuizScreen.js";
+import { renderBattleResult } from "./screens/battleResultScreen.js";
+
+// ★ 追加（オンライン対戦）
+import { renderBattleRoomCreate } from "./screens/battleRoomCreateScreen.js";
+import { renderBattleRoomJoin } from "./screens/battleRoomJoinScreen.js";
+import { renderBattleRoomLobby } from "./screens/battleRoomLobbyScreen.js";
+
 const appEl = document.getElementById("app");
 
 const state = {
@@ -25,6 +36,10 @@ const state = {
   currentRun: null,
   timeAttackRun: null,
   endlessRun: null,
+
+  // オンライン対戦用
+  battleClient: null,
+  currentRoomId: null,
 };
 
 function setView(html) {
@@ -34,12 +49,13 @@ function setView(html) {
 function parseHash() {
   const hash = location.hash || "#top";
   const [path, query] = hash.replace(/^#/, "").split("?");
-  const parts = path.split("/").filter(Boolean);
+  const parts = String(path || "top").split("/").filter(Boolean);
 
   const params = {};
   if (query) {
     for (const kv of query.split("&")) {
       const [k, v] = kv.split("=");
+      if (!k) continue;
       params[decodeURIComponent(k)] = decodeURIComponent(v ?? "");
     }
   }
@@ -47,108 +63,150 @@ function parseHash() {
 }
 
 function goto(hash) {
-  if (location.hash === hash) route();
-  else location.hash = hash;
+  location.hash = hash;
 }
 
 async function init() {
-  if (location.hash !== "#top") location.hash = "#top";
+  await initAudio();
 
-  state.save = ensureSaveLoaded();
   state.masters = await loadAllMasters();
-
-  // 🔓 最初の操作で音を解禁
-  initAudio();
+  state.save = ensureSaveLoaded();
 
   window.addEventListener("hashchange", route);
+
+  // F5更新時はトップへ
+  if (location.hash && location.hash !== "#top") {
+    location.hash = "#top";
+  }
+
   route();
 }
 
 function route() {
   const { parts, params } = parseHash();
 
-  // トップ
-  if (parts.length === 0 || parts[0] === "top") {
-    playBgm("top");
-    setView(renderTop({ goto }));
+  // TOP
+  if (parts[0] === "top") {
+    stopBgm();
+    setView(renderTop({ state, goto }));
     return;
   }
 
-  // ホーム
+  // HOME
   if (parts[0] === "home") {
     playBgm("home");
     setView(renderHome({ state, goto, params }));
     return;
   }
 
-  // ステージクイズ（BGMなし）
+  // QUIZ
   if (parts[0] === "quiz") {
     stopBgm();
     setView(renderQuiz({ state, goto, params }));
     return;
   }
 
-  // リザルト
   if (parts[0] === "result") {
-    playBgm("home");
+    stopBgm();
     setView(renderResult({ state, goto }));
     return;
   }
 
-  // オプション
+  // OPTIONS
   if (parts[0] === "options") {
     playBgm("home");
     setView(renderOptions({ state, goto }));
     return;
   }
 
-  // アバター
+  // AVATAR
   if (parts[0] === "avatar") {
     playBgm("home");
     setView(renderAvatar({ state, goto }));
     return;
   }
 
-  // ガチャ
+  // GACHA
   if (parts[0] === "gacha") {
     playBgm("home");
     setView(renderGacha({ state, goto, params }));
     return;
   }
+
   if (parts[0] === "gachaDraw") {
     playBgm("home");
     setView(renderGachaDraw({ state, goto, params }));
     return;
   }
 
-  // タイムアタック（BGMなし）
+  // TIME ATTACK
   if (parts[0] === "timeAttack") {
     stopBgm();
     setView(renderTimeAttack({ state, goto, params }));
     return;
   }
 
-  // エンドレス（BGMなし）
+  // ENDLESS
   if (parts[0] === "endless") {
     stopBgm();
     setView(renderEndless({ state, goto, params }));
     return;
   }
 
-  // 対戦（準備中・BGMなし）
+  // =========================
+  // BATTLE
+  // =========================
   if (parts[0] === "battle") {
     stopBgm();
-    setView(
-      renderPlaceholder({
-        title: "準備中",
-        message: "このモードは次フェーズで実装予定です。",
-        goto,
-      })
-    );
+    setView(renderBattleMenu({ state, goto }));
     return;
   }
 
-  goto("#top");
+  if (parts[0] === "battleCpuSetup") {
+    stopBgm();
+    setView(renderBattleCpuSetup({ state, goto }));
+    return;
+  }
+
+  if (parts[0] === "battleQuiz") {
+    stopBgm();
+    setView(renderBattleQuiz({ state, goto }));
+    return;
+  }
+
+  if (parts[0] === "battleResult") {
+    stopBgm();
+    setView(renderBattleResult({ state, goto }));
+    return;
+  }
+
+  // ★ オンライン対戦
+  if (parts[0] === "battleRoomCreate") {
+    stopBgm();
+    setView(renderBattleRoomCreate({ state, goto }));
+    return;
+  }
+
+  if (parts[0] === "battleRoomJoin") {
+    stopBgm();
+    setView(renderBattleRoomJoin({ state, goto }));
+    return;
+  }
+
+  if (parts[0] === "battleRoomLobby") {
+    stopBgm();
+    setView(renderBattleRoomLobby({ state, goto }));
+    return;
+  }
+
+  // fallback
+  setView(
+    renderPlaceholder({
+      title: "ページが見つかりません",
+      message: "URLが正しいか確認してください。",
+      goto,
+    })
+  );
 }
 
 init().catch((e) => {
