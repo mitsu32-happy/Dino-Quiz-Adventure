@@ -1,18 +1,16 @@
 // js/systems/battleClient.js
-// server.js（Render）とイベント名を完全に合わせる版
+// server.js（Render）とイベント名を完全に合わせる版 + roomId自動付与
 
 export function createBattleClient(options = {}) {
   const transport = options.transport || "local";
   let playerProfile = options.playerProfile || {};
 
-  // Socket.IO client 必須
   if (!window.io) {
     throw new Error(
       "Socket.IO client が見つかりません（window.io）。index.html で socket.io-client を読み込んでください。"
     );
   }
 
-  // serverUrl 決定
   let serverUrl = options.serverUrl;
   if (!serverUrl) {
     if (transport === "local") serverUrl = "http://localhost:3001";
@@ -28,8 +26,7 @@ export function createBattleClient(options = {}) {
     withCredentials: true,
   });
 
-  // ローカルイベント購読
-  const handlers = new Map(); // type -> Set(fn)
+  const handlers = new Map();
   function on(type, fn) {
     if (!handlers.has(type)) handlers.set(type, new Set());
     handlers.get(type).add(fn);
@@ -41,25 +38,21 @@ export function createBattleClient(options = {}) {
     const set = handlers.get(type);
     if (!set) return;
     for (const fn of set) {
-      try {
-        fn(payload);
-      } catch (e) {
-        console.error("[battleClient] handler error", type, e);
-      }
+      try { fn(payload); } catch (e) { console.error("[battleClient]", type, e); }
     }
   }
 
-  // 状態
   let clientId = null;
   let roomId = null;
   let isHost = false;
   let lastRoomUpdate = null;
 
-  // サーバ側の profile はそのまま表示されるので最低限整形
   function normalizeProfileForServer(p) {
+    // server.js側で sanitize されるので、ここは「欠けを埋める」程度
     return {
       name: p?.name || "Player",
       titleName: p?.titleName ?? p?.title ?? p?.titleId ?? "—",
+      // avatar: できれば { body, head } をそのまま持たせたい
       avatar: p?.avatar ?? p?.avatarEquipped ?? p?.equippedAvatar ?? null,
       wins: Number.isFinite(Number(p?.pvpWins)) ? Number(p.pvpWins) : Number(p?.wins) || 0,
       losses: Number.isFinite(Number(p?.pvpLosses)) ? Number(p.pvpLosses) : Number(p?.losses) || 0,
@@ -71,18 +64,10 @@ export function createBattleClient(options = {}) {
       const t = setTimeout(() => reject(new Error("timeout")), timeoutMs);
       Promise.resolve()
         .then(promiseFactory)
-        .then((v) => {
-          clearTimeout(t);
-          resolve(v);
-        })
-        .catch((e) => {
-          clearTimeout(t);
-          reject(e);
-        });
+        .then((v) => { clearTimeout(t); resolve(v); })
+        .catch((e) => { clearTimeout(t); reject(e); });
     });
   }
-
-  // ===== Socket.IO events（server.js と一致させる） =====
 
   socket.on("connect", () => {
     clientId = socket.id;
@@ -98,31 +83,23 @@ export function createBattleClient(options = {}) {
     emitLocal("conn:error", { err });
   });
 
-  // ✅ server.js は "room:update" を emit する
   socket.on("room:update", (p) => {
     lastRoomUpdate = p || null;
     if (p?.roomId) roomId = p.roomId;
-
-    if (p?.hostClientId && clientId) {
-      isHost = p.hostClientId === clientId;
-    }
+    if (p?.hostClientId && clientId) isHost = p.hostClientId === clientId;
     emitLocal("room:update", p);
   });
 
-  // ✅ server.js は "game:event" を emit する
   socket.on("game:event", (ev) => {
     emitLocal("game:event", ev);
   });
 
-  // ✅ ルーム解散通知
   socket.on("room:closed", () => {
     lastRoomUpdate = null;
     roomId = null;
     isHost = false;
     emitLocal("room:closed", {});
   });
-
-  // ===== Public API =====
 
   function updateProfile(nextProfile) {
     playerProfile = nextProfile || {};
@@ -173,7 +150,6 @@ export function createBattleClient(options = {}) {
             }
             clientId = socket.id;
             roomId = rid;
-            // isHost は room:update を受けた時点で判定される
             resolve(true);
           });
         }),
@@ -181,22 +157,21 @@ export function createBattleClient(options = {}) {
     );
   }
 
-  // ✅ server.js の room:leave は ack を返さないので待たない
   async function leaveRoom() {
-    try {
-      socket.emit("room:leave");
-    } catch (e) {
-      console.error(e);
-    }
+    try { socket.emit("room:leave"); } catch (e) { console.error(e); }
     lastRoomUpdate = null;
     roomId = null;
     isHost = false;
     return true;
   }
 
-  // ✅ server.js は "game:event" を受け取る
+  // ✅ ここが本命：roomIdを自動付与して server.js 側の rooms.get(ev.roomId) に必ず当てる
   function emitGameEvent(payload) {
-    socket.emit("game:event", payload);
+    const p = payload && typeof payload === "object" ? { ...payload } : payload;
+    if (p && typeof p === "object") {
+      if (!p.roomId && roomId) p.roomId = roomId;
+    }
+    socket.emit("game:event", p);
   }
 
   function sendAnswer({ index, choiceIndex, clientAnsweredAt }) {

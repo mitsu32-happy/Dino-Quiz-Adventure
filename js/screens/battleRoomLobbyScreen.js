@@ -256,37 +256,52 @@ export function renderBattleRoomLobby({ state, goto }) {
     return `<div class="fallback">🧑</div>`;
   }
 
-  function renderPlayersFromRoom(room) {
-    const grid = document.getElementById("playerGrid");
-    if (!grid) return;
+function renderPlayersFromRoom(room) {
+  const grid = document.getElementById("playerGrid");
+  if (!grid) return;
 
-    const raw = room?.players || [];
-    const normalized = raw.map(normalizePlayer).filter(Boolean);
+  const raw = Array.isArray(room?.players) ? room.players : [];
 
-    const slots = [];
-    for (let i = 0; i < 4; i++) slots.push(normalized[i] || null);
+  // 1) normalize
+  const normalized = raw.map(normalizePlayer).filter(Boolean);
 
-    grid.innerHTML = "";
-    for (let i = 0; i < 4; i++) {
-      const p = slots[i];
-      if (!p) {
-        grid.innerHTML += `<div class="player-box empty">空き</div>`;
-        continue;
-      }
-      const prof = p.profile;
-
-      const titleJa = resolveTitleJa(state.masters, prof.titleName);
-
-      grid.innerHTML += `
-        <div class="player-box">
-          <div class="player-name">${prof.name ?? "PLAYER"}</div>
-          <div class="player-avatar">${renderAvatarMini(prof)}</div>
-          <div class="player-title">${titleJa}</div>
-          <div class="player-wl">${prof.wins ?? 0}勝 ${prof.losses ?? 0}敗</div>
-        </div>
-      `;
-    }
+  // 2) clientId重複排除（稀に同一者が複数スロットに見える問題の防波堤）
+  const uniq = [];
+  const seen = new Set();
+  for (const p of normalized) {
+    const cid = p?.clientId ?? null;
+    if (!cid) continue;
+    if (seen.has(cid)) continue;
+    seen.add(cid);
+    uniq.push(p);
   }
+
+  // 3) 4枠へ詰める
+  const slots = [];
+  for (let i = 0; i < 4; i++) slots.push(uniq[i] || null);
+
+  grid.innerHTML = "";
+  for (let i = 0; i < 4; i++) {
+    const p = slots[i];
+    if (!p) {
+      grid.innerHTML += `<div class="player-box empty">空き</div>`;
+      continue;
+    }
+
+    const prof = p.profile || {};
+    const titleJa = resolveTitleJa(state.masters, prof.titleName);
+
+    grid.innerHTML += `
+      <div class="player-box">
+        <div class="player-name">${prof.name ?? "PLAYER"}</div>
+        <div class="player-avatar">${renderAvatarMini(prof)}</div>
+        <div class="player-title">${titleJa}</div>
+        <div class="player-wl">${prof.wins ?? 0}勝 ${prof.losses ?? 0}敗</div>
+      </div>
+    `;
+  }
+}
+
 
   setTimeout(() => {
     playBgm("assets/sounds/bgm/bgm_main.mp3");

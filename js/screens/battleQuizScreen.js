@@ -59,12 +59,11 @@ function resolveTitleJa(masters, maybeIdOrName) {
   return name ? String(name) : v;
 }
 
-// --- avatar helpers (重要：id / item_id 両対応) ---
+// --- avatar helpers (id / item_id 両対応) ---
 function getAvatarItems(masters) {
   return masters?.avatar_items || masters?.avatarItems || masters?.avatarItemsMaster || [];
 }
 function getItemKey(it) {
-  // どちらでも拾えるように
   return String(it?.item_id ?? it?.id ?? "");
 }
 function getItemById(items, id) {
@@ -103,12 +102,15 @@ function getEquippedForPi({ pi, myPi, save, run }) {
     if (eq) return eq;
   }
 
-  // run.players 側（CPU/オンライン共通）
   const p = run?.players?.[pi];
   const prof = p?.profile || p || {};
+
+  // ✅ ここが改善点：profile.avatar が {body,head} 直置きでも拾えるようにする
   const eq =
+    resolveEquippedFromAny(prof?.avatar) ||
     resolveEquippedFromAny(prof?.avatar?.equipped) ||
     resolveEquippedFromAny(prof?.avatarEquipped) ||
+    resolveEquippedFromAny(p?.avatar) ||
     resolveEquippedFromAny(p?.avatar?.equipped) ||
     resolveEquippedFromAny(p?.avatarEquipped) ||
     resolveEquippedFromAny(prof?.equipped);
@@ -116,7 +118,7 @@ function getEquippedForPi({ pi, myPi, save, run }) {
   return eq || null;
 }
 
-// 案1：正解が速い順に上位3人へ 3/2/1pt
+// 正解が速い順に上位3人へ 3/2/1pt
 function awardPointsBySpeed(correctList) {
   const sorted = [...correctList].sort((a, b) => a.tSec - b.tSec);
   const awards = [3, 2, 1];
@@ -153,9 +155,7 @@ function calcFinalStandings(run, activePis) {
 function killTypewriter() {
   const w = window;
   if (w.__battleTypewriterId) {
-    try {
-      clearInterval(w.__battleTypewriterId);
-    } catch (_) {}
+    try { clearInterval(w.__battleTypewriterId); } catch (_) {}
     w.__battleTypewriterId = null;
   }
 }
@@ -166,14 +166,8 @@ function startTypewriter(el, text, speedMs = 18) {
   el.textContent = "";
   let i = 0;
   const id = setInterval(() => {
-    if (!el.isConnected) {
-      clearInterval(id);
-      return;
-    }
-    if (i >= full.length) {
-      clearInterval(id);
-      return;
-    }
+    if (!el.isConnected) { clearInterval(id); return; }
+    if (i >= full.length) { clearInterval(id); return; }
     el.textContent += full[i];
     i++;
   }, speedMs);
@@ -192,12 +186,9 @@ function hashSeed(str) {
 function makeRng(seed) {
   let x = seed >>> 0;
   return () => {
-    x ^= x << 13;
-    x >>>= 0;
-    x ^= x >> 17;
-    x >>>= 0;
-    x ^= x << 5;
-    x >>>= 0;
+    x ^= x << 13; x >>>= 0;
+    x ^= x >> 17; x >>>= 0;
+    x ^= x << 5;  x >>>= 0;
     return (x >>> 0) / 4294967296;
   };
 }
@@ -211,6 +202,21 @@ function shuffledIndices(n, seedStr) {
   return arr;
 }
 
+// ✅ beginPayload.players を 4枠へ正規化（clientId重複排除）
+function normalizePlayersTo4(players = []) {
+  const out = [];
+  const seen = new Set();
+  for (const p of Array.isArray(players) ? players : []) {
+    const cid = p?.clientId ?? p?.profile?.clientId ?? null;
+    if (!cid) continue;
+    if (seen.has(cid)) continue;
+    seen.add(cid);
+    out.push(p);
+  }
+  while (out.length < 4) out.push(null);
+  return out.slice(0, 4);
+}
+
 export function renderBattleQuiz({ state, goto }) {
   ensureCssLoadedOnce(asset("assets/css/endless.css"), "quiz-base-css");
   killTypewriter();
@@ -221,7 +227,8 @@ export function renderBattleQuiz({ state, goto }) {
   const bc = state.battleClient;
 
   const isCpu = run?.mode === "battle_cpu";
-  const isOnline = run?.mode === "battle_online_local";
+  // ✅ ここを強化：battle_online_* を全部オンライン扱い
+  const isOnline = !!run?.mode && String(run.mode).startsWith("battle_online");
 
   if (!run || (!isCpu && !isOnline)) {
     return `
@@ -243,18 +250,6 @@ export function renderBattleQuiz({ state, goto }) {
   const TOTAL_Q = 10;
   const total = Math.min(TOTAL_Q, run.questionIds?.length ?? 0);
 
-  // activePis
-  let activePis = [0, 1, 2, 3];
-  if (isOnline) {
-    activePis = [];
-    for (let pi = 0; pi < 4; pi++) {
-      const p = run.players?.[pi];
-      const cid = p?.clientId ?? p?.profile?.clientId ?? null;
-      if (cid) activePis.push(pi);
-    }
-    if (activePis.length === 0) activePis = [0];
-  }
-
   // online sync store / cpu local store
   const online = (run.online = run.online || {});
   const sync = (online.sync = online.sync || {
@@ -263,35 +258,53 @@ export function renderBattleQuiz({ state, goto }) {
     answersByIndex: {},
     lastResultIndex: -1,
     lastSeenAnswerKey: "",
+    // ✅ 採点二重防止（ホスト側）
+    scoredIndex: -1,
   });
   const local = (run.localSync = run.localSync || {
     startAtMs: 0,
     answersByIndex: {},
     lastAppliedIndex: -1,
+    _scoredIndex: -1,
   });
 
+  // ✅ オンラインのイベント登録＆begin処理
   if (isOnline) {
     const me = bc?.getMe?.();
     online.myClientId = online.myClientId ?? (me?.clientId ?? bc?.clientId ?? null);
-    online.hostClientId = online.hostClientId ?? (run.hostClientId ?? null);
-    online.isHost = !!(
-      online.myClientId &&
-      online.hostClientId &&
-      online.myClientId === online.hostClientId
-    );
-
-    online.clientIdToPi = online.clientIdToPi || {};
-    for (let pi = 0; pi < 4; pi++) {
-      const p = run.players?.[pi];
-      const cid = p?.clientId ?? p?.profile?.clientId ?? null;
-      if (cid) online.clientIdToPi[cid] = pi;
-    }
 
     if (!online._handlersRegistered) {
       online._handlersRegistered = true;
 
       bc.on("game:event", (ev) => {
         if (!ev?.type) return;
+
+        if (ev.type === "game:begin") {
+          const bp = ev.beginPayload || {};
+          run.roomId = bp.roomId ?? run.roomId ?? ev.roomId ?? run.roomId;
+          run.hostClientId = bp.hostClientId ?? run.hostClientId ?? null;
+
+          // players を4枠へ正規化（重複排除）
+          const p4 = normalizePlayersTo4(bp.players || run.players || []);
+          run.players = p4.map((p, i) => {
+            if (!p) return { pi: i, clientId: null, profile: {} };
+            return {
+              pi: i,
+              clientId: p.clientId ?? p.profile?.clientId ?? null,
+              profile: p.profile || p,
+            };
+          });
+
+          // questionIds
+          if (Array.isArray(bp.questionIds) && bp.questionIds.length) {
+            run.questionIds = bp.questionIds;
+          }
+
+          // host判定
+          online.hostClientId = run.hostClientId;
+          online.isHost = !!(online.myClientId && online.hostClientId && online.myClientId === online.hostClientId);
+          return;
+        }
 
         if (ev.type === "game:question") {
           const i = Number(ev.index);
@@ -306,7 +319,10 @@ export function renderBattleQuiz({ state, goto }) {
           const i = Number(ev.index);
           if (!Number.isFinite(i)) return;
 
-          const pi = Number(online.clientIdToPi?.[ev.from]);
+          // from(clientId) -> pi
+          const from = ev.from ?? ev.clientId ?? null;
+          const map = online.clientIdToPi || {};
+          const pi = Number(map[from]);
           if (!Number.isFinite(pi)) return;
 
           const byPi = (sync.answersByIndex[i] = sync.answersByIndex[i] || {});
@@ -325,6 +341,7 @@ export function renderBattleQuiz({ state, goto }) {
           if (!Number.isFinite(i)) return;
           if (i <= sync.lastResultIndex) return;
           sync.lastResultIndex = i;
+          sync.scoredIndex = i; // ✅ 二重採点防止
 
           if (Array.isArray(ev.points)) run.points = ev.points;
           if (Array.isArray(ev.correctCounts)) run.correctCounts = ev.correctCounts;
@@ -339,6 +356,30 @@ export function renderBattleQuiz({ state, goto }) {
         }
       });
     }
+
+    // hostClientId / isHost は begin 後に安定するが、念のため
+    online.hostClientId = online.hostClientId ?? run.hostClientId ?? null;
+    online.isHost = !!(online.myClientId && online.hostClientId && online.myClientId === online.hostClientId);
+
+    // clientIdToPi を毎レンダーで再構築（重複/更新に強い）
+    online.clientIdToPi = {};
+    for (let pi = 0; pi < 4; pi++) {
+      const p = run.players?.[pi];
+      const cid = p?.clientId ?? p?.profile?.clientId ?? null;
+      if (cid) online.clientIdToPi[cid] = pi;
+    }
+  }
+
+  // activePis
+  let activePis = [0, 1, 2, 3];
+  if (isOnline) {
+    activePis = [];
+    for (let pi = 0; pi < 4; pi++) {
+      const p = run.players?.[pi];
+      const cid = p?.clientId ?? p?.profile?.clientId ?? null;
+      if (cid) activePis.push(pi);
+    }
+    if (activePis.length === 0) activePis = [0];
   }
 
   // finish
@@ -366,7 +407,7 @@ export function renderBattleQuiz({ state, goto }) {
   const correctIdxRaw = getCorrectIndex(q);
 
   // choice shuffle
-  const seedStr = `${isOnline ? online.hostClientId || "room" : "cpu"}|${run.roomId || ""}|${qid}|${idx}`;
+  const seedStr = `${isOnline ? (run.hostClientId || "room") : "cpu"}|${run.roomId || ""}|${qid}|${idx}`;
   const order = shuffledIndices(rawChoices.length, seedStr);
   const choices = order.map((oi) => rawChoices[oi]);
 
@@ -471,130 +512,38 @@ export function renderBattleQuiz({ state, goto }) {
 
     <style>
       .top-bar{ display:flex; justify-content:space-between; align-items:center; gap:10px; margin-bottom:10px; }
-/* 4人横並び：小さい端末でもはみ出さない */
-.players-row{
-  display:grid;
-  grid-template-columns:repeat(4, minmax(0, 1fr));
-  gap:8px;
-  align-items:start;
-}
-
-/* カードの詰め：狭い端末向けに少し圧縮 */
-.battle-player{
-  padding: 8px 6px;
-  border-radius: 12px;
-}
-/* アバターサイズを“画面幅に応じて縮む”ようにする（変数化してズレ防止） */
-.battle-avatar{
-  --av: clamp(64px, 18vw, 92px);
-  position:relative;
-  width: var(--av);
-  height: var(--av);
-  margin: 6px auto 2px;
-}
-
-/* レイヤーはコンテナ基準で縮める（固定pxを廃止） */
-.battle-avatar .av-layer{
-  position:absolute;
-  left:50%;
-  top:50%;
-  transform:translate(-50%,-50%);
-  width: calc(var(--av) - 6px);
-  height: calc(var(--av) - 6px);
-  object-fit:contain;
-  pointer-events:none;
-}
-
-/* 台座はコンテナぴったり */
-.battle-avatar .av-stand{
-  position:absolute;
-  left:50%;
-  top:50%;
-  transform:translate(-50%,-50%);
-  width: var(--av);
-  height: var(--av);
-  object-fit:contain;
-  pointer-events:none;
-  z-index:5;
-}
-/* 名前/称号/pt のフォントも少しスケール */
-.pname{
-  font-size: clamp(11px, 3.0vw, 14px);
-  margin-bottom: 4px;
-  text-align: center;
-}
-.ptitle{
-  font-size: clamp(10px, 2.6vw, 12px);
-  text-align: center;
-}
-.ppt{
-  font-size: clamp(16px, 4.5vw, 22px);
-  text-align: center;
-}
-
-/* 〇×表示：中身に応じて色分け */
-.battle-avatar .av-mark:not(:empty){
-  padding: 6px 12px;
-  border-radius: 999px;
-  color: #fff;
-  font-weight: 1000;
-
-  -webkit-text-stroke: 2px rgba(0,0,0,.35);
-  text-shadow:
-    0 2px 0 rgba(0,0,0,.25),
-    0 0 8px rgba(0,0,0,.25);
-}
-
-/* 正解：〇 → 緑 */
-.battle-avatar .av-mark:not(:empty):is(:contains("〇")){
-  background: rgba(0, 170, 80, 0.55);
-}
-
-/* 不正解：× → 赤 */
-.battle-avatar .av-mark:not(:empty):is(:contains("×")){
-  background: rgba(220, 60, 60, 0.55);
-}
-
-
-/* フォールバックも固定86pxをやめてコンテナ追従（ズレ防止） */
-.av-fallback{
-  position:absolute;
-  left:50%;
-  top:50%;
-  transform:translate(-50%,-50%);
-  width: calc(var(--av) - 6px);
-  height: calc(var(--av) - 6px);
-  border-radius: 12px;
-  background: rgba(0,0,0,.06);
-  display:flex;
-  align-items:center;
-  justify-content:center;
-  font-weight:1000;
-}
+      .players-row{ display:grid; grid-template-columns:repeat(4, minmax(0, 1fr)); gap:8px; align-items:start; }
+      .battle-player{ padding: 8px 6px; border-radius: 12px; }
+      .battle-avatar{ --av: clamp(64px, 18vw, 92px); position:relative; width: var(--av); height: var(--av); margin: 6px auto 2px; }
+      .battle-avatar .av-layer{
+        position:absolute; left:50%; top:50%; transform:translate(-50%,-50%);
+        width: calc(var(--av) - 6px); height: calc(var(--av) - 6px);
+        object-fit:contain; pointer-events:none;
+      }
+      .battle-avatar .av-stand{
+        position:absolute; left:50%; top:50%; transform:translate(-50%,-50%);
+        width: var(--av); height: var(--av); object-fit:contain; pointer-events:none; z-index:5;
+      }
+      .pname{ font-size: clamp(11px, 3.0vw, 14px); margin-bottom: 4px; text-align: center; }
+      .ptitle{ font-size: clamp(10px, 2.6vw, 12px); text-align: center; }
+      .ppt{ font-size: clamp(16px, 4.5vw, 22px); text-align: center; }
+      .av-fallback{
+        position:absolute; left:50%; top:50%; transform:translate(-50%,-50%);
+        width: calc(var(--av) - 6px); height: calc(var(--av) - 6px);
+        border-radius: 12px; background: rgba(0,0,0,.06);
+        display:flex; align-items:center; justify-content:center; font-weight:1000;
+      }
       .question-no{ opacity:.8; margin-bottom:6px; }
       .question-text{ min-height:2.6em; font-size:18px; font-weight:900; line-height:1.3; }
       .choices-grid{ margin-top:10px; display:grid; grid-template-columns:1fr 1fr; gap:10px; }
       .choice-btn{
-        width:100%;
-        border-radius:14px;
-        padding:10px 10px;
-        border: 2px solid rgba(0,0,0,.15);
-        background:#fff;
-        font-weight:900;
-        font-size:16px;
-        display:flex;
-        flex-direction:column;
-        align-items:center;
-        justify-content:center;
-        gap:8px;
-        min-height:86px;
+        width:100%; border-radius:14px; padding:10px 10px;
+        border: 2px solid rgba(0,0,0,.15); background:#fff;
+        font-weight:900; font-size:16px;
+        display:flex; flex-direction:column; align-items:center; justify-content:center;
+        gap:8px; min-height:86px;
       }
-      .choice-img{
-        width:100%;
-        max-height:92px;
-        object-fit:contain;
-        border-radius:10px;
-      }
+      .choice-img{ width:100%; max-height:92px; object-fit:contain; border-radius:10px; }
       .choice-text{ width:100%; text-align:center; }
       .choice-btn:disabled{ opacity:.6; }
     </style>
@@ -662,93 +611,29 @@ export function renderBattleQuiz({ state, goto }) {
       }
     }
 
-    function showMarksAndOtherAnswerSe() {
-      const answeredKeys = [];
-      for (let pi = 0; pi < 4; pi++) {
-        if (!activePis.includes(pi)) continue;
-        if (byPi?.[pi]?.answered) answeredKeys.push(`${pi}`);
-      }
-      const keyNow = answeredKeys.sort().join(",");
-      if (keyNow && keyNow !== sync.lastSeenAnswerKey) {
-        const prevSet = new Set((sync.lastSeenAnswerKey || "").split(",").filter(Boolean));
-        const nowSet = new Set(keyNow.split(",").filter(Boolean));
-        let otherAnswered = false;
-        nowSet.forEach((k) => {
-          if (!prevSet.has(k)) {
-            const pi = Number(k);
-            if (Number.isFinite(pi) && pi !== myPi) otherAnswered = true;
-          }
-        });
-        if (otherAnswered) playSe("assets/sounds/se/se_battle_other_answer.mp3", { volume: 0.9 });
-        sync.lastSeenAnswerKey = keyNow;
-      }
-
+    function showMarks() {
       for (let pi = 0; pi < 4; pi++) {
         const el = document.getElementById(`mark_${pi}`);
         if (!el) continue;
-        if (!activePis.includes(pi)) {
-          el.textContent = "";
-          continue;
-        }
-
+        if (!activePis.includes(pi)) { el.textContent = ""; continue; }
         const a = byPi?.[pi];
-        if (!a?.answered) {
-          el.textContent = "";
-          continue;
-        }
-
-        if (Number(a.choiceIndex) === -1) {
-          el.textContent = "⏱";
-          continue;
-        }
-
+        if (!a?.answered) { el.textContent = ""; continue; }
+        if (Number(a.choiceIndex) === -1) { el.textContent = "⏱"; continue; }
         const correct = correctIdx !== null && Number(a.choiceIndex) === Number(correctIdx);
         el.textContent = correct ? "〇" : "×";
       }
     }
 
-    // ---- CPU auto answer ----
-    function getCpuSetting(pi) {
-      const s = run?.cpuStrengths?.[pi] || run?.players?.[pi]?.strength || "normal";
-      if (s === "weak") return { acc: 0.5, base: 8 };
-      if (s === "strong") return { acc: 1.0, base: 4 };
-      return { acc: 0.75, base: 6 };
-    }
-    function pickCpuChoice() {
-      const { acc } = getCpuSetting(1);
-      const ok = Math.random() < acc;
-      if (ok && correctIdx !== null) return correctIdx;
-
-      const cand = [];
-      for (let i = 0; i < choices.length; i++) if (i !== correctIdx) cand.push(i);
-      return cand.length ? cand[Math.floor(Math.random() * cand.length)] : 0;
-    }
-    function scheduleCpu(pi) {
-      if (!isCpu) return;
-      if (!activePis.includes(pi)) return;
-      if (byPi?.[pi]?.answered) return;
-
-      const { base } = getCpuSetting(pi);
-      const t = Math.max(1, base + (Math.random() * 4 - 2)); // base±2秒
-
-      setTimeout(() => {
-        if (ended) return;
-        if (byPi?.[pi]?.answered) return;
-
-        const choiceIndex = pickCpuChoice(pi);
-        byPi[pi] = { answered: true, choiceIndex, answeredAtMs: Date.now() };
-      }, t * 1000);
-    }
-    if (isCpu) {
-      scheduleCpu(1);
-      scheduleCpu(2);
-      scheduleCpu(3);
-    }
-
+    // ホスト：出題開始を配信（roomIdは battleClient が自動付与）
     if (isOnline && online.isHost && sync.qIndex !== idx) {
       sync.qIndex = idx;
       sync.startAtMs = Date.now();
-      bc?.emitGameEvent?.({ type: "game:question", index: idx, qid, questionStartAtMs: sync.startAtMs });
+      bc?.emitGameEvent?.({
+        type: "game:question",
+        index: idx,
+        qid,
+        questionStartAtMs: sync.startAtMs
+      });
     }
 
     function handleAnswerSelect(choiceIndex) {
@@ -775,7 +660,13 @@ export function renderBattleQuiz({ state, goto }) {
       const cur = sync.answersByIndex[idx] || {};
       const all = activePis.every((pi) => !!cur?.[pi]?.answered);
       if (!all) return;
+
+      // ✅ 二重採点防止：この問をすでに採点済みなら戻る
+      if (sync.scoredIndex === idx) return;
+      // 受信で進んでいる場合も防ぐ
       if (sync.lastResultIndex >= idx) return;
+
+      sync.scoredIndex = idx;
 
       const correctList = [];
       for (const pi of activePis) {
@@ -803,63 +694,28 @@ export function renderBattleQuiz({ state, goto }) {
       const isLast = idx + 1 >= total;
       const result = isLast ? calcFinalStandings(run, activePis) : null;
 
-      bc?.emitGameEvent?.({ type: "game:result_question", index: idx, points: run.points, correctCounts: run.correctCounts, correctTimeSum: run.correctTimeSum, result });
+      bc?.emitGameEvent?.({
+        type: "game:result_question",
+        index: idx,
+        points: run.points,
+        correctCounts: run.correctCounts,
+        correctTimeSum: run.correctTimeSum,
+        result
+      });
       if (isLast) bc?.emitGameEvent?.({ type: "game:result_final", result });
-    }
-
-    function cpuTryAdvance() {
-      if (!isCpu) return;
-
-      const cur = local.answersByIndex[idx] || {};
-      const all = activePis.every((pi) => !!cur?.[pi]?.answered);
-      if (!all) return;
-
-      if (local._scoredIndex === idx) return;
-      local._scoredIndex = idx;
-
-      const correctList = [];
-      for (const pi of activePis) {
-        const a = cur[pi];
-        if (Number(a.choiceIndex) === -1) continue;
-        const tSec = Math.max(0, (Number(a.answeredAtMs) - startMs) / 1000);
-        const correct = correctIdx !== null && Number(a.choiceIndex) === Number(correctIdx);
-        if (correct) correctList.push({ pi, tSec });
-      }
-      const pointsMap = awardPointsBySpeed(correctList);
-
-      for (const pi of activePis) {
-        const a = cur[pi];
-        const tSec = Math.max(0, (Number(a.answeredAtMs) - startMs) / 1000);
-        const correct = correctIdx !== null && Number(a.choiceIndex) === Number(correctIdx);
-
-        run.points[pi] = Number(run.points?.[pi] ?? 0) + (pointsMap.get(pi) ?? 0);
-        if (correct) {
-          run.correctCounts[pi] = Number(run.correctCounts?.[pi] ?? 0) + 1;
-          run.correctTimeSum[pi] = Number(run.correctTimeSum?.[pi] ?? 0) + tSec;
-        }
-      }
-
-      ended = true;
-      run.index = idx + 1;
-      if (run.index >= total) {
-        run.result = calcFinalStandings(run, activePis);
-        goto("#battleResult");
-      } else {
-        goto(`#battleQuiz?i=${run.index}&t=${Date.now()}`);
-      }
     }
 
     const paintIv = setInterval(() => {
       if (ended) return;
-
       updatePoints();
-      showMarksAndOtherAnswerSe();
+      showMarks();
 
       if (isOnline) hostTryFinalize();
-      if (isCpu) cpuTryAdvance();
 
       if (isOnline && run.index !== idx) {
         ended = true;
+        clearInterval(paintIv);
+        clearInterval(timerIv);
         goto(`#battleQuiz?i=${run.index}&t=${Date.now()}`);
       }
     }, 120);
