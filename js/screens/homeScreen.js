@@ -89,7 +89,7 @@ export function renderHome({ state, goto, params }) {
     },
     {
       key: "endless",
-      label: "エンドレス",
+      label: "ｴﾝﾄﾞﾚｽ",
       icon: asset("assets/images/icon_endless.png"),
       onClick: () => goto("#endless"),
       disabled: false,
@@ -119,7 +119,7 @@ export function renderHome({ state, goto, params }) {
     },
     {
       key: "options",
-      label: "オプション",
+      label: "ｵﾌﾟｼｮﾝ",
       icon: asset("assets/images/icon_options.png"),
       onClick: () => goto("#options"),
       disabled: false,
