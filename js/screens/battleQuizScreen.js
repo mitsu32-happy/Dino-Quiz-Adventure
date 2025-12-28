@@ -242,6 +242,18 @@ function mergePlayersFromBeginPayload(run, beginPlayers) {
   });
 }
 
+function applyScoresObjectToRunPoints(scoresObj, run, online) {
+  if (!scoresObj || typeof scoresObj !== "object") return;
+  // run.points は UI 側が [pi] 前提なので、playerKey -> pi に変換して反映
+  for (const [pk, score] of Object.entries(scoresObj)) {
+    const piRaw = online?.playerKeyToPi?.[String(pk)];
+    const pi = Number(piRaw);
+    if (!Number.isFinite(pi)) continue;
+    run.points[pi] = Number(score ?? 0);
+  }
+}
+
+
 export function renderBattleQuiz({ state, goto }) {
   ensureCssLoadedOnce(asset("assets/css/endless.css"), "quiz-base-css");
   killTypewriter();
@@ -382,10 +394,11 @@ export function renderBattleQuiz({ state, goto }) {
             };
           }
 
-          // ✅ もし server が scores/points を同梱していれば反映（同梱なしでもOK）
-          if (Array.isArray(ev.scores)) run.points = ev.scores.slice(0, 4);
-          if (Array.isArray(ev.points)) run.points = ev.points.slice(0, 4);
-
+// ✅ server.js は scores を { [playerKey]: totalPt } 形式で送る
+applyScoresObjectToRunPoints(ev.scores, run, online);
+// 互換：もし points という名前で来ても同じ扱い
+applyScoresObjectToRunPoints(ev.points, run, online);
+															
           return;
         }
 
@@ -398,9 +411,10 @@ export function renderBattleQuiz({ state, goto }) {
 
         // 終了（サーバ正で結果へ）
         if (ev.type === "game:finished") {
-          if (Array.isArray(ev.scores)) run.points = ev.scores.slice(0, 4);
-          if (Array.isArray(ev.points)) run.points = ev.points.slice(0, 4);
-          run.result = calcFinalStandings(run, activePis);
+applyScoresObjectToRunPoints(ev.scores, run, online);
+applyScoresObjectToRunPoints(ev.points, run, online);
+
+run.result = calcFinalStandings(run, activePis);
           return;
         }
       });
