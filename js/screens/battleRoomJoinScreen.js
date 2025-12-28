@@ -24,35 +24,59 @@ export function renderBattleRoomJoin({ state, goto }) {
     });
 
 document.getElementById("joinBtn")?.addEventListener("click", async () => {
-  const roomId = document.getElementById("roomIdInput").value.trim().toUpperCase();
+  const input = document.getElementById("roomIdInput");
+  const roomId = String(input?.value ?? "").trim().toUpperCase();
   if (!roomId) return alert("ルームIDを入力してください");
 
   playSe("assets/sounds/se/se_decide.mp3");
 
   const btn = document.getElementById("joinBtn");
+  const back = document.getElementById("backBtn");
   btn.disabled = true;
-  btn.textContent = "接続中…";
+  back.disabled = true;
 
-  const bc = createBattleClient({
-    transport: "online", // ✅ 重要
-    serverUrl: "https://dino-quiz-battle-server.onrender.com",
-    playerProfile: {
-      name: state.save?.player?.name,
-      titleId: state.save?.titles?.equippedTitleId,
-      avatarEquipped: state.save?.avatar?.equipped,
-      pvpWins: state.save?.battle?.pvp?.wins ?? 0,
-      pvpLosses: state.save?.battle?.pvp?.losses ?? 0,
-    },
-  });
+  const SERVER_URL = "https://dino-quiz-battle-server.onrender.com";
+
+  // Renderの起床待ち（最大60秒）
+  const startAt = Date.now();
+  const timeoutMs = 60000;
+
+  btn.textContent = "接続中…（サーバー起動待ち）";
+  while (Date.now() - startAt < timeoutMs) {
+    try {
+      const res = await fetch(`${SERVER_URL}/health`, { cache: "no-store" });
+      if (res.ok) break;
+    } catch (_) {}
+    await new Promise(r => setTimeout(r, 2500));
+    btn.textContent = "接続中…（サーバー起動待ち）";
+  }
 
   try {
+    const bc = createBattleClient({
+      transport: "online",     // ✅ 重要
+      serverUrl: SERVER_URL,
+      playerProfile: {
+        name: state.save?.player?.name,
+        titleId: state.save?.titles?.equippedTitleId,
+        avatarEquipped: state.save?.avatar?.equipped,
+        pvpWins: state.save?.battle?.pvp?.wins ?? 0,
+        pvpLosses: state.save?.battle?.pvp?.losses ?? 0,
+      },
+    });
+
+    btn.textContent = "入室中…";
     await bc.joinRoom(roomId);
+
     state.battleClient = bc;
     state.currentRoomId = roomId;
+
     goto("#battleRoomLobby");
   } catch (e) {
-    alert("ルームが見つからないか、接続できませんでした。");
+    console.error(e);
+    // ルーム不存在などはここに来る
+    alert("入室できませんでした（ルームが存在しない／満員／サーバー未起動など）。");
     btn.disabled = false;
+    back.disabled = false;
     btn.textContent = "入室";
   }
 });

@@ -3,15 +3,25 @@ export function createBattleClient(options = {}) {
   const transport = options.transport || "local";
   let playerProfile = options.playerProfile || {};
 
+  // ✅ 本番では index.html で socket.io-client を必ず読み込むこと
   if (!window.io) {
     throw new Error(
-      "Socket.IO client が見つかりません（window.io）。index.html で socket.io の script を読み込んでください。"
+      "Socket.IO client が見つかりません（window.io）。index.html で socket.io-client の script を読み込んでください。"
     );
   }
 
-  const serverUrl =
-    options.serverUrl ||
-    (transport === "local" ? "http://localhost:3001" : window.location.origin);
+  // ✅ serverUrl の決定ロジックを修正
+  // - local: localhost
+  // - online: 明示指定必須（GitHub Pages の origin に接続しても意味がない）
+  let serverUrl = options.serverUrl;
+  if (!serverUrl) {
+    if (transport === "local") serverUrl = "http://localhost:3001";
+    else {
+      throw new Error(
+        "online transport では options.serverUrl が必須です（例：https://dino-quiz-battle-server.onrender.com）。"
+      );
+    }
+  }
 
   const socket = window.io(serverUrl, {
     transports: ["websocket"],
@@ -37,7 +47,11 @@ export function createBattleClient(options = {}) {
     const set = handlers.get(type);
     if (!set) return;
     for (const fn of set) {
-      try { fn(payload); } catch (e) { console.error("[battleClient] handler error", type, e); }
+      try {
+        fn(payload);
+      } catch (e) {
+        console.error("[battleClient] handler error", type, e);
+      }
     }
   }
 
@@ -52,9 +66,26 @@ export function createBattleClient(options = {}) {
     };
   }
 
+  function withTimeout(promiseFactory, timeoutMs = 20000) {
+    return new Promise((resolve, reject) => {
+      const t = setTimeout(() => reject(new Error("timeout")), timeoutMs);
+      Promise.resolve()
+        .then(promiseFactory)
+        .then((v) => {
+          clearTimeout(t);
+          resolve(v);
+        })
+        .catch((e) => {
+          clearTimeout(t);
+          reject(e);
+        });
+    });
+  }
+
   // ---- socket events ----
   socket.on("server:hello", (p) => {
     clientId = p?.clientId || socket.id;
+    emitLocal("conn:hello", { clientId });
   });
 
   socket.on("server:roomUpdate", (p) => {
@@ -70,8 +101,17 @@ export function createBattleClient(options = {}) {
     emitLocal("game:event", ev);
   });
 
+  socket.on("connect", () => {
+    emitLocal("conn:connected", { serverUrl });
+  });
+
+  socket.on("disconnect", (reason) => {
+    emitLocal("conn:disconnected", { reason });
+  });
+
   socket.on("connect_error", (err) => {
     console.error("[battleClient] connect_error", err);
+    emitLocal("conn:error", { err });
   });
 
   // ---- public api ----
@@ -88,48 +128,61 @@ export function createBattleClient(options = {}) {
   async function createRoom() {
     const profile = normalizeProfileForServer(playerProfile);
 
-    return await new Promise((resolve) => {
-      socket.emit("room:create", { profile }, (res) => {
-        if (!res?.ok) {
-          console.error("[battleClient] room:create failed", res);
-          resolve(null);
-          return;
-        }
-        clientId = res.clientId || clientId;
-        roomId = res.roomId;
-        isHost = true;
-        resolve(roomId);
-      });
-    });
+    // ✅ ackが返らないと永久待ちになるのでタイムアウト
+    return await withTimeout(
+      () =>
+        new Promise((resolve) => {
+          socket.emit("room:create", { profile }, (res) => {
+            if (!res?.ok) {
+              console.error("[battleClient] room:create failed", res);
+              resolve(null);
+              return;
+            }
+            clientId = res.clientId || clientId;
+            roomId = res.roomId;
+            isHost = true;
+            resolve(roomId);
+          });
+        }),
+      25000
+    );
   }
 
   async function joinRoom(targetRoomId) {
     const profile = normalizeProfileForServer(playerProfile);
     const rid = String(targetRoomId || "").trim().toUpperCase();
 
-    return await new Promise((resolve) => {
-      socket.emit("room:join", { roomId: rid, profile }, (res) => {
-        if (!res?.ok) {
-          console.error("[battleClient] room:join failed", res);
-          resolve(false);
-          return;
-        }
-        clientId = res.clientId || clientId;
-        roomId = res.roomId;
-        resolve(true);
-      });
-    });
+    return await withTimeout(
+      () =>
+        new Promise((resolve) => {
+          socket.emit("room:join", { roomId: rid, profile }, (res) => {
+            if (!res?.ok) {
+              console.error("[battleClient] room:join failed", res);
+              resolve(false);
+              return;
+            }
+            clientId = res.clientId || clientId;
+            roomId = res.roomId;
+            resolve(true);
+          });
+        }),
+      25000
+    );
   }
 
   async function leaveRoom() {
-    return await new Promise((resolve) => {
-      socket.emit("room:leave", null, (res) => {
-        roomId = null;
-        isHost = false;
-        lastRoomUpdate = null;
-        resolve(!!res?.ok);
-      });
-    });
+    return await withTimeout(
+      () =>
+        new Promise((resolve) => {
+          socket.emit("room:leave", null, (res) => {
+            roomId = null;
+            isHost = false;
+            lastRoomUpdate = null;
+            resolve(!!res?.ok);
+          });
+        }),
+      15000
+    );
   }
 
   function emitGameEvent(payload) {
@@ -160,6 +213,8 @@ export function createBattleClient(options = {}) {
     sendAnswer,
     getMe,
 
-    get clientId() { return clientId; },
+    get clientId() {
+      return clientId;
+    },
   };
 }
