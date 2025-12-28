@@ -1,7 +1,7 @@
 import { saveNow } from "../systems/saveManager.js";
 import { playSe } from "../systems/audioManager.js";
 
-// GitHub Pages (Project Pages) / ローカル両対応：このモジュール位置から assets を解決する
+// GitHub Pages / ローカル両対応
 const ROOT = new URL("../../", import.meta.url);
 const asset = (p) => new URL(String(p || "").replace(/^\/+/, ""), ROOT).toString();
 const normalizeAsset = (p) => {
@@ -10,12 +10,6 @@ const normalizeAsset = (p) => {
   if (/^https?:\/\//.test(s) || /^data:/.test(s)) return s;
   return asset(s);
 };
-
-/**
- * エンドレス（ステージクイズ画面と同じ構成に寄せる版）
- * - CSSは外部化して1回だけ読み込む（多重評価による崩れ防止）
- * - 終了時は result へ遷移し、報酬付与は resultScreen 側で行う
- */
 
 function ensureCssLoadedOnce(href, id) {
   if (document.getElementById(id)) return;
@@ -117,8 +111,19 @@ function ensureEndlessRun(state) {
   return { ok: true };
 }
 
+function sanitizeQuestionText(text) {
+  // ✅ 先頭/末尾のダブルクォート混入を除去（表示崩れ対策）
+  return String(text ?? "")
+    .replace(/^\s*"+\s*/g, "")
+    .replace(/\s*"+\s*$/g, "");
+}
+
 export function renderEndless({ state, goto }) {
   ensureCssLoadedOnce(asset("assets/css/endless.css"), "endless-css");
+
+  // ✅ このレンダーの世代トークン（前回のタイマーを止める）
+  state._endlessRenderToken = (state._endlessRenderToken || 0) + 1;
+  const token = state._endlessRenderToken;
 
   const { save, masters } = state;
 
@@ -154,7 +159,6 @@ export function renderEndless({ state, goto }) {
   const avatarZoneHtml = buildAvatarZoneHtml(state);
 
   const choices = Array.isArray(q.choices) ? q.choices : [];
-
   const order = shuffle(choices.map((_, i) => i));
 
   const choicesHtml = order
@@ -173,6 +177,9 @@ export function renderEndless({ state, goto }) {
     .join("");
 
   setTimeout(() => {
+    // ✅ 古いレンダーのタイマーは即終了
+    if (state._endlessRenderToken !== token) return;
+
     let answered = false;
     let paused = false;
 
@@ -186,6 +193,7 @@ export function renderEndless({ state, goto }) {
 
     const choiceButtons = Array.from(document.querySelectorAll(".choice-btn"));
 
+    // ✅ 出題SE（短時間連打は audioManager 側で抑制）
     playSe("assets/sounds/se/se_question.mp3", { volume: 0.9 });
 
     function setHud() {
@@ -232,6 +240,8 @@ export function renderEndless({ state, goto }) {
     }
 
     function goNext() {
+      // ✅ 次へ行く前に、残タイマーが走らないように止める
+      answered = true;
       run.cursor += 1;
       goto("#endless");
     }
@@ -244,19 +254,23 @@ export function renderEndless({ state, goto }) {
     setHud();
 
     pauseBtn?.addEventListener("click", () => {
+      if (state._endlessRenderToken !== token) return;
       playSe("assets/sounds/se/se_decide.mp3", { volume: 0.8 });
       openPause();
     });
     resumeBtn?.addEventListener("click", () => {
+      if (state._endlessRenderToken !== token) return;
       playSe("assets/sounds/se/se_decide.mp3", { volume: 0.8 });
       closePause();
     });
     retireBtn?.addEventListener("click", () => {
+      if (state._endlessRenderToken !== token) return;
       playSe("assets/sounds/se/se_decide.mp3", { volume: 0.8 });
       closePause();
       finish("retire");
     });
     modal?.addEventListener("click", (e) => {
+      if (state._endlessRenderToken !== token) return;
       if (e.target === modal) {
         playSe("assets/sounds/se/se_decide.mp3", { volume: 0.8 });
         closePause();
@@ -265,6 +279,7 @@ export function renderEndless({ state, goto }) {
 
     choiceButtons.forEach((btn) => {
       btn.addEventListener("click", () => {
+        if (state._endlessRenderToken !== token) return;
         if (answered) return;
         if (paused) return;
 
@@ -295,12 +310,18 @@ export function renderEndless({ state, goto }) {
       });
     });
 
-    const fullText = String(q.question_text ?? "");
+    // ===== typewriter =====
+    const fullText = sanitizeQuestionText(q.question_text ?? "");
     let i = 0;
     const speedMs = 38;
-    typeEl.textContent = "";
+    if (typeEl) typeEl.textContent = "";
 
     const t = setInterval(() => {
+      // ✅ 世代が変わったら停止
+      if (state._endlessRenderToken !== token) {
+        clearInterval(t);
+        return;
+      }
       if (answered) {
         clearInterval(t);
         return;
@@ -310,7 +331,7 @@ export function renderEndless({ state, goto }) {
         clearInterval(t);
         return;
       }
-      typeEl.textContent += fullText[i];
+      if (typeEl) typeEl.textContent += fullText[i];
       i += 1;
     }, speedMs);
   }, 0);

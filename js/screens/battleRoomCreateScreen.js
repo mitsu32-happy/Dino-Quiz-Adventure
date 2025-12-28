@@ -21,26 +21,37 @@ export function renderBattleRoomCreate({ state, goto }) {
       goto("#battle");
     });
 
-    document.getElementById("createBtn")?.addEventListener("click", async () => {
-      playSe("assets/sounds/se/se_decide.mp3");
+document.getElementById("createBtn")?.addEventListener("click", async () => {
+  playSe("assets/sounds/se/se_decide.mp3");
 
-      const bc = createBattleClient({
-        transport: "local",
-        playerProfile: {
-          name: state.save?.player?.name,
-          titleId: state.save?.titles?.equippedTitleId,
-          avatarEquipped: state.save?.avatar?.equipped,
-          pvpWins: state.save?.battle?.pvp?.wins ?? 0,
-          pvpLosses: state.save?.battle?.pvp?.losses ?? 0,
-        },
-      });
+  const btn = document.getElementById("createBtn");
+  btn.disabled = true;
+  btn.textContent = "接続中…（初回は数十秒かかることがあります）";
 
-      const roomId = await bc.createRoom();
-      state.battleClient = bc;
-      state.currentRoomId = roomId;
+  const bc = createBattleClient({
+    transport: "online", // ✅ 重要
+    serverUrl: "https://dino-quiz-battle-server.onrender.com",
+    playerProfile: {
+      name: state.save?.player?.name,
+      titleId: state.save?.titles?.equippedTitleId,
+      avatarEquipped: state.save?.avatar?.equipped,
+      pvpWins: state.save?.battle?.pvp?.wins ?? 0,
+      pvpLosses: state.save?.battle?.pvp?.losses ?? 0,
+    },
+  });
 
-      goto("#battleRoomLobby");
-    });
+  try {
+    const roomId = await bc.createRoom();
+    state.battleClient = bc;
+    state.currentRoomId = roomId;
+    goto("#battleRoomLobby");
+  } catch (e) {
+    alert("サーバーに接続できませんでした。少し待って再度お試しください。");
+    btn.disabled = false;
+    btn.textContent = "ルームを作成";
+  }
+});
+
   }, 0);
 
   return html;

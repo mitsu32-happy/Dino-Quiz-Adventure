@@ -23,29 +23,39 @@ export function renderBattleRoomJoin({ state, goto }) {
       goto("#battle");
     });
 
-    document.getElementById("joinBtn")?.addEventListener("click", async () => {
-      const roomId = document.getElementById("roomIdInput").value.trim().toUpperCase();
-      if (!roomId) return alert("ルームIDを入力してください");
+document.getElementById("joinBtn")?.addEventListener("click", async () => {
+  const roomId = document.getElementById("roomIdInput").value.trim().toUpperCase();
+  if (!roomId) return alert("ルームIDを入力してください");
 
-      playSe("assets/sounds/se/se_decide.mp3");
+  playSe("assets/sounds/se/se_decide.mp3");
 
-      const bc = createBattleClient({
-        transport: "local",
-        playerProfile: {
-          name: state.save?.player?.name,
-          titleId: state.save?.titles?.equippedTitleId,
-          avatarEquipped: state.save?.avatar?.equipped,
-          pvpWins: state.save?.battle?.pvp?.wins ?? 0,
-          pvpLosses: state.save?.battle?.pvp?.losses ?? 0,
-        },
-      });
+  const btn = document.getElementById("joinBtn");
+  btn.disabled = true;
+  btn.textContent = "接続中…";
 
-      await bc.joinRoom(roomId);
-      state.battleClient = bc;
-      state.currentRoomId = roomId;
+  const bc = createBattleClient({
+    transport: "online", // ✅ 重要
+    serverUrl: "https://dino-quiz-battle-server.onrender.com",
+    playerProfile: {
+      name: state.save?.player?.name,
+      titleId: state.save?.titles?.equippedTitleId,
+      avatarEquipped: state.save?.avatar?.equipped,
+      pvpWins: state.save?.battle?.pvp?.wins ?? 0,
+      pvpLosses: state.save?.battle?.pvp?.losses ?? 0,
+    },
+  });
 
-      goto("#battleRoomLobby");
-    });
+  try {
+    await bc.joinRoom(roomId);
+    state.battleClient = bc;
+    state.currentRoomId = roomId;
+    goto("#battleRoomLobby");
+  } catch (e) {
+    alert("ルームが見つからないか、接続できませんでした。");
+    btn.disabled = false;
+    btn.textContent = "入室";
+  }
+});
   }, 0);
 
   return html;

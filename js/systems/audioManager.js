@@ -63,15 +63,14 @@ function doPlayBgm(name) {
   currentBgmName = src;
 
   audio.play().catch(() => {
-    // ここに来るのが autoplay ブロック
-    // → unlock 後に再試行できるように pending を残す
+    // autoplay ブロック → unlock 後に再試行
     pendingBgmName = name;
   });
 }
 
 /**
- * ✅ 重要：ブラウザの自動再生制限を解除するための初期化
- * main.js が initAudio() を起動時に呼ぶ想定（引数なしでOK）
+ * ✅ ブラウザの自動再生制限を解除するための初期化
+ * main.js が initAudio() を起動時に呼ぶ想定
  */
 export function initAudio() {
   if (unlocked) return;
@@ -79,7 +78,7 @@ export function initAudio() {
   const unlock = () => {
     unlocked = true;
 
-    // 無音を一瞬鳴らして解禁（これが無いと環境によってBGM/SEが死ぬ）
+    // 無音を一瞬鳴らして解禁（環境によって必要）
     try {
       const a = new Audio();
       a.src =
@@ -101,7 +100,6 @@ export function initAudio() {
     window.removeEventListener("touchstart", unlock);
   };
 
-  // ユーザー操作の最初の1回で解禁
   window.addEventListener("pointerdown", unlock, { once: true });
   window.addEventListener("keydown", unlock, { once: true });
   window.addEventListener("touchstart", unlock, { once: true });
@@ -120,7 +118,6 @@ export function applyAudioOptions(options = {}) {
 
 /** BGM 再生（name: "home" など） */
 export function playBgm(name) {
-  // まだ解禁されていない場合は保留しておく
   if (!unlocked) {
     pendingBgmName = name;
     return;
@@ -141,24 +138,29 @@ export function stopBgm() {
 
 /**
  * SE 再生
- * ✅ 修正点：呼び出し側が volume を渡しても、必ず seVolume を掛ける
- *   - base = (volume 指定があればそれ / なければ 1)
- *   - final = base * seVolume
+ * ✅ 追加：同一SEの短時間多重再生を抑止（2回/3回鳴る対策）
  */
+const _lastSeAt = new Map(); // key: src, value: ms
+const _SE_THROTTLE_MS = 90;
+
 export function playSe(src, { loop = false, volume } = {}) {
   const base = (typeof volume === "number") ? volume : 1.0;
   const finalVolume = clamp(base * seVolume, 0, 1);
 
-  // 完全ミュートは生成自体しない
   if (finalVolume <= 0) return null;
+
+  // ✅ 同一srcを超短時間で連打したら無視
+  const now = performance.now();
+  const last = _lastSeAt.get(src) ?? -Infinity;
+  if (!loop && (now - last) < _SE_THROTTLE_MS) return null;
+  _lastSeAt.set(src, now);
 
   const se = new Audio(src);
   se.loop = loop;
   se.volume = finalVolume;
 
   se.play().catch(() => {
-    // autoplay ブロック環境でも、unlock済みなら次の操作で鳴ることが多い
-    // ここでは握りつぶしでOK
+    // autoplay ブロック等は握りつぶしでOK
   });
 
   return se;
