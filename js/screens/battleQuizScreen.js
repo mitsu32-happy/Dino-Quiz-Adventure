@@ -203,6 +203,57 @@ function shuffledIndices(n, seedStr) {
   return arr;
 }
 
+// --- online helper: playerKey/clientId -> pi ---
+function rebuildOnlineMaps(run, online) {
+  online.playerKeyToPi = {};
+  online.clientIdToPi = {};
+  for (let pi = 0; pi < 4; pi++) {
+    const p = run?.players?.[pi];
+    const cid = p?.clientId ?? p?.profile?.clientId ?? null;
+    const pk = p?.playerKey ?? p?.profile?.playerKey ?? null;
+    if (cid) online.clientIdToPi[cid] = pi;
+    if (pk) online.playerKeyToPi[String(pk)] = pi;
+  }
+}
+
+function mergePlayersFromBeginPayload(run, beginPlayers) {
+  if (!Array.isArray(beginPlayers)) return;
+
+  // すでに4枠の run.players があるなら「一致する人だけ」profile更新
+  if (Array.isArray(run.players) && run.players.length === 4) {
+    for (const bp of beginPlayers) {
+      const bCid = bp?.clientId ?? null;
+      const bPk = bp?.playerKey ?? bp?.profile?.playerKey ?? null;
+      for (let pi = 0; pi < 4; pi++) {
+        const p = run.players?.[pi];
+        const cid = p?.clientId ?? p?.profile?.clientId ?? null;
+        const pk = p?.playerKey ?? p?.profile?.playerKey ?? null;
+        if ((bPk && pk && String(bPk) === String(pk)) || (bCid && cid && String(bCid) === String(cid))) {
+          run.players[pi] = {
+            ...p,
+            ...bp,
+            clientId: bp?.clientId ?? p?.clientId,
+            playerKey: bp?.playerKey ?? p?.playerKey,
+            profile: { ...(p?.profile || {}), ...(bp?.profile || {}) },
+          };
+        }
+      }
+    }
+    return;
+  }
+
+  // run.players が無い/崩れてる場合：先頭から詰める
+  run.players = Array.from({ length: 4 }, (_, i) => {
+    const bp = beginPlayers[i] || null;
+    if (!bp) return {};
+    return {
+      clientId: bp?.clientId ?? null,
+      playerKey: bp?.playerKey ?? bp?.profile?.playerKey ?? null,
+      profile: bp?.profile || {},
+    };
+  });
+}
+
 export function renderBattleQuiz({ state, goto }) {
   ensureCssLoadedOnce(asset("assets/css/endless.css"), "quiz-base-css");
   killTypewriter();
@@ -244,7 +295,8 @@ export function renderBattleQuiz({ state, goto }) {
     for (let pi = 0; pi < 4; pi++) {
       const p = run.players?.[pi];
       const cid = p?.clientId ?? p?.profile?.clientId ?? null;
-      if (cid) activePis.push(pi);
+      const pk = p?.playerKey ?? p?.profile?.playerKey ?? null;
+      if (cid || pk) activePis.push(pi);
     }
     if (activePis.length === 0) activePis = [0];
   }
@@ -252,23 +304,23 @@ export function renderBattleQuiz({ state, goto }) {
   // online sync store / cpu local store
   const online = (run.online = run.online || {});
   const sync = (online.sync = online.sync || {
-    qIndex: 0,
-    startAtMs: 0,
-    answersByIndex: {},
-    lastResultIndex: -1,
-    lastSeenAnswerKey: "",
+    answersByIndex: {}, // idx -> { [pi]: { answered, choiceIndex, answeredAtMs } }
+    lastQuestionEndIndex: -1,
+    lastSeenOtherAnswerKey: "",
   });
   const local = (run.localSync = run.localSync || {
     startAtMs: 0,
     answersByIndex: {},
     lastAppliedIndex: -1,
-    // ✅ CPU用：他者回答SEの連打防止
+    // CPU戦：他者回答SEの連打防止
     lastSeenOtherAnswerKey: "",
   });
 
+  // online init
   if (isOnline) {
     const me = bc?.getMe?.();
     online.myClientId = online.myClientId ?? (me?.clientId ?? bc?.clientId ?? null);
+    online.myPlayerKey = online.myPlayerKey ?? (me?.playerKey ?? me?.getMe?.()?.playerKey ?? null);
     online.hostClientId = online.hostClientId ?? (run.hostClientId ?? null);
     online.isHost = !!(
       online.myClientId &&
@@ -276,12 +328,7 @@ export function renderBattleQuiz({ state, goto }) {
       online.myClientId === online.hostClientId
     );
 
-    online.clientIdToPi = online.clientIdToPi || {};
-    for (let pi = 0; pi < 4; pi++) {
-      const p = run.players?.[pi];
-      const cid = p?.clientId ?? p?.profile?.clientId ?? null;
-      if (cid) online.clientIdToPi[cid] = pi;
-    }
+    rebuildOnlineMaps(run, online);
 
     if (!online._handlersRegistered) {
       online._handlersRegistered = true;
@@ -289,49 +336,130 @@ export function renderBattleQuiz({ state, goto }) {
       bc.on("game:event", (ev) => {
         if (!ev?.type) return;
 
-        if (ev.type === "game:question") {
-          const i = Number(ev.index);
-          if (!Number.isFinite(i)) return;
-          sync.qIndex = i;
-          sync.startAtMs = Number(ev.questionStartAtMs) || Date.now();
-          run.index = i;
+        // game begin payload でプレイヤーprofileを補完（他人アバター表示のため）
+        if (ev.type === "game:begin") {
+          const bp = ev.beginPayload || {};
+          if (Array.isArray(bp.questionIds) && !Array.isArray(run.questionIds)) {
+            run.questionIds = bp.questionIds;
+          }
+          if (bp.hostClientId) {
+            run.hostClientId = bp.hostClientId;
+            online.hostClientId = bp.hostClientId;
+            online.isHost =
+              !!online.myClientId && !!online.hostClientId && online.myClientId === online.hostClientId;
+          }
+          mergePlayersFromBeginPayload(run, bp.players);
+          rebuildOnlineMaps(run, online);
           return;
         }
 
+        // 他者回答通知（SE + マーク表示用）
+        // server.js: { type:"game:answer", qIndex, playerKey }
         if (ev.type === "game:answer") {
-          const i = Number(ev.index);
+          const i = Number(ev.qIndex);
           if (!Number.isFinite(i)) return;
 
-          const pi = Number(online.clientIdToPi?.[ev.from]);
+          const pk = ev.playerKey != null ? String(ev.playerKey) : "";
+          const piRaw = online.playerKeyToPi?.[pk];
+          const pi = Number(piRaw);
           if (!Number.isFinite(pi)) return;
 
           const byPi = (sync.answersByIndex[i] = sync.answersByIndex[i] || {});
           if (byPi[pi]?.answered) return;
 
-          byPi[pi] = {
-            answered: true,
-            choiceIndex: Number(ev.choiceIndex),
-            answeredAtMs: Number(ev.clientAnsweredAt) || Number(ev.serverReceivedAtMs) || Date.now(),
-          };
+          // choiceIndex は server.js では questionEnd まで来ないので一旦「answered」だけ立てる
+          byPi[pi] = { answered: true, choiceIndex: null, answeredAtMs: Date.now() };
+
+          // ✅ 他人の回答SE（自分以外）
+          // 連続鳴りすぎ防止：qIndex+pi のキーで1回だけ
+          if (pi !== online.clientIdToPi?.[online.myClientId]) {
+            const k = `${i}:${pi}`;
+            if (sync.lastSeenOtherAnswerKey !== k) {
+              sync.lastSeenOtherAnswerKey = k;
+              playSe("assets/sounds/se/se_battle_other_answer.mp3", { volume: 0.85 });
+            }
+          }
           return;
         }
 
-        if (ev.type === "game:result_question") {
-          const i = Number(ev.index);
+        // server.js: { type:"game:questionEnd", qIndex, answers:{[playerKey]:{choiceIndex,answeredAtMs}} }
+        if (ev.type === "game:questionEnd") {
+          const i = Number(ev.qIndex);
           if (!Number.isFinite(i)) return;
-          if (i <= sync.lastResultIndex) return;
-          sync.lastResultIndex = i;
+          if (i <= sync.lastQuestionEndIndex) return;
+          sync.lastQuestionEndIndex = i;
 
-          if (Array.isArray(ev.points)) run.points = ev.points;
-          if (Array.isArray(ev.correctCounts)) run.correctCounts = ev.correctCounts;
-          if (Array.isArray(ev.correctTimeSum)) run.correctTimeSum = ev.correctTimeSum;
+          // answers を pi ベースに変換して保存（表示・採点）
+          const ansByPk = ev.answers || {};
+          const byPi = (sync.answersByIndex[i] = sync.answersByIndex[i] || {});
+          for (const [pk, a] of Object.entries(ansByPk)) {
+            const piRaw = online.playerKeyToPi?.[String(pk)];
+            const pi = Number(piRaw);
+            if (!Number.isFinite(pi)) continue;
 
-          run.index = i + 1;
+            byPi[pi] = {
+              answered: true,
+              choiceIndex: Number(a?.choiceIndex),
+              answeredAtMs: Number(a?.answeredAtMs) || Date.now(),
+            };
+          }
+
+          // 採点（全員同じ材料で同じ計算をする）
+          // ※「速さ」は answeredAtMs（サーバ時刻）で比較するので全端末一致しやすい
+          try {
+            // 現在画面の idx と違う問題の questionEnd が来てもOK（同期ズレ保険）
+            const qIndex = i;
+
+            // 問題の正解 index は「シャッフル後」で一致させる必要があるので、
+            // ここでは run.index=現在表示中の idx だけ想定（通常一致）
+            // → 表示中の idx と qIndex が違う場合は採点せず、進行だけ任せる
+            if (run.index === qIndex) {
+              // correctIdx は後段（レンダ時）で計算しているので window に退避して使う
+              const correctIdx = window.__battleCorrectIdx;
+              const active = window.__battleActivePis || activePis;
+
+              const correctList = [];
+              for (const pi of active) {
+                const a = byPi?.[pi];
+                if (!a?.answered) continue;
+                if (Number(a.choiceIndex) === -1) continue;
+                const ok = correctIdx !== null && Number(a.choiceIndex) === Number(correctIdx);
+                if (ok) {
+                  const tSec = Number(a.answeredAtMs) / 1000; // サーバ時刻で比較（相対は不要）
+                  correctList.push({ pi, tSec });
+                }
+              }
+              const pointsMap = awardPointsBySpeed(correctList);
+
+              for (const pi of active) {
+                const a = byPi?.[pi];
+                if (!a?.answered) continue;
+
+                const ok = correctIdx !== null && Number(a.choiceIndex) === Number(correctIdx);
+                run.points[pi] = Number(run.points?.[pi] ?? 0) + (pointsMap.get(pi) ?? 0);
+                if (ok) {
+                  run.correctCounts[pi] = Number(run.correctCounts?.[pi] ?? 0) + 1;
+                  // tie-break 用：サーバ時刻を累積（小さい方が速い）
+                  run.correctTimeSum[pi] = Number(run.correctTimeSum?.[pi] ?? 0) + Number(a.answeredAtMs);
+                }
+              }
+            }
+          } catch (_) {}
+
           return;
         }
 
-        if (ev.type === "game:result_final") {
-          run.result = ev.result;
+        // server.js: { type:"game:next", index }
+        if (ev.type === "game:next") {
+          const n = Number(ev.index);
+          if (Number.isFinite(n)) run.index = n;
+          return;
+        }
+
+        // server.js: { type:"game:finished" }
+        if (ev.type === "game:finished") {
+          run.result = calcFinalStandings(run, activePis);
+          return;
         }
       });
     }
@@ -361,8 +489,10 @@ export function renderBattleQuiz({ state, goto }) {
   const rawChoices = (Array.isArray(q.choices) ? q.choices : []).map(normalizeChoice);
   const correctIdxRaw = getCorrectIndex(q);
 
-  // choice shuffle
-  const seedStr = `${isOnline ? online.hostClientId || "room" : "cpu"}|${run.roomId || ""}|${qid}|${idx}`;
+  // choice shuffle（全員一致）
+  const seedStr = `${isOnline ? (run.hostClientId || online.hostClientId || "room") : "cpu"}|${
+    run.roomId || ""
+  }|${qid}|${idx}`;
   const order = shuffledIndices(rawChoices.length, seedStr);
   const choices = order.map((oi) => rawChoices[oi]);
 
@@ -373,9 +503,14 @@ export function renderBattleQuiz({ state, goto }) {
     correctIdx = pos >= 0 ? pos : null;
   }
 
+  // ✅ questionEnd 採点で参照するため、画面ごとに退避（UIは変えない）
+  window.__battleCorrectIdx = correctIdx;
+  window.__battleActivePis = activePis;
+
   // myPi
   let myPi = 0;
   if (isOnline) {
+    rebuildOnlineMaps(run, online);
     const v = online.clientIdToPi?.[online.myClientId];
     const n = Number(v);
     if (Number.isFinite(n)) myPi = n;
@@ -400,6 +535,7 @@ export function renderBattleQuiz({ state, goto }) {
   const standSrc = asset("assets/images/quiz/quiz_stand.png");
   const avatarItems = getAvatarItems(masters);
 
+  // ---- UI（ここは一切いじらない） ----
   const html = `
     <div class="quiz-root">
       <div class="top-bar">
@@ -507,12 +643,7 @@ export function renderBattleQuiz({ state, goto }) {
         gap:8px;
         min-height:86px;
       }
-      .choice-img{
-        width:100%;
-        max-height:92px;
-        object-fit:contain;
-        border-radius:10px;
-      }
+      .choice-img{ width:100%; max-height:92px; object-fit:contain; border-radius:10px; }
       .choice-text{ width:100%; text-align:center; }
       .choice-btn:disabled{ opacity:.6; }
     </style>
@@ -530,10 +661,9 @@ export function renderBattleQuiz({ state, goto }) {
       ? (sync.answersByIndex[idx] = sync.answersByIndex[idx] || {})
       : (local.answersByIndex[idx] = local.answersByIndex[idx] || {});
 
+    // startMs（CPUはローカルでOK / Onlineは「自分が描画開始した時刻」でOK）
     let startMs = Date.now();
-    if (isOnline) {
-      if (sync.startAtMs) startMs = Number(sync.startAtMs) || startMs;
-    } else {
+    if (!isOnline) {
       if (!local.startAtMs || local.lastAppliedIndex !== idx) {
         local.startAtMs = Date.now();
         local.lastAppliedIndex = idx;
@@ -580,30 +710,7 @@ export function renderBattleQuiz({ state, goto }) {
       }
     }
 
-    function showMarksAndOtherAnswerSe() {
-      // ✅ 他者回答SEは「オンラインのみ」で鳴らす（CPUは scheduleCpu で鳴らす）
-      if (isOnline) {
-        const answeredKeys = [];
-        for (let pi = 0; pi < 4; pi++) {
-          if (!activePis.includes(pi)) continue;
-          if (byPi?.[pi]?.answered) answeredKeys.push(`${pi}`);
-        }
-        const keyNow = answeredKeys.sort().join(",");
-        if (keyNow && keyNow !== sync.lastSeenAnswerKey) {
-          const prevSet = new Set((sync.lastSeenAnswerKey || "").split(",").filter(Boolean));
-          const nowSet = new Set(keyNow.split(",").filter(Boolean));
-          let otherAnswered = false;
-          nowSet.forEach((k) => {
-            if (!prevSet.has(k)) {
-              const pi = Number(k);
-              if (Number.isFinite(pi) && pi !== myPi) otherAnswered = true;
-            }
-          });
-          if (otherAnswered) playSe("assets/sounds/se/se_battle_other_answer.mp3", { volume: 0.9 });
-          sync.lastSeenAnswerKey = keyNow;
-        }
-      }
-
+    function showMarks() {
       for (let pi = 0; pi < 4; pi++) {
         const el = document.getElementById(`mark_${pi}`);
         if (!el) continue;
@@ -611,18 +718,20 @@ export function renderBattleQuiz({ state, goto }) {
           el.textContent = "";
           continue;
         }
-
         const a = byPi?.[pi];
         if (!a?.answered) {
           el.textContent = "";
           continue;
         }
-
+        // online は game:answer で choiceIndex が 아직未確定のことがある
+        if (a.choiceIndex == null) {
+          el.textContent = "…";
+          continue;
+        }
         if (Number(a.choiceIndex) === -1) {
           el.textContent = "⏱";
           continue;
         }
-
         const correct = correctIdx !== null && Number(a.choiceIndex) === Number(correctIdx);
         el.textContent = correct ? "〇" : "×";
       }
@@ -659,12 +768,13 @@ export function renderBattleQuiz({ state, goto }) {
         const choiceIndex = pickCpuChoice(pi);
         byPi[pi] = { answered: true, choiceIndex, answeredAtMs: Date.now() };
 
-        // ✅ CPU戦：他者（CPU）の回答SEを確実に鳴らす（連打防止）
+        // ✅ CPU戦：他者（CPU）の回答SEを鳴らす（自分=pi0以外）
+        // 連続鳴り防止：同じ問題idx・同じpiで1回だけ
         if (pi !== myPi) {
           const k = `cpu:${idx}:${pi}`;
           if (local.lastSeenOtherAnswerKey !== k) {
             local.lastSeenOtherAnswerKey = k;
-            playSe("assets/sounds/se/se_battle_other_answer.mp3", { volume: 0.9 });
+            playSe("assets/sounds/se/se_battle_other_answer.mp3", { volume: 0.85 });
           }
         }
       }, t * 1000);
@@ -673,12 +783,6 @@ export function renderBattleQuiz({ state, goto }) {
       scheduleCpu(1);
       scheduleCpu(2);
       scheduleCpu(3);
-    }
-
-    if (isOnline && online.isHost && sync.qIndex !== idx) {
-      sync.qIndex = idx;
-      sync.startAtMs = Date.now();
-      bc?.emitGameEvent?.({ type: "game:question", index: idx, qid, questionStartAtMs: sync.startAtMs });
     }
 
     function handleAnswerSelect(choiceIndex) {
@@ -695,46 +799,9 @@ export function renderBattleQuiz({ state, goto }) {
       setChoicesEnabled(false);
 
       if (isOnline) {
-        bc?.emitGameEvent?.({ type: "game:answer", index: idx, choiceIndex, clientAnsweredAt: Date.now() });
+        // ✅ server.js に合わせる
+        bc?.emitGameEvent?.({ type: "game:answer", choiceIndex });
       }
-    }
-
-    function hostTryFinalize() {
-      if (!isOnline || !online.isHost) return;
-
-      const cur = sync.answersByIndex[idx] || {};
-      const all = activePis.every((pi) => !!cur?.[pi]?.answered);
-      if (!all) return;
-      if (sync.lastResultIndex >= idx) return;
-
-      const correctList = [];
-      for (const pi of activePis) {
-        const a = cur[pi];
-        if (Number(a.choiceIndex) === -1) continue;
-        const tSec = Math.max(0, (Number(a.answeredAtMs) - startMs) / 1000);
-        const correct = correctIdx !== null && Number(a.choiceIndex) === Number(correctIdx);
-        if (correct) correctList.push({ pi, tSec });
-      }
-
-      const pointsMap = awardPointsBySpeed(correctList);
-
-      for (const pi of activePis) {
-        const a = cur[pi];
-        const tSec = Math.max(0, (Number(a.answeredAtMs) - startMs) / 1000);
-        const correct = correctIdx !== null && Number(a.choiceIndex) === Number(correctIdx);
-
-        run.points[pi] = Number(run.points?.[pi] ?? 0) + (pointsMap.get(pi) ?? 0);
-        if (correct) {
-          run.correctCounts[pi] = Number(run.correctCounts?.[pi] ?? 0) + 1;
-          run.correctTimeSum[pi] = Number(run.correctTimeSum?.[pi] ?? 0) + tSec;
-        }
-      }
-
-      const isLast = idx + 1 >= total;
-      const result = isLast ? calcFinalStandings(run, activePis) : null;
-
-      bc?.emitGameEvent?.({ type: "game:result_question", index: idx, points: run.points, correctCounts: run.correctCounts, correctTimeSum: run.correctTimeSum, result });
-      if (isLast) bc?.emitGameEvent?.({ type: "game:result_final", result });
     }
 
     function cpuTryAdvance() {
@@ -751,21 +818,22 @@ export function renderBattleQuiz({ state, goto }) {
       for (const pi of activePis) {
         const a = cur[pi];
         if (Number(a.choiceIndex) === -1) continue;
-        const tSec = Math.max(0, (Number(a.answeredAtMs) - startMs) / 1000);
-        const correct = correctIdx !== null && Number(a.choiceIndex) === Number(correctIdx);
-        if (correct) correctList.push({ pi, tSec });
+        const ok = correctIdx !== null && Number(a.choiceIndex) === Number(correctIdx);
+        if (ok) {
+          const tSec = (Number(a.answeredAtMs) || Date.now()) / 1000;
+          correctList.push({ pi, tSec });
+        }
       }
       const pointsMap = awardPointsBySpeed(correctList);
 
       for (const pi of activePis) {
         const a = cur[pi];
-        const tSec = Math.max(0, (Number(a.answeredAtMs) - startMs) / 1000);
-        const correct = correctIdx !== null && Number(a.choiceIndex) === Number(correctIdx);
+        const ok = correctIdx !== null && Number(a.choiceIndex) === Number(correctIdx);
 
         run.points[pi] = Number(run.points?.[pi] ?? 0) + (pointsMap.get(pi) ?? 0);
-        if (correct) {
+        if (ok) {
           run.correctCounts[pi] = Number(run.correctCounts?.[pi] ?? 0) + 1;
-          run.correctTimeSum[pi] = Number(run.correctTimeSum?.[pi] ?? 0) + tSec;
+          run.correctTimeSum[pi] = Number(run.correctTimeSum?.[pi] ?? 0) + Number(a.answeredAtMs || Date.now());
         }
       }
 
@@ -779,18 +847,29 @@ export function renderBattleQuiz({ state, goto }) {
       }
     }
 
+    // 描画更新
     const paintIv = setInterval(() => {
       if (ended) return;
 
       updatePoints();
-      showMarksAndOtherAnswerSe();
+      showMarks();
 
-      if (isOnline) hostTryFinalize();
       if (isCpu) cpuTryAdvance();
 
+      // online: server から game:next が来たら移動
       if (isOnline && run.index !== idx) {
         ended = true;
+        clearInterval(paintIv);
+        clearInterval(timerIv);
         goto(`#battleQuiz?i=${run.index}&t=${Date.now()}`);
+      }
+
+      // online: finished がセットされたら結果へ
+      if (isOnline && run.result) {
+        ended = true;
+        clearInterval(paintIv);
+        clearInterval(timerIv);
+        goto("#battleResult");
       }
     }, 120);
 
@@ -808,9 +887,21 @@ export function renderBattleQuiz({ state, goto }) {
       }
 
       if (elapsedSec >= TIME_LIMIT_SEC) {
-        for (const pi of activePis) {
-          if (!byPi?.[pi]?.answered) byPi[pi] = { answered: true, choiceIndex: -1, answeredAtMs: Date.now() };
+        // CPU：全員をtimeout扱い
+        if (isCpu) {
+          for (const pi of activePis) {
+            if (!byPi?.[pi]?.answered) byPi[pi] = { answered: true, choiceIndex: -1, answeredAtMs: Date.now() };
+          }
         }
+
+        // Online：自分が未回答ならサーバへ timeout 回答を送る（これが無いと進行しない）
+        if (isOnline) {
+          if (activePis.includes(myPi) && !byPi?.[myPi]?.answered) {
+            byPi[myPi] = { answered: true, choiceIndex: -1, answeredAtMs: Date.now() };
+            bc?.emitGameEvent?.({ type: "game:answer", choiceIndex: -1 });
+          }
+        }
+
         clearInterval(timerIv);
       }
     }, 100);
