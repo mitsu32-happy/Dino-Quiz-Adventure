@@ -1,18 +1,18 @@
 // js/systems/battleClient.js
+// server.js（Render）とイベント名を完全に合わせる版
+
 export function createBattleClient(options = {}) {
   const transport = options.transport || "local";
   let playerProfile = options.playerProfile || {};
 
-  // ✅ 本番では index.html で socket.io-client を必ず読み込むこと
+  // Socket.IO client 必須
   if (!window.io) {
     throw new Error(
-      "Socket.IO client が見つかりません（window.io）。index.html で socket.io-client の script を読み込んでください。"
+      "Socket.IO client が見つかりません（window.io）。index.html で socket.io-client を読み込んでください。"
     );
   }
 
-  // ✅ serverUrl の決定ロジックを修正
-  // - local: localhost
-  // - online: 明示指定必須（GitHub Pages の origin に接続しても意味がない）
+  // serverUrl 決定
   let serverUrl = options.serverUrl;
   if (!serverUrl) {
     if (transport === "local") serverUrl = "http://localhost:3001";
@@ -28,14 +28,8 @@ export function createBattleClient(options = {}) {
     withCredentials: true,
   });
 
+  // ローカルイベント購読
   const handlers = new Map(); // type -> Set(fn)
-  let clientId = null;
-  let roomId = null;
-  let isHost = false;
-
-  // ★最新状態を保持（ゲストが「表示されない」対策）
-  let lastRoomUpdate = null;
-
   function on(type, fn) {
     if (!handlers.has(type)) handlers.set(type, new Set());
     handlers.get(type).add(fn);
@@ -55,12 +49,18 @@ export function createBattleClient(options = {}) {
     }
   }
 
+  // 状態
+  let clientId = null;
+  let roomId = null;
+  let isHost = false;
+  let lastRoomUpdate = null;
+
+  // サーバ側の profile はそのまま表示されるので最低限整形
   function normalizeProfileForServer(p) {
-    // server.js sanitizeProfile に合わせる
     return {
       name: p?.name || "Player",
-      titleName: p?.titleName || p?.title || p?.titleId || "—",
-      avatar: p?.avatar || p?.avatarEquipped || p?.equippedAvatar || null,
+      titleName: p?.titleName ?? p?.title ?? p?.titleId ?? "—",
+      avatar: p?.avatar ?? p?.avatarEquipped ?? p?.equippedAvatar ?? null,
       wins: Number.isFinite(Number(p?.pvpWins)) ? Number(p.pvpWins) : Number(p?.wins) || 0,
       losses: Number.isFinite(Number(p?.pvpLosses)) ? Number(p.pvpLosses) : Number(p?.losses) || 0,
     };
@@ -82,27 +82,11 @@ export function createBattleClient(options = {}) {
     });
   }
 
-  // ---- socket events ----
-  socket.on("server:hello", (p) => {
-    clientId = p?.clientId || socket.id;
-    emitLocal("conn:hello", { clientId });
-  });
-
-  socket.on("server:roomUpdate", (p) => {
-    lastRoomUpdate = p || null;
-    roomId = p?.roomId ?? roomId;
-
-    if (p?.hostClientId && clientId) isHost = p.hostClientId === clientId;
-
-    emitLocal("room:update", p);
-  });
-
-  socket.on("server:gameEvent", (ev) => {
-    emitLocal("game:event", ev);
-  });
+  // ===== Socket.IO events（server.js と一致させる） =====
 
   socket.on("connect", () => {
-    emitLocal("conn:connected", { serverUrl });
+    clientId = socket.id;
+    emitLocal("conn:connected", { serverUrl, clientId });
   });
 
   socket.on("disconnect", (reason) => {
@@ -114,31 +98,57 @@ export function createBattleClient(options = {}) {
     emitLocal("conn:error", { err });
   });
 
-  // ---- public api ----
+  // ✅ server.js は "room:update" を emit する
+  socket.on("room:update", (p) => {
+    lastRoomUpdate = p || null;
+    if (p?.roomId) roomId = p.roomId;
+
+    if (p?.hostClientId && clientId) {
+      isHost = p.hostClientId === clientId;
+    }
+    emitLocal("room:update", p);
+  });
+
+  // ✅ server.js は "game:event" を emit する
+  socket.on("game:event", (ev) => {
+    emitLocal("game:event", ev);
+  });
+
+  // ✅ ルーム解散通知
+  socket.on("room:closed", () => {
+    lastRoomUpdate = null;
+    roomId = null;
+    isHost = false;
+    emitLocal("room:closed", {});
+  });
+
+  // ===== Public API =====
+
   function updateProfile(nextProfile) {
     playerProfile = nextProfile || {};
   }
 
   function getState() {
-    return {
-      room: lastRoomUpdate, // {roomId, hostClientId, players:[...]}
-    };
+    return { room: lastRoomUpdate };
+  }
+
+  function getMe() {
+    return { clientId, roomId, isHost };
   }
 
   async function createRoom() {
     const profile = normalizeProfileForServer(playerProfile);
 
-    // ✅ ackが返らないと永久待ちになるのでタイムアウト
     return await withTimeout(
       () =>
         new Promise((resolve) => {
           socket.emit("room:create", { profile }, (res) => {
-            if (!res?.ok) {
+            if (!res?.ok || !res?.roomId) {
               console.error("[battleClient] room:create failed", res);
               resolve(null);
               return;
             }
-            clientId = res.clientId || clientId;
+            clientId = socket.id;
             roomId = res.roomId;
             isHost = true;
             resolve(roomId);
@@ -161,8 +171,9 @@ export function createBattleClient(options = {}) {
               resolve(false);
               return;
             }
-            clientId = res.clientId || clientId;
-            roomId = res.roomId;
+            clientId = socket.id;
+            roomId = rid;
+            // isHost は room:update を受けた時点で判定される
             resolve(true);
           });
         }),
@@ -170,31 +181,26 @@ export function createBattleClient(options = {}) {
     );
   }
 
+  // ✅ server.js の room:leave は ack を返さないので待たない
   async function leaveRoom() {
-    return await withTimeout(
-      () =>
-        new Promise((resolve) => {
-          socket.emit("room:leave", null, (res) => {
-            roomId = null;
-            isHost = false;
-            lastRoomUpdate = null;
-            resolve(!!res?.ok);
-          });
-        }),
-      15000
-    );
+    try {
+      socket.emit("room:leave");
+    } catch (e) {
+      console.error(e);
+    }
+    lastRoomUpdate = null;
+    roomId = null;
+    isHost = false;
+    return true;
   }
 
+  // ✅ server.js は "game:event" を受け取る
   function emitGameEvent(payload) {
-    socket.emit("client:gameEvent", payload);
+    socket.emit("game:event", payload);
   }
 
   function sendAnswer({ index, choiceIndex, clientAnsweredAt }) {
     emitGameEvent({ type: "game:answer", index, choiceIndex, clientAnsweredAt });
-  }
-
-  function getMe() {
-    return { clientId, roomId, isHost };
   }
 
   return {
@@ -204,6 +210,7 @@ export function createBattleClient(options = {}) {
 
     updateProfile,
     getState,
+    getMe,
 
     createRoom,
     joinRoom,
@@ -211,7 +218,6 @@ export function createBattleClient(options = {}) {
 
     emitGameEvent,
     sendAnswer,
-    getMe,
 
     get clientId() {
       return clientId;
