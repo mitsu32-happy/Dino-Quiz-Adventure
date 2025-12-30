@@ -39,7 +39,6 @@ function loadQuestionsMaster() {
     return new Map();
   }
 }
-
 const QUESTION_MAP = loadQuestionsMaster();
 
 function getCorrectIndexByQid(qid) {
@@ -85,8 +84,7 @@ function emitRoomUpdate(io, room) {
     players: roomPlayersArray(room),
   };
   io.to(room.roomId).emit("server:roomUpdate", payload);
-
-  // 互換（古いクライアントがいた場合の保険）
+  // 互換
   io.to(room.roomId).emit("room:update", payload);
 }
 
@@ -119,6 +117,14 @@ function awardPointsBySpeed(correctList) {
   return awardsMap;
 }
 
+// socket.id から所属ルームを逆引き（roomIdが来ない場合の救済）
+function findRoomBySocketId(rooms, socketId) {
+  for (const room of rooms.values()) {
+    if (room.players.some((p) => p.clientId === socketId)) return room;
+  }
+  return null;
+}
+
 // ======================
 // server setup
 // ======================
@@ -137,6 +143,9 @@ app.use(
 
 app.get("/", (req, res) => res.status(200).send("Battle server OK"));
 
+// ✅ /health を追加（入室時の疎通確認が404でループしていたため）
+app.get("/health", (req, res) => res.status(200).json({ ok: true }));
+
 const server = http.createServer(app);
 const io = new Server(server, {
   cors: {
@@ -151,7 +160,7 @@ const rooms = new Map(); // roomId -> {roomId, hostClientId, players[], game}
 // socket.io
 // ======================
 io.on("connection", (socket) => {
-  // battleClient.js は server:hello を待っている（任意だが出しておく）
+  // battleClient.js は server:hello を受ける
   socket.emit("server:hello", { clientId: socket.id });
 
   // ---- room:create ----
@@ -166,6 +175,8 @@ io.on("connection", (socket) => {
     rooms.set(roomId, room);
     socket.join(roomId);
     emitRoomUpdate(io, room);
+
+    // ✅ roomId を必ず返す（battleClient.js が res.roomId を使う）
     cb?.({ ok: true, roomId, clientId: socket.id });
   });
 
@@ -179,7 +190,9 @@ io.on("connection", (socket) => {
     room.players.push({ clientId: socket.id, profile: profile || {} });
     socket.join(rid);
     emitRoomUpdate(io, room);
-    cb?.({ ok: true, clientId: socket.id });
+
+    // ✅ roomId を必ず返す（ここが抜けるとクライアントが同期不能になる）
+    cb?.({ ok: true, roomId: rid, clientId: socket.id });
   });
 
   // ---- room:leave ----
@@ -205,8 +218,11 @@ io.on("connection", (socket) => {
   // game event handler
   // ======================
   function handleGameEvent(ev) {
-    const roomId = String(ev?.roomId || "").trim().toUpperCase();
-    const room = rooms.get(roomId);
+    // ✅ roomId が来ないケースがあるので救済する
+    let room = null;
+    const rid = String(ev?.roomId || "").trim().toUpperCase();
+    if (rid) room = rooms.get(rid);
+    if (!room) room = findRoomBySocketId(rooms, socket.id);
     if (!room) return;
 
     const game = room.game;
@@ -222,7 +238,6 @@ io.on("connection", (socket) => {
       game.scores = {};
       game.timeLimitSec = Number(ev.timeLimitSec ?? 20) || 20;
 
-      // 初期スコア
       for (const p of room.players) {
         const pk = getPlayerKeyFromProfile(p.profile) || p.clientId;
         game.scores[pk] = 0;
@@ -249,14 +264,14 @@ io.on("connection", (socket) => {
 
       const qIndex = game.index;
       if (!game.answersByIndex[qIndex]) game.answersByIndex[qIndex] = {};
-      if (game.answersByIndex[qIndex][playerKey]) return; // 二重回答防止
+      if (game.answersByIndex[qIndex][playerKey]) return;
 
       const answeredAtMs = Number(ev.clientAnsweredAt ?? ev.answeredAtMs ?? ev.timeMs) || Date.now();
       const choiceIndex = Number(ev.choiceIndex);
 
       game.answersByIndex[qIndex][playerKey] = { choiceIndex, answeredAtMs };
 
-      // 回答通知（表示/SE用）
+      // 回答通知
       emitGameEvent(io, room.roomId, { type: "game:answer", playerKey, qIndex });
 
       // 全員回答したら確定
@@ -269,7 +284,7 @@ io.on("connection", (socket) => {
 
       const correctList = [];
       for (const [pk, a] of Object.entries(game.answersByIndex[qIndex])) {
-        if (Number(a.choiceIndex) === -1) continue; // timeout
+        if (Number(a.choiceIndex) === -1) continue;
         if (correctIdx === null) continue;
         if (Number(a.choiceIndex) === Number(correctIdx)) {
           correctList.push({ playerKey: pk, answeredAtMs: Number(a.answeredAtMs) || Date.now() });
@@ -281,7 +296,6 @@ io.on("connection", (socket) => {
         game.scores[pk] = Number(game.scores[pk] ?? 0) + Number(awards.get(pk) ?? 0);
       }
 
-      // 問題終了結果
       emitGameEvent(io, room.roomId, {
         type: "game:questionEnd",
         qIndex,
@@ -289,7 +303,6 @@ io.on("connection", (socket) => {
         scores: game.scores,
       });
 
-      // 次へ
       game.index++;
       if (game.index >= game.questionIds.length) {
         game.status = "finished";
@@ -301,11 +314,10 @@ io.on("connection", (socket) => {
     }
   }
 
-  // battleClient.js は game:event で送る（現状）ので両方受ける
-  socket.on("game:event", handleGameEvent);
+  // battleClient.js は client:gameEvent で送る（念のため両対応）
   socket.on("client:gameEvent", handleGameEvent);
+  socket.on("game:event", handleGameEvent);
 
-  // ---- disconnect ----
   socket.on("disconnect", () => {
     for (const room of rooms.values()) {
       const idx = room.players.findIndex((p) => p.clientId === socket.id);
