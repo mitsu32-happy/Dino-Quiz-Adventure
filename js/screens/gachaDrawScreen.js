@@ -124,15 +124,37 @@ export function renderGachaDraw({ state, goto, params }) {
     toAvatarBtn?.addEventListener("click", () => goto("#avatar"));
 
     let pendingResult = null;
-    video?.addEventListener("ended", () => {
+
+    // ✅ 追加：演出中の多重発火（連打/貫通）防止
+    let isAnimating = false;
+
+    function setPullLocked(locked) {
+      isAnimating = !!locked;
+      if (pullBtn) pullBtn.disabled = !!locked || Number(save.economy?.coins ?? 0) < cost;
+    }
+
+    video?.addEventListener("ended", (e) => {
+      // 念のため
+      e?.preventDefault?.();
+      e?.stopPropagation?.();
+
       closeMovie();
+      setPullLocked(false);
+
       if (pendingResult) {
         showResult(pendingResult.item, pendingResult.already);
         pendingResult = null;
       }
     });
-    skipBtn?.addEventListener("click", () => {
+
+    skipBtn?.addEventListener("click", (e) => {
+      // ✅ 重要：クリック貫通/伝播で下のボタンが押されるのを防ぐ
+      e?.preventDefault?.();
+      e?.stopPropagation?.();
+
       closeMovie();
+      setPullLocked(false);
+
       if (pendingResult) {
         showResult(pendingResult.item, pendingResult.already);
         pendingResult = null;
@@ -166,6 +188,10 @@ export function renderGachaDraw({ state, goto, params }) {
       if (coinsEl) coinsEl.textContent = `🪙 ${Number(save.economy?.coins ?? 0)}`;
 
       pendingResult = { item, already };
+
+      // ✅ 追加：演出中は引けないようロック
+      setPullLocked(true);
+
       openMovie();
     });
   }, 0);
