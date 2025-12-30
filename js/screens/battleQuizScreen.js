@@ -736,23 +736,33 @@ run.result = calcFinalStandings(run, activePis);
       scheduleCpu(3);
     }
 
-    function handleAnswerSelect(choiceIndex) {
-      if (ended) return;
-      if (!activePis.includes(myPi)) return;
-      if (byPi?.[myPi]?.answered) return;
+function handleAnswerSelect(choiceIndex) {
+  if (ended) return;
+  if (!activePis.includes(myPi)) return;
+  if (byPi?.[myPi]?.answered) return;
 
-      byPi[myPi] = { answered: true, choiceIndex, answeredAtMs: Date.now() };
+  byPi[myPi] = { answered: true, choiceIndex, answeredAtMs: Date.now() };
 
-      const correct = correctIdx !== null && Number(choiceIndex) === Number(correctIdx);
-      if (correct) playSe("assets/sounds/se/se_correct.mp3", { volume: 0.9 });
-      else playSe("assets/sounds/se/se_wrong.mp3", { volume: 0.9 });
+  const correct = correctIdx !== null && Number(choiceIndex) === Number(correctIdx);
+  if (correct) playSe("assets/sounds/se/se_correct.mp3", { volume: 0.9 });
+  else playSe("assets/sounds/se/se_wrong.mp3", { volume: 0.9 });
 
-      setChoicesEnabled(false);
+  setChoicesEnabled(false);
 
-      if (isOnline) {
-        bc?.emitGameEvent?.({ type: "game:answer", choiceIndex });
-      }
-    }
+  if (isOnline) {
+    // ✅ サーバ採点用：シャッフル前 index（raw）も送る
+    const choiceIndexRaw = Array.isArray(order) ? Number(order[choiceIndex]) : Number(choiceIndex);
+    bc?.emitGameEvent?.({
+      type: "game:answer",
+      index: idx,
+      // 画面同期用（シャッフル後）
+      choiceIndex,
+      // 採点用（シャッフル前）
+      choiceIndexRaw,
+      clientAnsweredAt: Date.now(),
+    });
+  }
+}
 
     function cpuTryAdvance() {
       if (!isCpu) return;

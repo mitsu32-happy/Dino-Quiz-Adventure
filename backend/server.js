@@ -91,7 +91,12 @@ function emitGameEvent(io, roomId, payload) {
   io.to(roomId).emit("server:gameEvent", payload);
   io.to(roomId).emit("game:event", payload); // battleQuizScreen.js がこれで受ける
 
-  console.log("[server] emit game:event", { roomId, type: payload?.type, index: payload?.index, reason: payload?.reason });
+  console.log("[server] emit game:event", {
+    roomId,
+    type: payload?.type,
+    index: payload?.index,
+    reason: payload?.reason,
+  });
 }
 
 function createEmptyGame() {
@@ -101,7 +106,7 @@ function createEmptyGame() {
     index: 0,
     timeLimitSec: 20,
 
-    // qIndex -> { [clientId]: { choiceIndex, clientAnsweredAt, serverReceivedAtMs } }
+    // qIndex -> { [clientId]: { choiceIndex, choiceIndexRaw, clientAnsweredAt, serverReceivedAtMs } }
     answersByIndex: {},
 
     // クライアントが期待する配列形式
@@ -197,6 +202,7 @@ function endQuestionAndAdvance(io, room, reason) {
     if (!byClient[cid]) {
       byClient[cid] = {
         choiceIndex: -1,
+        choiceIndexRaw: -1,
         clientAnsweredAt: 0,
         serverReceivedAtMs: Date.now(),
       };
@@ -211,8 +217,13 @@ function endQuestionAndAdvance(io, room, reason) {
   const correctEntries = [];
   if (correctIdx !== null) {
     for (const [cid, a] of Object.entries(byClient)) {
-      if (Number(a.choiceIndex) === -1) continue;
-      if (Number(a.choiceIndex) === Number(correctIdx)) {
+      const chosen = Number(a.choiceIndex);
+      if (chosen === -1) continue;
+
+      // ✅ 採点は raw 優先（シャッフル前 index）
+      const pickedRaw = Number.isFinite(Number(a.choiceIndexRaw)) ? Number(a.choiceIndexRaw) : chosen;
+
+      if (pickedRaw === Number(correctIdx)) {
         const elapsedMs = Math.max(
           0,
           (Number(a.serverReceivedAtMs) || Date.now()) - (game.questionStartAtMs || Date.now())
@@ -234,7 +245,14 @@ function endQuestionAndAdvance(io, room, reason) {
     for (const [cid, a] of Object.entries(byClient)) {
       const pi = cidToPi[cid];
       if (!Number.isFinite(pi)) continue;
-      if (Number(a.choiceIndex) === Number(correctIdx)) {
+
+      const chosen = Number(a.choiceIndex);
+      if (chosen === -1) continue;
+
+      // ✅ ここも raw 優先
+      const pickedRaw = Number.isFinite(Number(a.choiceIndexRaw)) ? Number(a.choiceIndexRaw) : chosen;
+
+      if (pickedRaw === Number(correctIdx)) {
         game.correctCounts[pi] = Number(game.correctCounts[pi] || 0) + 1;
         const elapsedMs = Math.max(
           0,
@@ -368,7 +386,11 @@ io.on("connection", (socket) => {
     emitRoomUpdate(io, room);
     cb?.({ ok: true, roomId: rid, clientId: socket.id });
 
-    console.log("[server] room:join", { roomId: rid, socketId: socket.id, playersLen: room.players.length });
+    console.log("[server] room:join", {
+      roomId: rid,
+      socketId: socket.id,
+      playersLen: room.players.length,
+    });
   });
 
   socket.on("room:leave", () => {
@@ -475,7 +497,14 @@ io.on("connection", (socket) => {
       const clientAnsweredAt = Number(ev.clientAnsweredAt) || 0;
       const serverReceivedAtMs = Date.now();
 
-      byClient[socket.id] = { choiceIndex, clientAnsweredAt, serverReceivedAtMs };
+      // ✅ raw index を受け取って保存（無ければ choiceIndex を raw とみなす）
+      const choiceIndexRaw = Number(ev.choiceIndexRaw);
+      byClient[socket.id] = {
+        choiceIndex,
+        choiceIndexRaw: Number.isFinite(choiceIndexRaw) ? choiceIndexRaw : choiceIndex,
+        clientAnsweredAt,
+        serverReceivedAtMs,
+      };
 
       console.log("[server] accepted answer", {
         roomId: room.roomId,
@@ -490,7 +519,10 @@ io.on("connection", (socket) => {
         type: "game:answer",
         index,
         from: socket.id,
+        // 画面同期用（シャッフル後）
         choiceIndex,
+        // 採点用（シャッフル前）
+        choiceIndexRaw: byClient[socket.id].choiceIndexRaw,
         clientAnsweredAt,
         serverReceivedAtMs,
       });
