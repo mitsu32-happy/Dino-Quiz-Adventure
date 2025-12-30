@@ -59,6 +59,22 @@ function getCorrectIndexByQid(qid) {
 // ======================
 // utils
 // ======================
+function generateNumericRoomId(roomsMap, length = 6) {
+  // 例: length=6 → 100000〜999999
+  const min = Math.pow(10, length - 1);
+  const max = Math.pow(10, length) - 1;
+
+  // 衝突回避（念のため最大50回）
+  for (let i = 0; i < 50; i++) {
+    const id = String(Math.floor(min + Math.random() * (max - min + 1)));
+    if (!roomsMap.has(id)) return id;
+  }
+
+  // ほぼ起きないが、起きたら length+1 に退避
+  const fallback = String(Math.floor(Math.pow(10, length) + Math.random() * Math.pow(10, length)));
+  return fallback;
+}
+
 function originAllowed(origin) {
   if (!origin) return true;
   return ORIGIN_ALLOWLIST.some((o) => origin.startsWith(o));
@@ -360,7 +376,7 @@ io.on("connection", (socket) => {
   socket.emit("server:hello", { clientId: socket.id });
 
   socket.on("room:create", ({ profile }, cb) => {
-    const roomId = randomUUID().slice(0, 6).toUpperCase();
+    const roomId = generateNumericRoomId(rooms, 6);
     const room = {
       roomId,
       hostClientId: socket.id,
