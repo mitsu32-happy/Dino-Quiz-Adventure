@@ -77,12 +77,23 @@ function roomPlayersArray(room) {
   }));
 }
 
+// battleClient.js は server:roomUpdate を受け取る
 function emitRoomUpdate(io, room) {
-  io.to(room.roomId).emit("room:update", {
+  const payload = {
     roomId: room.roomId,
     hostClientId: room.hostClientId,
     players: roomPlayersArray(room),
-  });
+  };
+  io.to(room.roomId).emit("server:roomUpdate", payload);
+
+  // 互換（古いクライアントがいた場合の保険）
+  io.to(room.roomId).emit("room:update", payload);
+}
+
+function emitGameEvent(io, roomId, payload) {
+  io.to(roomId).emit("server:gameEvent", payload);
+  // 互換
+  io.to(roomId).emit("game:event", payload);
 }
 
 function createEmptyGame() {
@@ -140,6 +151,9 @@ const rooms = new Map(); // roomId -> {roomId, hostClientId, players[], game}
 // socket.io
 // ======================
 io.on("connection", (socket) => {
+  // battleClient.js は server:hello を待っている（任意だが出しておく）
+  socket.emit("server:hello", { clientId: socket.id });
+
   // ---- room:create ----
   socket.on("room:create", ({ profile }, cb) => {
     const roomId = randomUUID().slice(0, 6).toUpperCase();
@@ -152,7 +166,7 @@ io.on("connection", (socket) => {
     rooms.set(roomId, room);
     socket.join(roomId);
     emitRoomUpdate(io, room);
-    cb?.({ ok: true, roomId });
+    cb?.({ ok: true, roomId, clientId: socket.id });
   });
 
   // ---- room:join ----
@@ -165,7 +179,7 @@ io.on("connection", (socket) => {
     room.players.push({ clientId: socket.id, profile: profile || {} });
     socket.join(rid);
     emitRoomUpdate(io, room);
-    cb?.({ ok: true });
+    cb?.({ ok: true, clientId: socket.id });
   });
 
   // ---- room:leave ----
@@ -214,7 +228,7 @@ io.on("connection", (socket) => {
         game.scores[pk] = 0;
       }
 
-      io.to(room.roomId).emit("game:event", {
+      emitGameEvent(io, room.roomId, {
         type: "game:begin",
         beginPayload: {
           roomId: room.roomId,
@@ -243,7 +257,7 @@ io.on("connection", (socket) => {
       game.answersByIndex[qIndex][playerKey] = { choiceIndex, answeredAtMs };
 
       // 回答通知（表示/SE用）
-      io.to(room.roomId).emit("game:event", { type: "game:answer", playerKey, qIndex });
+      emitGameEvent(io, room.roomId, { type: "game:answer", playerKey, qIndex });
 
       // 全員回答したら確定
       const need = room.players.length;
@@ -268,7 +282,7 @@ io.on("connection", (socket) => {
       }
 
       // 問題終了結果
-      io.to(room.roomId).emit("game:event", {
+      emitGameEvent(io, room.roomId, {
         type: "game:questionEnd",
         qIndex,
         answers: game.answersByIndex[qIndex],
@@ -279,19 +293,17 @@ io.on("connection", (socket) => {
       game.index++;
       if (game.index >= game.questionIds.length) {
         game.status = "finished";
-        io.to(room.roomId).emit("game:event", { type: "game:finished", scores: game.scores });
+        emitGameEvent(io, room.roomId, { type: "game:finished", scores: game.scores });
       } else {
-        io.to(room.roomId).emit("game:event", { type: "game:next", index: game.index });
+        emitGameEvent(io, room.roomId, { type: "game:next", index: game.index });
       }
       return;
     }
   }
 
-  // ✅ battleClient.js が送るイベント名（正）
-  socket.on("client:gameEvent", handleGameEvent);
-
-  // ✅ 念のため旧名も受ける
+  // battleClient.js は game:event で送る（現状）ので両方受ける
   socket.on("game:event", handleGameEvent);
+  socket.on("client:gameEvent", handleGameEvent);
 
   // ---- disconnect ----
   socket.on("disconnect", () => {
@@ -314,6 +326,7 @@ io.on("connection", (socket) => {
 });
 
 server.listen(PORT, () => {
+  console.log("[master] loaded questions:", QUESTION_MAP.size);
   console.log("Battle server listening on", PORT);
   console.log("Allowed origins:", ORIGIN_ALLOWLIST);
   console.log("Questions path:", QUESTIONS_PATH);
