@@ -70,131 +70,174 @@ export function renderGachaDraw({ state, goto, params }) {
     const resultArea = document.getElementById("resultArea");
     const coinsEl = document.getElementById("coinsText");
 
+    let pendingResult = null;
+
+    // ✅ 二重消費の根本対策：1回の抽選中は絶対に再実行させない
+    let isPulling = false;
+
+    function setPullLocked(locked) {
+      isPulling = !!locked;
+      if (pullBtn) {
+        const coins = Number(save.economy?.coins ?? 0);
+        pullBtn.disabled = !!locked || coins < cost;
+      }
+    }
+
     function openMovie() {
-      if (!modal) return;
-      modal.style.display = "flex";
-      try {
-        video.currentTime = 0;
-        const p = video.play();
-        if (p && typeof p.catch === "function") p.catch(() => {});
-      } catch {}
+      if (modal) modal.style.display = "flex";
+      if (video) {
+        try {
+          video.currentTime = 0;
+          const p = video.play();
+          if (p && typeof p.catch === "function") p.catch(() => {});
+        } catch {}
+      }
     }
 
     function closeMovie() {
-      if (!modal) return;
-      try { video.pause(); } catch {}
-      modal.style.display = "none";
+      if (video) {
+        try {
+          video.pause();
+        } catch {}
+      }
+      if (modal) modal.style.display = "none";
     }
 
     function showResult(item, already) {
+      if (!resultArea) return;
+
+      const rarity = item?.rarity ?? "";
+      const name = item?.name ?? item?.item_id ?? "アイテム";
+      const img = normalizeAsset(item?.asset_path);
+
       resultArea.innerHTML = `
-        <div class="result-card">
-          <div class="result-title">獲得！</div>
-          <div class="result-box">
-            <img class="result-img" src="${normalizeAsset(item.asset_path)}" alt="" onerror="this.style.opacity=0.25" />
-            <div class="result-name">${item.name ?? item.item_id}</div>
-            <div class="result-sub">
-              ${already ? `<span class="pill">すでに所持</span>` : `<span class="pill" style="color:var(--good)">NEW!</span>`}
-              <span class="pill">${item.type}</span>
+        <div class="card" style="margin-top:12px;">
+          <div class="card-inner">
+            <div style="font-weight:1000;font-size:16px;">獲得！</div>
+            <div style="color:var(--muted);font-size:12px;margin-top:4px;">
+              ${already ? "※すでに所持しています（重複獲得しない仕様のため所持済み表示）" : ""}
             </div>
+
+            <div class="row" style="gap:12px;align-items:center;margin-top:10px;">
+              <div style="width:72px;height:72px;border-radius:16px;border:2px solid rgba(31,42,68,.12);overflow:hidden;background:#fff;flex:0 0 auto;">
+                ${img ? `<img src="${img}" alt="" style="width:100%;height:100%;object-fit:contain;" />` : ""}
+              </div>
+              <div style="flex:1;min-width:0;">
+                <div style="font-weight:1000;">${name}</div>
+                <div style="color:var(--muted);font-size:12px;margin-top:2px;">${rarity}</div>
+              </div>
+            </div>
+
+            <div class="space"></div>
+
+            <div class="row" style="gap:10px;flex-wrap:wrap;">
+              <button class="btn" type="button" id="againBtn" style="flex:1;min-width:160px;">もう1回引く</button>
+              <button class="btn secondary" type="button" id="backToBannersBtn" style="flex:1;min-width:160px;">バナー選択へ</button>
+            </div>
+
+            <div class="space"></div>
+
+            <button class="btn secondary" type="button" id="toAvatarFromResultBtn">アバターで確認</button>
           </div>
-
-          <div class="space"></div>
-
-          <div class="row" style="gap:10px;flex-wrap:wrap;">
-            <button class="btn" type="button" id="againBtn" style="flex:1;min-width:160px;">もう1回引く</button>
-            <button class="btn secondary" type="button" id="backToBannersBtn" style="flex:1;min-width:160px;">バナー選択へ</button>
-          </div>
-
-          <div class="space"></div>
-
-          <button class="btn secondary" type="button" id="toAvatarFromResultBtn">アバターで確認</button>
         </div>
       `;
 
       document.getElementById("againBtn")?.addEventListener("click", () => {
-        goto(`#gachaDraw?gachaId=${encodeURIComponent(pack.gacha_id)}`);
+        // 次の抽選を許可
+        setPullLocked(false);
+        // 画面の結果表示だけ消して、同画面で再度引けるようにする
+        if (resultArea) resultArea.innerHTML = "";
       });
-      document.getElementById("backToBannersBtn")?.addEventListener("click", () => goto("#gacha"));
-      document.getElementById("toAvatarFromResultBtn")?.addEventListener("click", () => goto("#avatar"));
+
+      document.getElementById("backToBannersBtn")?.addEventListener("click", () => {
+        goto("#gacha");
+      });
+
+      document.getElementById("toAvatarFromResultBtn")?.addEventListener("click", () => {
+        goto("#avatar");
+      });
     }
 
-    backBtn?.addEventListener("click", () => goto("#gacha"));
-    toHomeBtn?.addEventListener("click", () => goto("#home"));
-    toAvatarBtn?.addEventListener("click", () => goto("#avatar"));
+    // ✅ ここが重要：addEventListener だと「再描画で多重登録」されやすいので onclick で上書きする
+    if (toHomeBtn) toHomeBtn.onclick = () => goto("#home");
+    if (toAvatarBtn) toAvatarBtn.onclick = () => goto("#avatar");
+    if (backBtn) backBtn.onclick = () => goto("#gacha");
 
-    let pendingResult = null;
+    if (video) {
+      video.onended = (e) => {
+        e?.preventDefault?.();
+        e?.stopPropagation?.();
+        closeMovie();
 
-    // ✅ 追加：演出中の多重発火（連打/貫通）防止
-    let isAnimating = false;
-
-    function setPullLocked(locked) {
-      isAnimating = !!locked;
-      if (pullBtn) pullBtn.disabled = !!locked || Number(save.economy?.coins ?? 0) < cost;
+        if (pendingResult) {
+          showResult(pendingResult.item, pendingResult.already);
+          pendingResult = null;
+        }
+        // 抽選後は「もう1回引く」まではロック継続でもOKだが、
+        // ここでは結果表示後もロックのままにしておく（againBtnで解除）
+        setPullLocked(true);
+      };
     }
 
-    video?.addEventListener("ended", (e) => {
-      // 念のため
-      e?.preventDefault?.();
-      e?.stopPropagation?.();
+    if (skipBtn) {
+      skipBtn.onclick = (e) => {
+        // ✅ クリック貫通対策
+        e?.preventDefault?.();
+        e?.stopPropagation?.();
 
-      closeMovie();
-      setPullLocked(false);
+        closeMovie();
 
-      if (pendingResult) {
-        showResult(pendingResult.item, pendingResult.already);
-        pendingResult = null;
-      }
-    });
+        if (pendingResult) {
+          showResult(pendingResult.item, pendingResult.already);
+          pendingResult = null;
+        }
+        // 結果表示中は引けない
+        setPullLocked(true);
+      };
+    }
 
-    skipBtn?.addEventListener("click", (e) => {
-      // ✅ 重要：クリック貫通/伝播で下のボタンが押されるのを防ぐ
-      e?.preventDefault?.();
-      e?.stopPropagation?.();
+    if (pullBtn) {
+      pullBtn.onclick = () => {
+        // ✅ 二重実行ガード（連打・多重登録・貫通すべて止める）
+        if (isPulling) return;
 
-      closeMovie();
-      setPullLocked(false);
+        if (Number(save.economy?.coins ?? 0) < cost) return;
 
-      if (pendingResult) {
-        showResult(pendingResult.item, pendingResult.already);
-        pendingResult = null;
-      }
-    });
+        const picked = pickWeighted(pack.pool);
+        if (!picked?.item_id) return;
 
-    pullBtn?.addEventListener("click", () => {
-      if (Number(save.economy?.coins ?? 0) < cost) return;
+        const item = (items || []).find((it) => it.item_id === picked.item_id);
+        if (!item) return;
 
-      const picked = pickWeighted(pack.pool);
-      if (!picked?.item_id) return;
+        // ここで即ロック（この時点で二重消費を止める）
+        setPullLocked(true);
 
-      const item = (items || []).find((it) => it.item_id === picked.item_id);
-      if (!item) return;
+        save.economy.coins -= cost;
 
-      save.economy.coins -= cost;
+        const owned = Array.isArray(save.avatar?.ownedItemIds) ? save.avatar.ownedItemIds : [];
+        if (!save.avatar) save.avatar = { equipped: { body: null, head: null, outfit: null, background: null }, ownedItemIds: [] };
+        if (!Array.isArray(save.avatar.ownedItemIds)) save.avatar.ownedItemIds = owned;
 
-      const owned = Array.isArray(save.avatar?.ownedItemIds) ? save.avatar.ownedItemIds : [];
-      if (!save.avatar) save.avatar = { equipped: { body: null, head: null, outfit: null, background: null }, ownedItemIds: [] };
-      if (!Array.isArray(save.avatar.ownedItemIds)) save.avatar.ownedItemIds = owned;
+        const already = save.avatar.ownedItemIds.includes(item.item_id);
+        if (!already) save.avatar.ownedItemIds.push(item.item_id);
 
-      const already = save.avatar.ownedItemIds.includes(item.item_id);
-      if (!already) save.avatar.ownedItemIds.push(item.item_id);
+        if (!save.gacha) save.gacha = { totalPulls: 0, lastPulledAt: null };
+        save.gacha.totalPulls = Number(save.gacha.totalPulls ?? 0) + 1;
+        save.gacha.lastPulledAt = new Date().toISOString();
 
-      if (!save.gacha) save.gacha = { totalPulls: 0, lastPulledAt: null };
-      save.gacha.totalPulls = Number(save.gacha.totalPulls ?? 0) + 1;
-      save.gacha.lastPulledAt = new Date().toISOString();
+        saveNow(save);
 
-      saveNow(save);
+        if (coinsEl) coinsEl.textContent = `🪙 ${Number(save.economy?.coins ?? 0)}`;
 
-      if (coinsEl) coinsEl.textContent = `🪙 ${Number(save.economy?.coins ?? 0)}`;
+        pendingResult = { item, already };
+        openMovie();
+      };
+    }
 
-      pendingResult = { item, already };
-
-      // ✅ 追加：演出中は引けないようロック
-      setPullLocked(true);
-
-      openMovie();
-    });
+    // 初期状態：コイン不足なら押せない
+    setPullLocked(false);
   }, 0);
+
 
   return `
     <div class="card"><div class="card-inner">
