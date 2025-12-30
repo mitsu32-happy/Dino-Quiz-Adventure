@@ -21,8 +21,6 @@ const ORIGIN_ALLOWLIST = [
 // ======================
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
-
-// repo ルートに data/questions.json がある想定（backend/server.js から ../data/questions.json）
 const QUESTIONS_PATH = path.resolve(__dirname, "../data/questions.json");
 
 function loadQuestionsMaster() {
@@ -62,7 +60,7 @@ function getCorrectIndexByQid(qid) {
 // utils
 // ======================
 function originAllowed(origin) {
-  if (!origin) return true; // curl等
+  if (!origin) return true;
   return ORIGIN_ALLOWLIST.some((o) => origin.startsWith(o));
 }
 
@@ -72,7 +70,6 @@ function getPlayerKeyFromProfile(profile) {
 }
 
 function roomPlayersArray(room) {
-  // ルーム更新でクライアントが使うため、playerKeyも明示
   return room.players.map((p) => ({
     clientId: p.clientId,
     playerKey: getPlayerKeyFromProfile(p.profile),
@@ -178,7 +175,6 @@ io.on("connection", (socket) => {
       if (idx >= 0) {
         room.players.splice(idx, 1);
 
-        // host leave -> close
         if (room.hostClientId === socket.id) {
           io.to(room.roomId).emit("room:closed");
           rooms.delete(room.roomId);
@@ -192,73 +188,74 @@ io.on("connection", (socket) => {
   });
 
   // ======================
-  // game:event
+  // game event handler
   // ======================
-// 互換のため、旧/新どちらのイベント名でも受ける
-function handleGameEvent(ev) {
-  // ★ここに、元の socket.on("game:event", ...) の中身を「そのまま」移動してください
-  const roomId = String(ev?.roomId || "").trim().toUpperCase();
-  const room = rooms.get(roomId);
-  if (!room) return;
+  function handleGameEvent(ev) {
+    const roomId = String(ev?.roomId || "").trim().toUpperCase();
+    const room = rooms.get(roomId);
+    if (!room) return;
 
-  const game = room.game;
+    const game = room.game;
 
-  // ---- game begin (host only) ----
-  if (ev.type === "game:begin") {
-    if (socket.id !== room.hostClientId) return;
+    // ---- game begin (host only) ----
+    if (ev.type === "game:begin") {
+      if (socket.id !== room.hostClientId) return;
 
-    game.status = "playing";
-    game.questionIds = Array.isArray(ev.questionIds) ? ev.questionIds : [];
-    game.index = 0;
-    game.answersByIndex = {};
-    game.scores = {};
-    game.timeLimitSec = Number(ev.timeLimitSec ?? 20) || 20;
+      game.status = "playing";
+      game.questionIds = Array.isArray(ev.questionIds) ? ev.questionIds : [];
+      game.index = 0;
+      game.answersByIndex = {};
+      game.scores = {};
+      game.timeLimitSec = Number(ev.timeLimitSec ?? 20) || 20;
 
-    for (const p of room.players) {
-      const pk = getPlayerKeyFromProfile(p.profile) || p.clientId;
-      game.scores[pk] = 0;
+      // 初期スコア
+      for (const p of room.players) {
+        const pk = getPlayerKeyFromProfile(p.profile) || p.clientId;
+        game.scores[pk] = 0;
+      }
+
+      io.to(room.roomId).emit("game:event", {
+        type: "game:begin",
+        beginPayload: {
+          roomId: room.roomId,
+          hostClientId: room.hostClientId,
+          players: roomPlayersArray(room),
+          questionIds: game.questionIds,
+        },
+      });
+      return;
     }
 
-    io.to(room.roomId).emit("game:event", {
-      type: "game:begin",
-      beginPayload: {
-        roomId: room.roomId,
-        hostClientId: room.hostClientId,
-        players: roomPlayersArray(room),
-        questionIds: game.questionIds,
-      },
-    });
-    return;
-  }
+    // ---- answer ----
+    if (ev.type === "game:answer") {
+      if (game.status !== "playing") return;
 
-  // ---- answer ----
-  if (ev.type === "game:answer") {
-    if (game.status !== "playing") return;
+      const me = room.players.find((p) => p.clientId === socket.id);
+      const playerKey = getPlayerKeyFromProfile(me?.profile) || socket.id;
 
-    const me = room.players.find((p) => p.clientId === socket.id);
-    const playerKey = getPlayerKeyFromProfile(me?.profile) || socket.id;
+      const qIndex = game.index;
+      if (!game.answersByIndex[qIndex]) game.answersByIndex[qIndex] = {};
+      if (game.answersByIndex[qIndex][playerKey]) return; // 二重回答防止
 
-    const qIndex = game.index;
-    if (!game.answersByIndex[qIndex]) game.answersByIndex[qIndex] = {};
-    if (game.answersByIndex[qIndex][playerKey]) return;
+      const answeredAtMs = Number(ev.clientAnsweredAt ?? ev.answeredAtMs ?? ev.timeMs) || Date.now();
+      const choiceIndex = Number(ev.choiceIndex);
 
-    const answeredAtMs = Number(ev.clientAnsweredAt ?? ev.answeredAtMs ?? ev.timeMs) || Date.now();
-    const choiceIndex = Number(ev.choiceIndex);
+      game.answersByIndex[qIndex][playerKey] = { choiceIndex, answeredAtMs };
 
-    game.answersByIndex[qIndex][playerKey] = { choiceIndex, answeredAtMs };
+      // 回答通知（表示/SE用）
+      io.to(room.roomId).emit("game:event", { type: "game:answer", playerKey, qIndex });
 
-    io.to(room.roomId).emit("game:event", { type: "game:answer", playerKey, qIndex });
+      // 全員回答したら確定
+      const need = room.players.length;
+      const got = Object.keys(game.answersByIndex[qIndex]).length;
+      if (got < need) return;
 
-    const need = room.players.length;
-    const got = Object.keys(game.answersByIndex[qIndex]).length;
-
-    if (got >= need) {
       const qid = game.questionIds[qIndex];
       const correctIdx = getCorrectIndexByQid(qid);
 
       const correctList = [];
       for (const [pk, a] of Object.entries(game.answersByIndex[qIndex])) {
-        if (Number(a.choiceIndex) === -1) continue;
+        if (Number(a.choiceIndex) === -1) continue; // timeout
         if (correctIdx === null) continue;
         if (Number(a.choiceIndex) === Number(correctIdx)) {
           correctList.push({ playerKey: pk, answeredAtMs: Number(a.answeredAtMs) || Date.now() });
@@ -270,6 +267,7 @@ function handleGameEvent(ev) {
         game.scores[pk] = Number(game.scores[pk] ?? 0) + Number(awards.get(pk) ?? 0);
       }
 
+      // 問題終了結果
       io.to(room.roomId).emit("game:event", {
         type: "game:questionEnd",
         qIndex,
@@ -277,6 +275,7 @@ function handleGameEvent(ev) {
         scores: game.scores,
       });
 
+      // 次へ
       game.index++;
       if (game.index >= game.questionIds.length) {
         game.status = "finished";
@@ -284,100 +283,15 @@ function handleGameEvent(ev) {
       } else {
         io.to(room.roomId).emit("game:event", { type: "game:next", index: game.index });
       }
+      return;
     }
-    return;
   }
-}
 
-// ✅ クライアント（battleClient.js）が送っている正しいイベント名
-socket.on("client:gameEvent", handleGameEvent);
+  // ✅ battleClient.js が送るイベント名（正）
+  socket.on("client:gameEvent", handleGameEvent);
 
-// ✅ 念のため旧名でも受ける（将来の混乱防止）
-socket.on("game:event", handleGameEvent);
-
-      return;
-    }
-
-    // ---- answer ----
-    if (ev.type === "game:answer") {
-      if (game.status !== "playing") return;
-
-      // この回答者の playerKey
-      const me = room.players.find((p) => p.clientId === socket.id);
-      const playerKey = getPlayerKeyFromProfile(me?.profile) || socket.id;
-
-      const qIndex = game.index;
-      if (!game.answersByIndex[qIndex]) game.answersByIndex[qIndex] = {};
-
-      // 二重回答防止（playerKey単位）
-      if (game.answersByIndex[qIndex][playerKey]) return;
-
-      const answeredAtMs = Number(ev.clientAnsweredAt ?? ev.answeredAtMs ?? ev.timeMs) || Date.now();
-      const choiceIndex = Number(ev.choiceIndex);
-
-      game.answersByIndex[qIndex][playerKey] = {
-        choiceIndex,
-        answeredAtMs,
-      };
-
-      // 全員に「この人が回答した」通知（クライアントは表示/SE用）
-      io.to(room.roomId).emit("game:event", {
-        type: "game:answer",
-        playerKey,
-        qIndex,
-      });
-
-      // 全員回答したら確定
-      const need = room.players.length;
-      const got = Object.keys(game.answersByIndex[qIndex]).length;
-
-      if (got >= need) {
-        // スコア計算（サーバー正）
-        const qid = game.questionIds[qIndex];
-        const correctIdx = getCorrectIndexByQid(qid);
-
-        const correctList = [];
-        for (const [pk, a] of Object.entries(game.answersByIndex[qIndex])) {
-          if (Number(a.choiceIndex) === -1) continue; // timeout
-          if (correctIdx === null) continue;
-          if (Number(a.choiceIndex) === Number(correctIdx)) {
-            correctList.push({ playerKey: pk, answeredAtMs: Number(a.answeredAtMs) || Date.now() });
-          }
-        }
-
-        const awards = awardPointsBySpeed(correctList);
-        for (const pk of Object.keys(game.scores)) {
-          game.scores[pk] = Number(game.scores[pk] ?? 0) + Number(awards.get(pk) ?? 0);
-        }
-
-        // その問題の結果
-        io.to(room.roomId).emit("game:event", {
-          type: "game:questionEnd",
-          qIndex,
-          answers: game.answersByIndex[qIndex], // { [playerKey]: {choiceIndex, answeredAtMs} }
-          scores: game.scores, // { [playerKey]: totalPt }
-        });
-
-        // 次へ
-        game.index++;
-
-        if (game.index >= game.questionIds.length) {
-          game.status = "finished";
-          io.to(room.roomId).emit("game:event", {
-            type: "game:finished",
-            scores: game.scores,
-          });
-        } else {
-          io.to(room.roomId).emit("game:event", {
-            type: "game:next",
-            index: game.index,
-          });
-        }
-      }
-
-      return;
-    }
-  });
+  // ✅ 念のため旧名も受ける
+  socket.on("game:event", handleGameEvent);
 
   // ---- disconnect ----
   socket.on("disconnect", () => {
