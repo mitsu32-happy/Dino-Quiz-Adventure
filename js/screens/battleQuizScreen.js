@@ -334,7 +334,7 @@ export function renderBattleQuiz({ state, goto }) {
         // begin payload（他人アバター表示など）
         if (ev.type === "game:begin") {
           const bp = ev.beginPayload || {};
-          if (Array.isArray(bp.questionIds) && !Array.isArray(run.questionIds)) {
+          if (Array.isArray(bp.questionIds) && Array.isArray(run.questionIds) && run.questionIds.length === 0) {
             run.questionIds = bp.questionIds;
           }
           if (bp.hostClientId) {
@@ -347,24 +347,45 @@ export function renderBattleQuiz({ state, goto }) {
           return;
         }
 
-        // 他者回答通知（表示＆SE）
+        // ✅ server.js は「game:question」で次の問題開始を通知する
+        if (ev.type === "game:question") {
+          const n = Number(ev.index);
+          if (Number.isFinite(n)) run.index = n;
+
+          // タイマー同期用（無くても動くが、あったほうが正確）
+          const startAt = Number(ev.questionStartAtMs);
+          if (Number.isFinite(startAt)) {
+            sync.startAtMs = startAt;
+            sync.qIndex = n;
+          }
+          return;
+        }
+
+        // ✅ server.js は「game:answer」を { from: socketId, index, choiceIndex } で送る
         if (ev.type === "game:answer") {
-          const i = Number(ev.qIndex);
+          const i = Number(ev.index);
           if (!Number.isFinite(i)) return;
 
-          const pk = ev.playerKey != null ? String(ev.playerKey) : "";
-          const piRaw = online.playerKeyToPi?.[pk];
+          rebuildOnlineMaps(run, online);
+
+          const fromCid = String(ev.from ?? "");
+          const piRaw = online.clientIdToPi?.[fromCid];
           const pi = Number(piRaw);
           if (!Number.isFinite(pi)) return;
 
           const byPi = (sync.answersByIndex[i] = sync.answersByIndex[i] || {});
           if (byPi[pi]?.answered) return;
 
-          // choiceIndex は questionEnd で確定するので、ここは「回答済み表示」だけ
-          byPi[pi] = { answered: true, choiceIndex: null, answeredAtMs: Date.now() };
+          // ここで choiceIndex を入れてしまう（〇×表示に使える）
+          byPi[pi] = {
+            answered: true,
+            choiceIndex: Number(ev.choiceIndex),
+            answeredAtMs: Number(ev.clientAnsweredAt) || Date.now(),
+          };
 
           // 自分以外のSE（連打防止）
-          if (pi !== online.clientIdToPi?.[online.myClientId]) {
+          const myPiNow = Number(online.clientIdToPi?.[online.myClientId]);
+          if (pi !== myPiNow) {
             const k = `${i}:${pi}`;
             if (sync.lastSeenOtherAnswerKey !== k) {
               sync.lastSeenOtherAnswerKey = k;
@@ -374,47 +395,24 @@ export function renderBattleQuiz({ state, goto }) {
           return;
         }
 
-        // 問題終了（回答結果の反映のみ。採点・pt加算はしない）
-        if (ev.type === "game:questionEnd") {
-          const i = Number(ev.qIndex);
+        // ✅ server.js は「game:result_question」でスコア配列を返す
+        if (ev.type === "game:result_question") {
+          const i = Number(ev.index);
           if (!Number.isFinite(i)) return;
-          if (i <= sync.lastQuestionEndIndex) return;
-          sync.lastQuestionEndIndex = i;
 
-          const ansByPk = ev.answers || {};
-          const byPi = (sync.answersByIndex[i] = sync.answersByIndex[i] || {});
-          for (const [pk, a] of Object.entries(ansByPk)) {
-            const piRaw = online.playerKeyToPi?.[String(pk)];
-            const pi = Number(piRaw);
-            if (!Number.isFinite(pi)) continue;
-            byPi[pi] = {
-              answered: true,
-              choiceIndex: Number(a?.choiceIndex),
-              answeredAtMs: Number(a?.answeredAtMs) || Date.now(),
-            };
-          }
+          if (Array.isArray(ev.points)) run.points = ev.points.slice(0, 4);
+          if (Array.isArray(ev.correctCounts)) run.correctCounts = ev.correctCounts.slice(0, 4);
+          if (Array.isArray(ev.correctTimeSum)) run.correctTimeSum = ev.correctTimeSum.slice(0, 4);
 
-// ✅ server.js は scores を { [playerKey]: totalPt } 形式で送る
-applyScoresObjectToRunPoints(ev.scores, run, online);
-// 互換：もし points という名前で来ても同じ扱い
-applyScoresObjectToRunPoints(ev.points, run, online);
-															
+          sync.lastResultIndex = i;
           return;
         }
 
-        // 次問題（サーバ正で進行）
-        if (ev.type === "game:next") {
-          const n = Number(ev.index);
-          if (Number.isFinite(n)) run.index = n;
-          return;
-        }
-
-        // 終了（サーバ正で結果へ）
-        if (ev.type === "game:finished") {
-applyScoresObjectToRunPoints(ev.scores, run, online);
-applyScoresObjectToRunPoints(ev.points, run, online);
-
-run.result = calcFinalStandings(run, activePis);
+        // ✅ server.js は「game:result_final」で最終結果を返す
+        if (ev.type === "game:result_final") {
+          // result.entries は server.js 側で順位付け済みだが、
+          // 画面は run の配列を使う想定なので、ここでは standings 計算でOK
+          run.result = calcFinalStandings(run, activePis);
           return;
         }
       });
@@ -851,7 +849,13 @@ function handleAnswerSelect(choiceIndex) {
         if (isOnline) {
           if (activePis.includes(myPi) && !byPi?.[myPi]?.answered) {
             byPi[myPi] = { answered: true, choiceIndex: -1, answeredAtMs: Date.now() };
-            bc?.emitGameEvent?.({ type: "game:answer", choiceIndex: -1 });
+            bc?.emitGameEvent?.({
+              type: "game:answer",
+              index: idx,
+              choiceIndex: -1,
+              choiceIndexRaw: -1,
+              clientAnsweredAt: Date.now(),
+            });
           }
         }
 
