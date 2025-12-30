@@ -79,11 +79,19 @@ function emitRoomUpdate(io, room) {
   };
   io.to(room.roomId).emit("server:roomUpdate", payload);
   io.to(room.roomId).emit("room:update", payload); // 互換
+
+  console.log("[server] emit room:update", {
+    roomId: room.roomId,
+    playersLen: room.players.length,
+    hostClientId: room.hostClientId,
+  });
 }
 
 function emitGameEvent(io, roomId, payload) {
   io.to(roomId).emit("server:gameEvent", payload);
   io.to(roomId).emit("game:event", payload); // battleQuizScreen.js がこれで受ける
+
+  console.log("[server] emit game:event", { roomId, type: payload?.type, index: payload?.index, reason: payload?.reason });
 }
 
 function createEmptyGame() {
@@ -147,7 +155,17 @@ function scheduleTimeout(io, room, index) {
   game.timerForIndex = index;
 
   const ms = Math.max(1, Number(game.timeLimitSec || 20) * 1000);
+  console.log("[server] scheduleTimeout", { roomId: room.roomId, index, ms });
+
   game.timerHandle = setTimeout(() => {
+    console.log("[server] timeout fired", {
+      roomId: room.roomId,
+      scheduledIndex: index,
+      gameIndex: room.game.index,
+      timerForIndex: room.game.timerForIndex,
+      status: room.game.status,
+    });
+
     // その時点で index が変わっていたら何もしない（別問題に進んでいる）
     if (room.game.status !== "playing") return;
     if (room.game.timerForIndex !== index) return;
@@ -158,6 +176,13 @@ function scheduleTimeout(io, room, index) {
 }
 
 function endQuestionAndAdvance(io, room, reason) {
+  console.log("[server] endQuestionAndAdvance ENTER", {
+    roomId: room.roomId,
+    index: room.game.index,
+    reason,
+    playersLen: room.players.length,
+  });
+
   const game = room.game;
   const qIndex = game.index;
 
@@ -188,7 +213,10 @@ function endQuestionAndAdvance(io, room, reason) {
     for (const [cid, a] of Object.entries(byClient)) {
       if (Number(a.choiceIndex) === -1) continue;
       if (Number(a.choiceIndex) === Number(correctIdx)) {
-        const elapsedMs = Math.max(0, (Number(a.serverReceivedAtMs) || Date.now()) - (game.questionStartAtMs || Date.now()));
+        const elapsedMs = Math.max(
+          0,
+          (Number(a.serverReceivedAtMs) || Date.now()) - (game.questionStartAtMs || Date.now())
+        );
         correctEntries.push({ clientId: cid, elapsedMs });
       }
     }
@@ -208,11 +236,22 @@ function endQuestionAndAdvance(io, room, reason) {
       if (!Number.isFinite(pi)) continue;
       if (Number(a.choiceIndex) === Number(correctIdx)) {
         game.correctCounts[pi] = Number(game.correctCounts[pi] || 0) + 1;
-        const elapsedMs = Math.max(0, (Number(a.serverReceivedAtMs) || Date.now()) - (game.questionStartAtMs || Date.now()));
+        const elapsedMs = Math.max(
+          0,
+          (Number(a.serverReceivedAtMs) || Date.now()) - (game.questionStartAtMs || Date.now())
+        );
         game.correctTimeSum[pi] = Number(game.correctTimeSum[pi] || 0) + elapsedMs;
       }
     }
   }
+
+  console.log("[server] scoring snapshot", {
+    roomId: room.roomId,
+    qIndex,
+    answersCount: Object.keys(byClient).length,
+    points: game.points,
+    correctCounts: game.correctCounts,
+  });
 
   // 問題結果
   emitGameEvent(io, room.roomId, {
@@ -299,6 +338,7 @@ const rooms = new Map(); // roomId -> {roomId, hostClientId, players[], game}
 // socket.io
 // ======================
 io.on("connection", (socket) => {
+  console.log("[server] connect", { socketId: socket.id });
   socket.emit("server:hello", { clientId: socket.id });
 
   socket.on("room:create", ({ profile }, cb) => {
@@ -313,6 +353,8 @@ io.on("connection", (socket) => {
     socket.join(roomId);
     emitRoomUpdate(io, room);
     cb?.({ ok: true, roomId, clientId: socket.id });
+
+    console.log("[server] room:create", { roomId, socketId: socket.id });
   });
 
   socket.on("room:join", ({ roomId, profile }, cb) => {
@@ -325,9 +367,12 @@ io.on("connection", (socket) => {
     socket.join(rid);
     emitRoomUpdate(io, room);
     cb?.({ ok: true, roomId: rid, clientId: socket.id });
+
+    console.log("[server] room:join", { roomId: rid, socketId: socket.id, playersLen: room.players.length });
   });
 
   socket.on("room:leave", () => {
+    console.log("[server] room:leave", { socketId: socket.id });
     for (const room of rooms.values()) {
       const idx = room.players.findIndex((p) => p.clientId === socket.id);
       if (idx >= 0) {
@@ -336,6 +381,7 @@ io.on("connection", (socket) => {
         if (room.hostClientId === socket.id) {
           io.to(room.roomId).emit("room:closed");
           rooms.delete(room.roomId);
+          console.log("[server] host left -> room closed", { roomId: room.roomId });
           return;
         }
 
@@ -353,11 +399,22 @@ io.on("connection", (socket) => {
   }
 
   function handleGameEvent(ev) {
+    console.log("[server] recv game:event", {
+      socketId: socket.id,
+      type: ev?.type,
+      roomId: ev?.roomId,
+      index: ev?.index,
+      choiceIndex: ev?.choiceIndex,
+    });
+
     let room = null;
     const rid = String(ev?.roomId || "").trim().toUpperCase();
     if (rid) room = rooms.get(rid);
     if (!room) room = findRoomBySocket();
-    if (!room) return;
+    if (!room) {
+      console.log("[server] room not found for socket", { socketId: socket.id, rid });
+      return;
+    }
 
     const game = room.game;
 
@@ -406,8 +463,10 @@ io.on("connection", (socket) => {
       const requestedIndex = Number(ev.index);
       const index = Number.isFinite(requestedIndex) ? requestedIndex : game.index;
 
-      // すでに次の問題に進んでいる回答は無視（ただし current 以外は捨てる）
-      if (index !== game.index) return;
+      if (index !== game.index) {
+        console.log("[server] ignored answer due to index mismatch", { index, gameIndex: game.index });
+        return;
+      }
 
       const byClient = ensureAnswersContainer(game, index);
       if (byClient[socket.id]) return; // 二重回答防止
@@ -417,6 +476,14 @@ io.on("connection", (socket) => {
       const serverReceivedAtMs = Date.now();
 
       byClient[socket.id] = { choiceIndex, clientAnsweredAt, serverReceivedAtMs };
+
+      console.log("[server] accepted answer", {
+        roomId: room.roomId,
+        index,
+        need: room.players.length,
+        got: Object.keys(byClient).length,
+        choiceIndex,
+      });
 
       // クライアントが期待する形式：from / index / choiceIndex
       emitGameEvent(io, room.roomId, {
@@ -432,7 +499,6 @@ io.on("connection", (socket) => {
       const need = room.players.length;
       const got = Object.keys(byClient).length;
       if (got >= need) {
-        // タイマー解除 → 進行
         clearGameTimer(game);
         endQuestionAndAdvance(io, room, "all_answered");
       }
@@ -444,6 +510,8 @@ io.on("connection", (socket) => {
   socket.on("game:event", handleGameEvent); // 互換
 
   socket.on("disconnect", () => {
+    console.log("[server] disconnect", { socketId: socket.id });
+
     for (const room of rooms.values()) {
       const idx = room.players.findIndex((p) => p.clientId === socket.id);
       if (idx >= 0) {
@@ -452,6 +520,7 @@ io.on("connection", (socket) => {
         if (room.hostClientId === socket.id) {
           io.to(room.roomId).emit("room:closed");
           rooms.delete(room.roomId);
+          console.log("[server] host disconnected -> room closed", { roomId: room.roomId });
           return;
         }
 
