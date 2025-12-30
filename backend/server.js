@@ -83,7 +83,7 @@ function emitRoomUpdate(io, room) {
 
 function emitGameEvent(io, roomId, payload) {
   io.to(roomId).emit("server:gameEvent", payload);
-  io.to(roomId).emit("game:event", payload); // 互換
+  io.to(roomId).emit("game:event", payload); // battleQuizScreen.js がこれで受ける
 }
 
 function createEmptyGame() {
@@ -96,13 +96,14 @@ function createEmptyGame() {
     // qIndex -> { [clientId]: { choiceIndex, clientAnsweredAt, serverReceivedAtMs } }
     answersByIndex: {},
 
-    // サーバー集計（クライアントが期待する配列形式）
+    // クライアントが期待する配列形式
     points: [0, 0, 0, 0],
     correctCounts: [0, 0, 0, 0],
     correctTimeSum: [0, 0, 0, 0],
 
     questionStartAtMs: 0,
     timerHandle: null,
+    timerForIndex: null, // ← どの問題のタイマーかを固定して保持
   };
 }
 
@@ -111,20 +112,7 @@ function clearGameTimer(game) {
     clearTimeout(game.timerHandle);
     game.timerHandle = null;
   }
-}
-
-// ======================
-// scoring (3/2/1)
-// ======================
-function calcAwardsBySpeed(correctEntries) {
-  // correctEntries: [{ clientId, elapsedMs }]
-  const sorted = [...correctEntries].sort((a, b) => a.elapsedMs - b.elapsedMs);
-  const awards = [3, 2, 1];
-  const awardByClientId = new Map();
-  for (let rank = 0; rank < Math.min(3, sorted.length); rank++) {
-    awardByClientId.set(sorted[rank].clientId, awards[rank]);
-  }
-  return awardByClientId;
+  game.timerForIndex = null;
 }
 
 function ensureAnswersContainer(game, qIndex) {
@@ -141,12 +129,44 @@ function makeClientIdToPi(room) {
   return map;
 }
 
-function endQuestionAndAdvance(io, room) {
+// 速い順 3/2/1pt
+function calcAwardsBySpeed(correctEntries) {
+  const sorted = [...correctEntries].sort((a, b) => a.elapsedMs - b.elapsedMs);
+  const awards = [3, 2, 1];
+  const awardByClientId = new Map();
+  for (let rank = 0; rank < Math.min(3, sorted.length); rank++) {
+    awardByClientId.set(sorted[rank].clientId, awards[rank]);
+  }
+  return awardByClientId;
+}
+
+// ★ タイマーを必ず「特定の index に紐づけて」セットする（ここが重要）
+function scheduleTimeout(io, room, index) {
+  const game = room.game;
+  clearGameTimer(game);
+  game.timerForIndex = index;
+
+  const ms = Math.max(1, Number(game.timeLimitSec || 20) * 1000);
+  game.timerHandle = setTimeout(() => {
+    // その時点で index が変わっていたら何もしない（別問題に進んでいる）
+    if (room.game.status !== "playing") return;
+    if (room.game.timerForIndex !== index) return;
+    if (room.game.index !== index) return;
+
+    endQuestionAndAdvance(io, room, "timeout");
+  }, ms);
+}
+
+function endQuestionAndAdvance(io, room, reason) {
   const game = room.game;
   const qIndex = game.index;
 
-  // 未回答者を timeout(-1) で埋める
+  // 念のため：既に終了しているなら何もしない
+  if (game.status !== "playing") return;
+
   const byClient = ensureAnswersContainer(game, qIndex);
+
+  // 未回答者を timeout(-1) で埋める
   for (const p of room.players) {
     const cid = p.clientId;
     if (!byClient[cid]) {
@@ -160,7 +180,6 @@ function endQuestionAndAdvance(io, room) {
 
   const qid = game.questionIds[qIndex];
   const correctIdx = getCorrectIndexByQid(qid);
-
   const cidToPi = makeClientIdToPi(room);
 
   // 正解者（タイムアウト除外）
@@ -195,10 +214,11 @@ function endQuestionAndAdvance(io, room) {
     }
   }
 
-  // クライアントが期待している「問題結果」イベント
+  // 問題結果
   emitGameEvent(io, room.roomId, {
     type: "game:result_question",
     index: qIndex,
+    reason: reason || "all_answered",
     points: game.points.slice(0, 4),
     correctCounts: game.correctCounts.slice(0, 4),
     correctTimeSum: game.correctTimeSum.slice(0, 4),
@@ -211,10 +231,7 @@ function endQuestionAndAdvance(io, room) {
     game.status = "finished";
     clearGameTimer(game);
 
-    // 最終結果（クライアントは result を受け取る想定）
-    // ここでは points 等からサーバー側で簡易 result を生成して渡す
-    const players = room.players;
-    const entries = players.map((p, pi) => ({
+    const entries = room.players.map((p, pi) => ({
       pi,
       clientId: p.clientId,
       name: p?.profile?.name ?? "Player",
@@ -223,20 +240,16 @@ function endQuestionAndAdvance(io, room) {
       timeSum: Number(game.correctTimeSum[pi] || 0),
     }));
 
-    // 並び: points desc -> correct desc -> timeSum asc
+    // points desc -> correct desc -> timeSum asc
     entries.sort((a, b) => {
       if (b.points !== a.points) return b.points - a.points;
       if (b.correct !== a.correct) return b.correct - a.correct;
       return a.timeSum - b.timeSum;
     });
 
-    const result = {
-      entries,
-    };
-
     emitGameEvent(io, room.roomId, {
       type: "game:result_final",
-      result,
+      result: { entries },
     });
     return;
   }
@@ -249,14 +262,8 @@ function endQuestionAndAdvance(io, room) {
     questionStartAtMs: game.questionStartAtMs,
   });
 
-  // タイムアウトタイマーを張り直し
-  clearGameTimer(game);
-  game.timerHandle = setTimeout(() => {
-    // 既に進んでいたら無視
-    if (room.game.status !== "playing") return;
-    if (room.game.index !== game.index) return;
-    endQuestionAndAdvance(io, room);
-  }, Math.max(1, Number(game.timeLimitSec || 20) * 1000));
+  // タイマー張り直し（必ず index 固定で）
+  scheduleTimeout(io, room, game.index);
 }
 
 // ======================
@@ -386,12 +393,8 @@ io.on("connection", (socket) => {
         questionStartAtMs: game.questionStartAtMs,
       });
 
-      clearGameTimer(game);
-      game.timerHandle = setTimeout(() => {
-        if (room.game.status !== "playing") return;
-        if (room.game.index !== 0) return;
-        endQuestionAndAdvance(io, room);
-      }, Math.max(1, Number(game.timeLimitSec || 20) * 1000));
+      // タイマー（index固定）
+      scheduleTimeout(io, room, 0);
       return;
     }
 
@@ -399,10 +402,11 @@ io.on("connection", (socket) => {
     if (ev.type === "game:answer") {
       if (game.status !== "playing") return;
 
-      const index = Number(ev.index);
-      if (!Number.isFinite(index)) return;
+      // ★ index がズレてても「現在の問題」を優先して受理する（止まり防止）
+      const requestedIndex = Number(ev.index);
+      const index = Number.isFinite(requestedIndex) ? requestedIndex : game.index;
 
-      // 既に次の問題に進んでいたら無視
+      // すでに次の問題に進んでいる回答は無視（ただし current 以外は捨てる）
       if (index !== game.index) return;
 
       const byClient = ensureAnswersContainer(game, index);
@@ -428,15 +432,16 @@ io.on("connection", (socket) => {
       const need = room.players.length;
       const got = Object.keys(byClient).length;
       if (got >= need) {
+        // タイマー解除 → 進行
         clearGameTimer(game);
-        endQuestionAndAdvance(io, room);
+        endQuestionAndAdvance(io, room, "all_answered");
       }
       return;
     }
   }
 
   socket.on("client:gameEvent", handleGameEvent);
-  socket.on("game:event", handleGameEvent);
+  socket.on("game:event", handleGameEvent); // 互換
 
   socket.on("disconnect", () => {
     for (const room of rooms.values()) {
@@ -450,7 +455,6 @@ io.on("connection", (socket) => {
           return;
         }
 
-        // 進行中で欠員が出たら「次の判定」で自然に進む（必要なら後で厳密化）
         emitRoomUpdate(io, room);
         return;
       }
